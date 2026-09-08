@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — read minds, not answers</title>
+<meta name="description" content="Resonance is a candy-colored spectrum-guessing party game — one player gives a single clue for a hidden target on a spectrum, everyone else races to place their pointer as close as possible.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%88%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#150C24;--surface:#221735;--surface-tint:#2C1F4A;
+    --border:#3A2A57;--border-strong:#4B3872;
+    --text:#F5EFFF;--text-muted:#B6A6D9;--text-faint:#8676A8;
+    --pink:#FF6FA8;--purple:#9B84FF;--blue:#6FA8FF;--teal:#2DE0C2;--gold:#FFD666;--coral:#FF6F72;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(800px 500px at 90% -10%, rgba(155,132,255,0.18), transparent 60%),
+      radial-gradient(700px 460px at 0% 100%, rgba(45,224,194,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:800px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;
+  }
+  .back:hover{color:var(--text);}
+
+  .dial{
+    width:100%;height:10px;border-radius:999px;margin-bottom:20px;
+    background:linear-gradient(90deg, var(--purple) 0%, var(--blue) 25%, var(--teal) 50%, var(--gold) 75%, var(--coral) 100%);
+    box-shadow:0 8px 24px -8px rgba(155,132,255,0.4);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px;
+  }
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;}
+  h1{
+    font-family:'Fredoka',sans-serif;font-weight:700;font-size:44px;margin:0 0 10px;letter-spacing:-0.01em;
+    background:linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .tagline{font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;color:var(--gold);margin:0 0 14px;}
+  .lede{font-size:15px;line-height:1.72;color:var(--text-muted);margin:0;max-width:58ch;}
+
+  main{margin-top:30px;}
+  section{margin-bottom:16px;}
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--pink);margin:0 0 12px;font-weight:600;
+  }
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:22px 24px;box-shadow:0 14px 30px -22px rgba(0,0,0,0.6);}
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text);font-weight:700;}
+
+  .steps{display:grid;gap:10px;}
+  .step{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 18px;}
+  .step-num{
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;color:var(--gold);
+    background:rgba(255,214,102,0.12);border-radius:8px;width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .step-title{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;margin:0 0 3px;color:var(--text);}
+  .step-desc{font-size:13.5px;line-height:1.6;color:var(--text-muted);margin:0;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .feature{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 20px;}
+  .feature-icon{font-size:20px;margin-bottom:8px;}
+  .feature h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;margin:0 0 6px;color:var(--text);}
+  .feature p{font-size:13.5px;opacity:0.95;margin:0;}
+
+  .cta-row{
+    margin-top:28px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  .privacy-link{
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13.5px;
+    color:#1D1030;background:linear-gradient(90deg, var(--pink), var(--gold));
+    padding:11px 20px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  }
+  .privacy-link:hover{filter:brightness(1.06);}
+  .cta-row p{font-size:12.5px;color:var(--text-faint);margin:0;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="../index.html">← devIndi</a>
+    <div class="dial" aria-hidden="true"></div>
+    <p class="kicker"><span class="status-dot"></span>Party Game · In Development</p>
+    <h1>Resonance</h1>
+    <p class="tagline">One clue. One dial. The fun is reading minds, not being "right."</p>
+    <p class="lede">Resonance is a spectrum-guessing party game played in person around a physical dial — a spectrum stretched between two opposing concepts, a hidden target somewhere along it, one player giving a single clue, and everyone else racing to place a pointer as close as they can before the reveal. It only ever worked with everyone crowded around one table. Resonance keeps the tension of that single silent clue and drops the table.</p>
+  </header>
+
+  <main>
+    <section>
+      <p class="section-label">How a round works</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div><p class="step-title">The Psychic sees the target</p><p class="step-desc">One player alone sees where the hidden target sits on this round's spectrum.</p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div><p class="step-title">One clue, no more</p><p class="step-desc">The Psychic gives a single word or phrase meant to point everyone toward the target — and nothing else.</p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div><p class="step-title">Everyone places a pointer</p><p class="step-desc">Each player drags their own pointer onto their own phone's spectrum before the clock runs out.</p></div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div><p class="step-title">The dial reveals</p><p class="step-desc">The target and everyone's guesses light up together, closest scores highest, and the Psychic rotates for the next round.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">What's inside</p>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature-icon">🚪</div>
+          <h3>Private rooms or open matchmaking</h3>
+          <p>Pull friends in with a shareable code, or tap Competitive to get seated with other players.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔄</div>
+          <h3>Full Psychic rotation</h3>
+          <p>A complete 10-round match cycles every player through giving the clue, enforced end to end by the app.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🎨</div>
+          <h3>Spectrum packs</h3>
+          <p>Fresh sets of opposing concepts to keep clues surprising, unlockable as you play.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔊</div>
+          <h3>Vibrant by design</h3>
+          <p>Color, motion, sound, and haptics are core to the feel — this is a party game, not a utility.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-row">
+      <p>Data collected while you play, explained plainly.</p>
+      <a class="privacy-link" href="privacy.html">Privacy Policy →</a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

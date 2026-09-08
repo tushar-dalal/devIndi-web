@@ -117,7 +117,7 @@
 
 <div class="wrap">
   <header>
-    <a class="back" href="../index.html">← devIndi</a>
+    <a class="back" href="index.html">← Connect</a>
     <div class="badge">🕯️</div>
     <p class="kicker">Build Kit · Social Deduction</p>
     <h1>Connect</h1>
@@ -126,15 +126,14 @@
 
   <main>
     <div class="ticket">
-      <p>Connect is a real-time social-deduction party game: players are dropped into a match, a secret connection is hidden somewhere in the round, and everyone races to guess it before time runs out. This policy covers what we collect while you play.</p>
+      <p>Connect is a real-time party word game: one player (the Danner) is given a secret word revealed one letter at a time, while everyone else races to guess it through a chain of text hints readable by teammates but not by the Danner. This policy covers what we collect while you play.</p>
     </div>
 
     <div class="ticket">
       <h2><span class="num">01</span> Information we collect</h2>
       <p><strong>Account &amp; profile.</strong> An email or anonymous sign-in, plus whatever display name you set.</p>
-      <p><strong>Match data.</strong> The matches and rounds you join, the round secrets your device receives, your connection attempts, answers, and guesses, and the resulting score events — this is what makes live scoring and the reveal work, and is visible to the other players in your match in real time.</p>
-      <p><strong>Microphone &amp; audio.</strong> If a round uses a voice-based clue, Connect requests microphone access for that moment only; audio is used to power that game mechanic and is not stored as a permanent recording tied to your identity.</p>
-      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs, used only to keep the app working.</p>
+      <p><strong>Match data.</strong> The matches and rounds you join, the secret word revealed to your device when you're the Danner, the hints and guesses submitted in your match, and the resulting score events — this is what makes live scoring and turn order work, and is visible to the other players in your match in real time.</p>
+      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs, used only to keep the app working. The app requests audio-related device permissions to support in-game sound effects and background audio; Connect's hints and guesses are fully text-based and no microphone recording is made or transmitted.</p>
     </div>
 
     <div class="ticket">
@@ -152,7 +151,6 @@
       <p>Connect runs on <strong>Supabase</strong> (hosted Postgres, Auth, and Realtime), with row-level security scoping each player to the matches they're actually part of. Data is encrypted in transit.</p>
       <div class="pill-row">
         <span class="pill">Supabase (Postgres, Auth, Realtime)</span>
-        <span class="pill jade">Microphone — round-specific, optional</span>
       </div>
     </div>
 
@@ -160,7 +158,6 @@
       <h2><span class="num">04</span> Your choices</h2>
       <ul>
         <li>Play as an anonymous guest instead of creating an email account.</li>
-        <li>Deny microphone access — voice-based rounds simply won't be available to you.</li>
         <li>Request an export or deletion of your data at any time — see contact below.</li>
       </ul>
     </div>

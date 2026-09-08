@@ -110,7 +110,7 @@
 
 <div class="wrap">
   <header>
-    <a class="back" href="../index.html">← devIndi</a>
+    <a class="back" href="index.html">← Resonance</a>
     <div class="dial" aria-hidden="true"></div>
     <p class="kicker">Build Kit · Party Game</p>
     <h1>Resonance</h1>
@@ -127,9 +127,8 @@
       <p><strong>Account &amp; profile.</strong> Sign in with Apple, an email address, or as an anonymous guest, plus your chosen display name.</p>
       <p><strong>Match &amp; gameplay data.</strong> The matches you queue for or join, your round and guess records, and resulting score events — needed to run live scoring and reveals, visible to the other players in your match.</p>
       <p><strong>Purchases &amp; entitlements.</strong> If you buy a spectrum pack, we record the purchase and the resulting entitlement so it unlocks on your account. Payment details are handled entirely by Apple/Google.</p>
-      <p><strong>Microphone.</strong> If a round type uses a voice clue, we request microphone access for that moment only.</p>
       <p><strong>Safety data.</strong> If you block another player, we store that so you're never matched with them again. If you send a bug report or contact request, we store its contents to respond to you.</p>
-      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs.</p>
+      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs. The app requests audio-related device permissions to support in-game sound effects (dial ticks, reveal stingers); Resonance's clues are fully text- and touch-based, and no microphone recording is made or transmitted.</p>
     </div>
 
     <div class="card">
@@ -150,7 +149,6 @@
       <div class="pill-row">
         <span class="pill">Supabase (Postgres, Auth, Realtime)</span>
         <span class="pill gold">Apple / Google (Sign-In &amp; purchases)</span>
-        <span class="pill teal">Microphone — round-specific, optional</span>
       </div>
     </div>
 
@@ -159,7 +157,6 @@
       <ul>
         <li>Play as an anonymous guest instead of using Sign in with Apple or email.</li>
         <li>Block any player, at any time, from within a match.</li>
-        <li>Deny microphone access — voice-clue rounds simply won't be offered to you.</li>
         <li>Request an export or deletion of your data at any time — see contact below.</li>
       </ul>
     </div>

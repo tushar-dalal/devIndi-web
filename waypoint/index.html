@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waypoint — do the work, not the app management</title>
+<meta name="description" content="Waypoint is a cross-platform mobile task manager that distinguishes not-started, paused, and no-longer-relevant instead of losing track of everything in one flat list.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f4;--surface:#ffffff;--surface2:#f3f0ea;
+    --text:#211e29;--text-muted:#726c7a;--text-faint:#a29cae;
+    --border:#e8e3ed;--border-soft:#f0ecf3;
+    --accent:#4f3de0;--accent-soft:#eeeafd;
+    --active:#2e6ff2;--active-soft:#e7efff;
+    --suspended:#c9860f;--suspended-soft:#fbf0dc;
+    --completed:#1e9e63;--completed-soft:#e4f7ec;
+    --deleted:#d9483f;--deleted-soft:#fbe7e5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:radial-gradient(720px 420px at 92% -8%, rgba(79,61,224,0.06), transparent 60%), var(--bg);
+    color:var(--text);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:800px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;
+  }
+  .back:hover{color:var(--text);}
+
+  .badge{
+    display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;
+    background:var(--accent-soft);margin-bottom:18px;font-size:26px;
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;font-weight:500;display:flex;align-items:center;gap:8px;
+  }
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:42px;margin:0 0 10px;letter-spacing:-0.01em;}
+  .tagline{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;color:var(--accent);margin:0 0 14px;}
+  .lede{font-size:15px;line-height:1.72;color:var(--text-muted);margin:0;max-width:58ch;}
+
+  main{margin-top:30px;}
+  section{margin-bottom:16px;}
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 12px;font-weight:500;
+  }
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 10px 24px -20px rgba(33,30,41,0.18);}
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text);font-weight:600;}
+
+  .lifecycle-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+  .life-pill{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;padding:6px 14px;border-radius:999px;
+  }
+  .life-pill.active{color:var(--active);background:var(--active-soft);}
+  .life-pill.suspended{color:var(--suspended);background:var(--suspended-soft);}
+  .life-pill.completed{color:var(--completed);background:var(--completed-soft);}
+  .life-pill.deleted{color:var(--deleted);background:var(--deleted-soft);}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .feature{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
+  .feature-icon{font-size:20px;margin-bottom:8px;}
+  .feature h3{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin:0 0 6px;}
+  .feature p{font-size:13.5px;opacity:0.9;margin:0;}
+
+  .cta-row{
+    margin-top:28px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  .privacy-link{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;
+    color:#ffffff;background:var(--accent);
+    padding:11px 20px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  }
+  .privacy-link:hover{filter:brightness(1.08);}
+  .cta-row p{font-size:12.5px;color:var(--text-faint);margin:0;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="../index.html">← devIndi</a>
+    <div class="badge">🧭</div>
+    <p class="kicker"><span class="status-dot"></span>Task Manager · In Development</p>
+    <h1>Waypoint</h1>
+    <p class="tagline">Do the work. Don't manage the app.</p>
+    <p class="lede">Tasks don't usually get forgotten because a to-do list is missing — they get lost once they drift outside your immediate attention, buried in a flat list that can't tell the difference between "not started," "actively paused," and "no longer relevant." Waypoint gives every task an honest lifecycle instead of one undifferentiated pile, backed by a real server so it's durable and portable across devices.</p>
+  </header>
+
+  <main>
+    <section>
+      <p class="section-label">A task's lifecycle</p>
+      <div class="card">
+        <p>Every task moves through explicit states instead of living in one flat, ever-growing list:</p>
+        <div class="lifecycle-row">
+          <span class="life-pill active">Active</span>
+          <span class="life-pill suspended">Suspended</span>
+          <span class="life-pill completed">Completed</span>
+          <span class="life-pill deleted">Deleted</span>
+        </div>
+        <p style="margin-top:14px;">Suspended tasks are paused, not abandoned — they can be revived. Deleted tasks step out of the way without vanishing outright.</p>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">What's inside</p>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature-icon">💬</div>
+          <h3>Timestamped comments</h3>
+          <p>An immutable log on every task, so context never gets overwritten or lost.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🙋</div>
+          <h3>Third-party hold</h3>
+          <p>Note that a task is waiting on someone else with a quick typeahead, without needing them to have an account.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🏷️</div>
+          <h3>Tags &amp; priority</h3>
+          <p>Filter and sort by what actually matters right now, not by creation date.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔁</div>
+          <h3>Regulars</h3>
+          <p>Recurring tasks that reappear on their own schedule, without manual re-creation.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-row">
+      <p>Data collected to keep this running, explained plainly.</p>
+      <a class="privacy-link" href="privacy.html">Privacy Policy →</a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

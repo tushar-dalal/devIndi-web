@@ -1,17 +1,28 @@
 # devIndi
 
-The home for devIndi's build kits — a static home page plus one privacy policy per
-app, each themed to match that app's own design system.
+The home for devIndi's apps — a static home page, one "about this app" page per
+app, and one privacy policy per app — each themed to match that app's own design
+system. Navigation follows one hierarchy: **home → app page → privacy policy**.
 
 ```
 devIndi/
-├── index.html            home page — the build kit grid
-├── chatpata/privacy.html
-├── lantern/privacy.html
-├── connect/privacy.html
-├── resonance/privacy.html
-├── waypoint/privacy.html
-└── CNAME                 custom domain for GitHub Pages (devindi.in)
+├── index.html              home page — the app grid
+├── chatpata/
+│   ├── index.html          about Chatpata
+│   └── privacy.html
+├── lantern/
+│   ├── index.html          about Lantern
+│   └── privacy.html
+├── connect/
+│   ├── index.html          about Connect
+│   └── privacy.html
+├── resonance/
+│   ├── index.html          about Resonance
+│   └── privacy.html
+├── waypoint/
+│   ├── index.html          about Waypoint
+│   └── privacy.html
+└── CNAME                   custom domain for GitHub Pages (devindi.in)
 ```
 
 No build step, no dependencies — plain HTML/CSS, fonts loaded from Google Fonts.
