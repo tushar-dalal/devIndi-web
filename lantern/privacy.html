@@ -61,7 +61,15 @@
     font-family:'Quicksand',sans-serif;font-weight:700;font-size:36px;margin:0 0 10px;letter-spacing:-0.01em;
     color:var(--ink);
   }
-  .updated{font-size:13px;color:var(--ink-soft);margin:0 0 8px;}
+  .updated{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--line);
+  }
+  .tab.active{background:var(--accent);color:#FBFBF8;border-color:transparent;}
+  .tab:not(.active){color:var(--ink-soft);}
+  .tab:not(.active):hover{color:var(--ink);}
 
   main{margin-top:8px;}
 
@@ -111,9 +119,13 @@
   <header>
     <a class="back" href="index.html">← Lantern</a>
     <div class="glow"><span>🏮</span></div>
-    <p class="kicker">Build Kit · Daily Structure</p>
+    <p class="kicker">Daily Structure · Privacy</p>
     <h1>Lantern</h1>
     <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+    <div class="tab-row">
+      <a class="tab" href="terms.html">Terms</a>
+      <a class="tab active" href="privacy.html">Privacy Policy</a>
+    </div>
   </header>
 
   <main>
@@ -174,7 +186,7 @@
 
   <footer>
     <p>Questions about your data? We're happy to help.</p>
-    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
   </footer>
 </div>
 

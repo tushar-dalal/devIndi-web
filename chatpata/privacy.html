@@ -70,7 +70,15 @@
   h1{
     font-family:'Baloo 2',sans-serif;font-weight:800;font-size:38px;margin:0 0 8px;letter-spacing:-0.01em;
   }
-  .updated{font-size:13px;color:var(--ink-soft);margin:0;}
+  .updated{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--line);
+  }
+  .tab.active{background:var(--marigold);color:#3a1c10;border-color:transparent;}
+  .tab:not(.active){color:var(--ink-soft);}
+  .tab:not(.active):hover{color:var(--ink);}
 
   main{margin-top:26px;}
 
@@ -141,9 +149,13 @@
   <header>
     <a class="back" href="index.html">← Chatpata</a>
     <div class="title-box">
-      <p class="kicker">Build Kit · Party Game</p>
+      <p class="kicker">Party Game · Privacy</p>
       <h1>Chatpata</h1>
       <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+      <div class="tab-row">
+        <a class="tab" href="terms.html">Terms</a>
+        <a class="tab active" href="privacy.html">Privacy Policy</a>
+      </div>
     </div>
   </header>
 
@@ -204,7 +216,7 @@
 
   <footer>
     <p>Questions about your data? We're happy to help.</p>
-    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
   </footer>
 </div>
 

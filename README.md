@@ -9,19 +9,24 @@ devIndi/
 ├── index.html              home page — the app grid
 ├── chatpata/
 │   ├── index.html          about Chatpata
-│   └── privacy.html
+│   ├── privacy.html
+│   └── terms.html
 ├── lantern/
 │   ├── index.html          about Lantern
-│   └── privacy.html
+│   ├── privacy.html
+│   └── terms.html
 ├── connect/
 │   ├── index.html          about Connect
-│   └── privacy.html
+│   ├── privacy.html
+│   └── terms.html
 ├── resonance/
 │   ├── index.html          about Resonance
-│   └── privacy.html
+│   ├── privacy.html
+│   └── terms.html
 ├── waypoint/
 │   ├── index.html          about Waypoint
-│   └── privacy.html
+│   ├── privacy.html
+│   └── terms.html
 └── CNAME                   custom domain for GitHub Pages (devindi.in)
 ```
 
@@ -51,6 +56,8 @@ See the step-by-step guide in the project chat, or follow these steps:
 6. Wait for DNS to propagate (minutes to a few hours), then back in
    **Settings → Pages**, tick **Enforce HTTPS** once it becomes available.
 
-Update `privacy@devindi.in` and `hello@devindi.in` in the HTML if you'd rather use
-different addresses — those inboxes need to actually exist (or forward somewhere)
-once the site is live.
+Update `reach@devindi.in` in the HTML if you'd rather use a different address — that
+inbox needs to actually exist (or forward somewhere) once the site is live.
+
+Each app page also links to a `terms.html`, with a small tab toggle at the top of
+both the terms and privacy pages so visitors can flip between them.

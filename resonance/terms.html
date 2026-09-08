@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — Terms &amp; Conditions</title>
+<meta name="description" content="Terms and Conditions for Resonance, the spectrum-guessing party game.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%88%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#150C24;--surface:#221735;--surface-tint:#2C1F4A;
+    --border:#3A2A57;--border-strong:#4B3872;
+    --text:#F5EFFF;--text-muted:#B6A6D9;--text-faint:#8676A8;
+    --pink:#FF6FA8;--purple:#9B84FF;--blue:#6FA8FF;--teal:#2DE0C2;--gold:#FFD666;--coral:#FF6F72;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(800px 500px at 90% -10%, rgba(155,132,255,0.18), transparent 60%),
+      radial-gradient(700px 460px at 0% 100%, rgba(45,224,194,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+
+  .dial{
+    width:100%;height:10px;border-radius:999px;margin-bottom:20px;
+    background:linear-gradient(90deg, var(--purple) 0%, var(--blue) 25%, var(--teal) 50%, var(--gold) 75%, var(--coral) 100%);
+    box-shadow:0 8px 24px -8px rgba(155,132,255,0.4);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px;font-weight:600;
+  }
+  h1{
+    font-family:'Fredoka',sans-serif;font-weight:700;font-size:38px;margin:0 0 10px;letter-spacing:-0.01em;
+    background:linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .updated{font-size:13px;color:var(--text-muted);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--border-strong);
+  }
+  .tab.active{background:linear-gradient(90deg, var(--pink), var(--gold));color:#1D1030;border-color:transparent;}
+  .tab:not(.active){color:var(--text-muted);}
+  .tab:not(.active):hover{color:var(--text);}
+
+  main{margin-top:26px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:24px 26px;margin-bottom:14px;box-shadow:0 14px 30px -22px rgba(0,0,0,0.6);}
+  h2{font-family:'Fredoka',sans-serif;font-weight:600;font-size:19px;margin:0 0 12px;display:flex;align-items:center;gap:10px;color:var(--text);}
+  h2 .num{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gold);font-weight:600;}
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:700;}
+  a.inline{color:var(--teal);font-weight:700;}
+
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--teal);text-decoration:none;font-size:12.5px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="index.html">← Resonance</a>
+    <div class="dial" aria-hidden="true"></div>
+    <p class="kicker">Party Game · Terms</p>
+    <h1>Terms &amp; Conditions</h1>
+    <p class="updated">Last updated September 8, 2026</p>
+    <div class="tab-row">
+      <a class="tab active" href="terms.html">Terms</a>
+      <a class="tab" href="privacy.html">Privacy Policy</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <p>These Terms govern your use of Resonance. By creating an account or joining a match, you agree to them. If you don't agree, please don't use the app.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">01</span> The game</h2>
+      <p>Resonance is a spectrum-guessing party game — a Psychic gives one clue for a hidden target and everyone else races to place a pointer near it. It's provided as-is and may change, be paused, or be discontinued at any time.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> Accounts &amp; eligibility</h2>
+      <ul>
+        <li>You must be at least 13 years old to use Resonance.</li>
+        <li>You're responsible for keeping your sign-in credentials secure, whether you use Sign in with Apple, email, or anonymous guest play.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">03</span> Your content</h2>
+      <p>Clues, guesses, and your display name stay yours. By submitting them, you grant us a license to store, display, and show them to the other players in your match, solely to run the game.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Purchases</h2>
+      <p>Spectrum packs and other in-app purchases are processed entirely by Apple or Google under their own terms. Purchases unlock in-app content only, have no cash value, and aren't transferable between accounts. Refunds are handled by Apple/Google per their standard policies.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Player safety &amp; conduct</h2>
+      <ul>
+        <li>Don't cheat, exploit bugs, or automate gameplay.</li>
+        <li>Don't harass other players — you can block anyone directly from a match, and we may act on bug reports or contact requests flagging abuse.</li>
+        <li>Don't attempt to reverse-engineer, scrape, or disrupt the service.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">06</span> Termination</h2>
+      <p>We may suspend or terminate your access if you violate these Terms. You can stop using Resonance and request account deletion at any time — see <a class="inline" href="privacy.html">Privacy Policy</a> for how.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">07</span> Disclaimers &amp; liability</h2>
+      <p>Resonance is provided "as is," without warranties of any kind. To the extent permitted by law, we aren't liable for indirect, incidental, or consequential damages arising from your use of the app.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">08</span> Changes &amp; governing law</h2>
+      <p>We may update these Terms from time to time; the date above reflects the latest revision. These Terms are governed by the laws of India, without regard to conflict-of-law principles.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about these terms? We're happy to help.</p>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatpata — Terms &amp; Conditions</title>
+<meta name="description" content="Terms and Conditions for Chatpata, the bluffing party game.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B6%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#7C3520;--bg-deep:#4A1F14;--ink:#FBF2E6;--ink-soft:#E7C9AC;--warli:#F0E2CC;--border:#FFFFFF;
+    --glass:rgba(35,17,10,0.40);--glass-raised:rgba(35,17,10,0.55);
+    --marigold:#F0B255;--terracotta:#FF7A54;--gulaal:#EF7C97;--indigo:#93A6E8;--line:rgba(255,255,255,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 500px at 100% -10%, rgba(240,178,85,0.14), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(147,166,232,0.10), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;color:var(--ink);font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;position:relative;
+  }
+  .warli-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.10;}
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;
+  }
+  .back:hover{color:var(--ink);}
+
+  .title-box{
+    position:relative;background:var(--glass-raised);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border:1.6px solid var(--border);border-radius:18px;padding:30px 28px 26px;
+    transform:rotate(-0.3deg);box-shadow:0 20px 40px -24px rgba(0,0,0,0.6);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--marigold);margin:0 0 10px;font-weight:600;
+  }
+  h1{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:38px;margin:0 0 8px;letter-spacing:-0.01em;}
+  .updated{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--line);
+  }
+  .tab.active{background:var(--marigold);color:#3a1c10;border-color:transparent;}
+  .tab:not(.active){color:var(--ink-soft);}
+  .tab:not(.active):hover{color:var(--ink);}
+
+  main{margin-top:26px;}
+  .chalk-box{
+    position:relative;background:var(--glass);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1.4px solid var(--border);border-radius:16px;padding:24px 26px;margin-bottom:16px;
+  }
+  .chalk-box:nth-of-type(3n+1){transform:rotate(-0.25deg);}
+  .chalk-box:nth-of-type(3n+2){transform:rotate(0.3deg);}
+  .chalk-box:nth-of-type(3n){transform:rotate(-0.15deg);}
+
+  h2{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:19px;margin:0 0 12px;display:flex;align-items:center;gap:10px;}
+  h2 .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--marigold);font-weight:600;}
+  p{font-size:14.5px;line-height:1.7;color:var(--warli);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.7;color:var(--warli);margin-bottom:6px;}
+  strong{color:var(--ink);font-weight:700;}
+
+  footer{
+    margin-top:36px;padding-top:22px;border-top:1px dashed var(--line);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--ink-soft);margin:0;}
+  footer a{color:var(--marigold);text-decoration:none;font-size:12.5px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<svg class="warli-bg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <defs>
+    <pattern id="warli" width="140" height="140" patternUnits="userSpaceOnUse">
+      <g stroke="#F0E2CC" stroke-width="2" fill="none" stroke-linecap="round">
+        <circle cx="30" cy="24" r="6"/>
+        <path d="M30 30 L20 46 L40 46 Z"/>
+        <path d="M30 46 L20 66 L28 60 M30 46 L40 66 L32 60"/>
+        <path d="M20 34 L10 44 M40 34 L50 44"/>
+        <circle cx="100" cy="90" r="6"/>
+        <path d="M100 96 L90 112 L110 112 Z"/>
+        <path d="M100 112 L90 132 L98 126 M100 112 L110 132 L102 126"/>
+        <path d="M90 100 L80 110 M110 100 L120 110"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#warli)"/>
+</svg>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="index.html">← Chatpata</a>
+    <div class="title-box">
+      <p class="kicker">Party Game · Terms</p>
+      <h1>Terms &amp; Conditions</h1>
+      <p class="updated">Last updated September 8, 2026</p>
+      <div class="tab-row">
+        <a class="tab active" href="terms.html">Terms</a>
+        <a class="tab" href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="chalk-box">
+      <p>These Terms govern your use of Chatpata. By creating an account or joining a room, you agree to them. If you don't agree, please don't use the app.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">01</span> The game</h2>
+      <p>Chatpata is a real-time multiplayer bluffing trivia game with India-only content. Rooms, prompts, bluffs, and voting are provided as-is and may change, be paused, or be discontinued at any time — we'll try to give notice where reasonably possible.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">02</span> Accounts &amp; eligibility</h2>
+      <ul>
+        <li>You must be at least 13 years old to use Chatpata.</li>
+        <li>You're responsible for keeping your sign-in credentials secure and for activity under your account.</li>
+        <li>Anonymous guest play is available and doesn't require an email address.</li>
+      </ul>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">03</span> Your content</h2>
+      <p>Anything you submit — bluffs, custom questions, your avatar or Busted Card photo — stays yours. By submitting it, you grant us a license to store, display, and show it to other players in your room or match, solely to run the game. Don't submit anything you don't have the right to share, or that's abusive, hateful, sexual, or otherwise inappropriate for a group setting — we can remove content or suspend accounts that violate this.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">04</span> Purchases</h2>
+      <p>Any in-app purchases are processed entirely by Apple or Google under their own terms. Purchases unlock in-app content only, have no cash value, and aren't transferable between accounts. Refunds are handled by Apple/Google per their standard policies.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">05</span> Acceptable use</h2>
+      <ul>
+        <li>Don't cheat, exploit bugs, or automate gameplay.</li>
+        <li>Don't harass other players or use the game to share illegal content.</li>
+        <li>Don't attempt to reverse-engineer, scrape, or disrupt the service.</li>
+      </ul>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">06</span> Termination</h2>
+      <p>We may suspend or terminate your access if you violate these Terms. You can stop using Chatpata and request account deletion at any time — see <a class="inline" href="privacy.html" style="color:var(--marigold);">Privacy Policy</a> for how.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">07</span> Disclaimers &amp; liability</h2>
+      <p>Chatpata is provided "as is," without warranties of any kind. To the extent permitted by law, we aren't liable for indirect, incidental, or consequential damages arising from your use of the app.</p>
+    </div>
+
+    <div class="chalk-box">
+      <h2><span class="num">08</span> Changes &amp; governing law</h2>
+      <p>We may update these Terms from time to time; the date above reflects the latest revision. These Terms are governed by the laws of India, without regard to conflict-of-law principles.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about these terms? We're happy to help.</p>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

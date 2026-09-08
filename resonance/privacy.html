@@ -61,7 +61,15 @@
     background:linear-gradient(90deg, var(--purple), var(--pink));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .updated{font-size:13px;color:var(--text-muted);margin:0;}
+  .updated{font-size:13px;color:var(--text-muted);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--border-strong);
+  }
+  .tab.active{background:linear-gradient(90deg, var(--pink), var(--gold));color:#1D1030;border-color:transparent;}
+  .tab:not(.active){color:var(--text-muted);}
+  .tab:not(.active):hover{color:var(--text);}
 
   main{margin-top:26px;}
 
@@ -112,9 +120,13 @@
   <header>
     <a class="back" href="index.html">← Resonance</a>
     <div class="dial" aria-hidden="true"></div>
-    <p class="kicker">Build Kit · Party Game</p>
+    <p class="kicker">Party Game · Privacy</p>
     <h1>Resonance</h1>
     <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+    <div class="tab-row">
+      <a class="tab" href="terms.html">Terms</a>
+      <a class="tab active" href="privacy.html">Privacy Policy</a>
+    </div>
   </header>
 
   <main>
@@ -174,7 +186,7 @@
 
   <footer>
     <p>Questions about your data? We're happy to help.</p>
-    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
   </footer>
 </div>
 
