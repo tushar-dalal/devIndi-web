@@ -7,6 +7,7 @@ system. Navigation follows one hierarchy: **home → app page → privacy policy
 ```
 devIndi/
 ├── index.html              home page — the app grid
+├── feedback.html           shared feedback form (all apps, one inbox)
 ├── chatpata/
 │   ├── index.html          about Chatpata
 │   ├── privacy.html
@@ -61,3 +62,19 @@ inbox needs to actually exist (or forward somewhere) once the site is live.
 
 Each app page also links to a `terms.html`, with a small tab toggle at the top of
 both the terms and privacy pages so visitors can flip between them.
+
+## Feedback form (`feedback.html`)
+
+One shared feedback page for every app, linked from the home page and from each
+app's own page (with `?app=<Name>` pre-selecting the right option in the dropdown).
+Submissions POST to [FormSubmit](https://formsubmit.co) — a free, no-signup
+form-to-email relay — which emails each submission to `reach@devindi.in`.
+
+**One-time setup required:** the *first* submission FormSubmit ever receives for
+`reach@devindi.in` triggers a confirmation email to that address. Someone with
+access to that inbox needs to click the confirmation link once — after that,
+every future submission is delivered automatically, no further action needed.
+
+To point submissions at a different address, change the URL in the `fetch(...)`
+call inside `feedback.html`'s `<script>` block
+(`https://formsubmit.co/ajax/reach@devindi.in`).
