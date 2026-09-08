@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>devIndi — small, obsessively-designed apps</title>
+<meta name="description" content="devIndi is an independent studio building small, carefully-crafted mobile apps. Browse the build kits and their privacy policies.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Baloo+2:wght@700&family=Quicksand:wght@700&family=Bricolage+Grotesque:wght@800&family=Fredoka:wght@700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0d0f;
+    --bg-soft:#151318;
+    --card:#1a171c;
+    --card-border:rgba(244,243,240,0.08);
+    --ink:#f4f3f0;
+    --ink-soft:rgba(244,243,240,0.62);
+    --ink-faint:rgba(244,243,240,0.38);
+    --gold:#d9a441;
+    --gold-soft:rgba(217,164,65,0.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 620px at 12% -8%, rgba(217,164,65,0.10), transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, rgba(255,255,255,0.04), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  header.site{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 0;
+  }
+  .wordmark{
+    font-family:'Sora',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
+  header.site nav a{
+    font-size:13.5px;color:var(--ink-soft);text-decoration:none;margin-left:22px;
+  }
+  header.site nav a:hover{color:var(--ink);}
+
+  .hero{padding:64px 0 56px;}
+  .hero .eyebrow{
+    font-family:'Inter',sans-serif;font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .hero .eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);display:inline-block;}
+  .hero h1{
+    font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(34px,6vw,58px);
+    line-height:1.05;letter-spacing:-0.02em;margin:0 0 20px;
+    max-width:11ch;
+  }
+  .hero p.lede{
+    font-size:17px;line-height:1.65;color:var(--ink-soft);max-width:520px;margin:0;
+  }
+
+  .palette-row{display:flex;gap:8px;margin-top:32px;}
+  .palette-row span{
+    width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);
+    margin-left:-10px;box-shadow:0 2px 8px rgba(0,0,0,0.4);
+  }
+  .palette-row span:first-child{margin-left:0;}
+
+  section.kits{padding:8px 0 80px;}
+  section.kits h2{
+    font-family:'Sora',sans-serif;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:600;margin:0 0 24px;
+  }
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;
+  }
+
+  .kit-card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    padding:26px 24px 22px;
+    text-decoration:none;
+    color:var(--ink);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .kit-card::before{
+    content:'';position:absolute;inset:0 0 auto 0;height:4px;
+    background:var(--accent);
+  }
+  .kit-card::after{
+    content:'';position:absolute;width:180px;height:180px;border-radius:50%;
+    background:var(--accent);opacity:0.16;filter:blur(40px);
+    top:-70px;right:-60px;pointer-events:none;
+  }
+  .kit-card:hover{
+    transform:translateY(-3px);
+    border-color:var(--accent);
+    box-shadow:0 16px 32px -18px rgba(0,0,0,0.6);
+  }
+
+  .kit-icon{
+    width:42px;height:42px;border-radius:12px;background:var(--accent-soft);
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+    margin-bottom:16px;
+  }
+  .kit-name{
+    font-size:23px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;
+  }
+  .kit-tag{
+    font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);
+    font-weight:600;margin-bottom:12px;font-family:'Inter',sans-serif;
+  }
+  .kit-desc{
+    font-size:14px;line-height:1.6;color:var(--ink-soft);margin:0 0 20px;flex:1;
+  }
+  .kit-link{
+    font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;
+    font-family:'Inter',sans-serif;
+  }
+  .kit-link .arrow{transition:transform .18s ease;}
+  .kit-card:hover .kit-link .arrow{transform:translateX(3px);}
+
+  /* Per-kit identity */
+  .kit-chatpata{--accent:#FF7A54;--accent-soft:rgba(255,122,84,0.16);}
+  .kit-chatpata .kit-name{font-family:'Baloo 2',sans-serif;}
+  .kit-lantern{--accent:#4C7B73;--accent-soft:rgba(76,123,115,0.16);}
+  .kit-lantern .kit-name{font-family:'Quicksand',sans-serif;}
+  .kit-connect{--accent:#e8a33d;--accent-soft:rgba(232,163,61,0.16);}
+  .kit-connect .kit-name{font-family:'Bricolage Grotesque',sans-serif;}
+  .kit-resonance{--accent:#9B84FF;--accent-soft:rgba(155,132,255,0.18);}
+  .kit-resonance .kit-name{font-family:'Fredoka',sans-serif;}
+  .kit-waypoint{--accent:#4f3de0;--accent-soft:rgba(79,61,224,0.16);}
+  .kit-waypoint .kit-name{font-family:'Space Grotesk',sans-serif;}
+
+  footer{
+    border-top:1px solid var(--card-border);
+    padding:28px 0 48px;
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  footer p{margin:0;font-size:13px;color:var(--ink-faint);}
+  footer a{font-size:13px;color:var(--ink-soft);text-decoration:none;}
+  footer a:hover{color:var(--gold);}
+
+  @media (max-width:520px){
+    header.site nav a{margin-left:14px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="site">
+    <div class="wordmark"><span class="dot"></span>devIndi</div>
+    <nav>
+      <a href="#kits">Build Kits</a>
+      <a href="mailto:hello@devindi.in">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Independent app studio</div>
+    <h1>Small apps, made with too much care.</h1>
+    <p class="lede">devIndi is where a handful of tightly-scoped, genuinely-designed mobile apps live — each with its own name, its own palette, its own reason to exist. This page is the front door and the privacy-policy shelf.</p>
+    <div class="palette-row" aria-hidden="true">
+      <span style="background:#FF7A54"></span>
+      <span style="background:#4C7B73"></span>
+      <span style="background:#e8a33d"></span>
+      <span style="background:#9B84FF"></span>
+      <span style="background:#4f3de0"></span>
+    </div>
+  </section>
+
+  <section class="kits" id="kits">
+    <h2>Build Kits</h2>
+    <div class="grid">
+
+      <a class="kit-card kit-chatpata" href="chatpata/privacy.html">
+        <div class="kit-icon">🌶️</div>
+        <div class="kit-tag">Party game</div>
+        <h3 class="kit-name">Chatpata</h3>
+        <p class="kit-desc">A bluffing party game with real desi masala — invent a lie, vote on the truth, and try not to get Busted.</p>
+        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
+      </a>
+
+      <a class="kit-card kit-lantern" href="lantern/privacy.html">
+        <div class="kit-icon">🏮</div>
+        <div class="kit-tag">Daily structure</div>
+        <h3 class="kit-name">Lantern</h3>
+        <p class="kit-desc">A gentle, ADHD-friendly companion for time-blind days — capture what matters, do today's few things.</p>
+        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
+      </a>
+
+      <a class="kit-card kit-connect" href="connect/privacy.html">
+        <div class="kit-icon">🕯️</div>
+        <div class="kit-tag">Social deduction</div>
+        <h3 class="kit-name">Connect</h3>
+        <p class="kit-desc">A tense little party game played by amber light — find the hidden connection before anyone else does.</p>
+        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
+      </a>
+
+      <a class="kit-card kit-resonance" href="resonance/privacy.html">
+        <div class="kit-icon">🌈</div>
+        <div class="kit-tag">Party game</div>
+        <h3 class="kit-name">Resonance</h3>
+        <p class="kit-desc">A candy-colored spectrum-guessing game — the fun is reading minds, not getting the "right" answer.</p>
+        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
+      </a>
+
+      <a class="kit-card kit-waypoint" href="waypoint/privacy.html">
+        <div class="kit-icon">🧭</div>
+        <div class="kit-tag">Task manager</div>
+        <h3 class="kit-name">Waypoint</h3>
+        <p class="kit-desc">A calm, focused task manager for people who'd rather do the work than manage the app.</p>
+        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 devIndi. Built by Tushar Dalal.</p>
+    <a href="mailto:hello@devindi.in">hello@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

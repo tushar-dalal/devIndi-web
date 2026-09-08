@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — Privacy Policy</title>
+<meta name="description" content="Privacy Policy for Resonance, the spectrum-guessing party game.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%88%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#150C24;
+    --surface:#221735;
+    --surface-tint:#2C1F4A;
+    --border:#3A2A57;
+    --border-strong:#4B3872;
+    --text:#F5EFFF;
+    --text-muted:#B6A6D9;
+    --text-faint:#8676A8;
+    --pink:#FF6FA8;
+    --purple:#9B84FF;
+    --blue:#6FA8FF;
+    --teal:#2DE0C2;
+    --gold:#FFD666;
+    --coral:#FF6F72;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(800px 500px at 90% -10%, rgba(155,132,255,0.18), transparent 60%),
+      radial-gradient(700px 460px at 0% 100%, rgba(45,224,194,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+
+  .dial{
+    width:100%;height:10px;border-radius:999px;margin-bottom:20px;
+    background:linear-gradient(90deg, var(--purple) 0%, var(--blue) 25%, var(--teal) 50%, var(--gold) 75%, var(--coral) 100%);
+    box-shadow:0 8px 24px -8px rgba(155,132,255,0.4);
+  }
+
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px;font-weight:600;
+  }
+  h1{
+    font-family:'Fredoka',sans-serif;font-weight:700;font-size:38px;margin:0 0 10px;letter-spacing:-0.01em;
+    background:linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .updated{font-size:13px;color:var(--text-muted);margin:0;}
+
+  main{margin-top:26px;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:24px 26px;
+    margin-bottom:14px;
+    box-shadow:0 14px 30px -22px rgba(0,0,0,0.6);
+  }
+
+  h2{
+    font-family:'Fredoka',sans-serif;font-weight:600;font-size:19px;margin:0 0 12px;
+    display:flex;align-items:center;gap:10px;color:var(--text);
+  }
+  h2 .num{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gold);font-weight:600;
+  }
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:700;}
+
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);
+    background:var(--surface-tint);border:1px solid var(--border-strong);
+    border-radius:999px;padding:5px 12px;
+  }
+  .pill.teal{color:var(--teal);}
+  .pill.coral{color:var(--coral);}
+  .pill.gold{color:var(--gold);}
+
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--teal);text-decoration:none;font-size:12.5px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="../index.html">← devIndi</a>
+    <div class="dial" aria-hidden="true"></div>
+    <p class="kicker">Build Kit · Party Game</p>
+    <h1>Resonance</h1>
+    <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <p>Resonance is a spectrum-guessing party game — a clue-giver describes where something falls on a spectrum, and everyone else has to read their mind, not find the "right" answer. This policy covers what we collect while you play, matchmake, and shop for packs.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">01</span> Information we collect</h2>
+      <p><strong>Account &amp; profile.</strong> Sign in with Apple, an email address, or as an anonymous guest, plus your chosen display name.</p>
+      <p><strong>Match &amp; gameplay data.</strong> The matches you queue for or join, your round and guess records, and resulting score events — needed to run live scoring and reveals, visible to the other players in your match.</p>
+      <p><strong>Purchases &amp; entitlements.</strong> If you buy a spectrum pack, we record the purchase and the resulting entitlement so it unlocks on your account. Payment details are handled entirely by Apple/Google.</p>
+      <p><strong>Microphone.</strong> If a round type uses a voice clue, we request microphone access for that moment only.</p>
+      <p><strong>Safety data.</strong> If you block another player, we store that so you're never matched with them again. If you send a bug report or contact request, we store its contents to respond to you.</p>
+      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> How we use it</h2>
+      <ul>
+        <li>Run matchmaking, live rounds, guesses, and scoreboards.</li>
+        <li>Unlock the packs and entitlements you've purchased.</li>
+        <li>Keep blocked players out of your future matches.</li>
+        <li>Respond to bug reports and support requests.</li>
+        <li>Diagnose crashes and improve reliability.</li>
+      </ul>
+      <p>We don't use your gameplay history for advertising, and we don't sell your data.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">03</span> Where it's stored</h2>
+      <p>Resonance runs on <strong>Supabase</strong> (hosted Postgres, Auth, Realtime), with row-level security scoping each player to their own matches, purchases, and reports. Data is encrypted in transit.</p>
+      <div class="pill-row">
+        <span class="pill">Supabase (Postgres, Auth, Realtime)</span>
+        <span class="pill gold">Apple / Google (Sign-In &amp; purchases)</span>
+        <span class="pill teal">Microphone — round-specific, optional</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Your choices</h2>
+      <ul>
+        <li>Play as an anonymous guest instead of using Sign in with Apple or email.</li>
+        <li>Block any player, at any time, from within a match.</li>
+        <li>Deny microphone access — voice-clue rounds simply won't be offered to you.</li>
+        <li>Request an export or deletion of your data at any time — see contact below.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Children's privacy</h2>
+      <p>Resonance is not directed at children under 13, and we don't knowingly collect data from them.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">06</span> Changes to this policy</h2>
+      <p>If this policy changes meaningfully, we'll update the date above and, where required, notify you in-app.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about your data? We're happy to help.</p>
+    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

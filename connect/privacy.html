@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect — Privacy Policy</title>
+<meta name="description" content="Privacy Policy for Connect, the social-deduction party game.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17130f;
+    --board:#1c1610;
+    --surface:#241c15;
+    --surface-raised:#2e2419;
+    --border:#3c2f22;
+    --border-soft:#2a2118;
+    --text:#f4ecdf;
+    --text-muted:#a8987f;
+    --text-faint:#6f6151;
+    --amber:#e8a33d;
+    --amber-strong:#ffc266;
+    --amber-dim:#6b4f24;
+    --crimson:#c8433a;
+    --jade:#5fae82;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(720px 420px at 88% -8%, rgba(232,163,61,0.14), transparent 60%),
+      radial-gradient(600px 400px at 0% 100%, rgba(95,174,130,0.06), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+
+  .badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:14px;
+    background:linear-gradient(180deg, var(--surface-raised), var(--surface));
+    border:1px solid var(--border);margin-bottom:18px;font-size:24px;
+    box-shadow:0 10px 26px -14px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,194,102,0.06);
+  }
+
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--amber);margin:0 0 10px;font-weight:500;
+  }
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  .updated{font-size:13px;color:var(--text-muted);margin:0;}
+
+  main{margin-top:26px;}
+
+  .ticket{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px 26px;
+    margin-bottom:14px;
+  }
+  .ticket::before, .ticket::after{
+    content:'';position:absolute;width:16px;height:16px;border-radius:50%;
+    background:var(--bg);top:50%;transform:translateY(-50%);
+    box-shadow:0 0 0 1px var(--border);
+  }
+  .ticket::before{left:-9px;}
+  .ticket::after{right:-9px;}
+
+  h2{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;margin:0 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2 .num{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--amber);font-weight:600;
+  }
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:600;}
+
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);
+    background:var(--surface-raised);border:1px solid var(--border-soft);
+    border-radius:999px;padding:5px 12px;
+  }
+  .pill.jade{color:var(--jade);border-color:rgba(95,174,130,0.3);}
+  .pill.crimson{color:var(--crimson);border-color:rgba(200,67,58,0.3);}
+
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border-soft);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--amber);text-decoration:none;font-size:12.5px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="../index.html">← devIndi</a>
+    <div class="badge">🕯️</div>
+    <p class="kicker">Build Kit · Social Deduction</p>
+    <h1>Connect</h1>
+    <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+  </header>
+
+  <main>
+    <div class="ticket">
+      <p>Connect is a real-time social-deduction party game: players are dropped into a match, a secret connection is hidden somewhere in the round, and everyone races to guess it before time runs out. This policy covers what we collect while you play.</p>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">01</span> Information we collect</h2>
+      <p><strong>Account &amp; profile.</strong> An email or anonymous sign-in, plus whatever display name you set.</p>
+      <p><strong>Match data.</strong> The matches and rounds you join, the round secrets your device receives, your connection attempts, answers, and guesses, and the resulting score events — this is what makes live scoring and the reveal work, and is visible to the other players in your match in real time.</p>
+      <p><strong>Microphone &amp; audio.</strong> If a round uses a voice-based clue, Connect requests microphone access for that moment only; audio is used to power that game mechanic and is not stored as a permanent recording tied to your identity.</p>
+      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs, used only to keep the app working.</p>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">02</span> How we use it</h2>
+      <ul>
+        <li>Run live matches — lobbies, rounds, secrets, guesses, and scoreboards.</li>
+        <li>Show your name and guesses to the other players in your current match.</li>
+        <li>Diagnose crashes and improve matchmaking reliability.</li>
+      </ul>
+      <p>We don't use your match history for advertising, and we don't sell your data.</p>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">03</span> Where it's stored</h2>
+      <p>Connect runs on <strong>Supabase</strong> (hosted Postgres, Auth, and Realtime), with row-level security scoping each player to the matches they're actually part of. Data is encrypted in transit.</p>
+      <div class="pill-row">
+        <span class="pill">Supabase (Postgres, Auth, Realtime)</span>
+        <span class="pill jade">Microphone — round-specific, optional</span>
+      </div>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">04</span> Your choices</h2>
+      <ul>
+        <li>Play as an anonymous guest instead of creating an email account.</li>
+        <li>Deny microphone access — voice-based rounds simply won't be available to you.</li>
+        <li>Request an export or deletion of your data at any time — see contact below.</li>
+      </ul>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">05</span> Children's privacy</h2>
+      <p>Connect is not directed at children under 13, and we don't knowingly collect data from them.</p>
+    </div>
+
+    <div class="ticket">
+      <h2><span class="num">06</span> Changes to this policy</h2>
+      <p>If this policy changes meaningfully, we'll update the date above and, where required, notify you in-app.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about your data? We're happy to help.</p>
+    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

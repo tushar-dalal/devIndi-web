@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waypoint — Privacy Policy</title>
+<meta name="description" content="Privacy Policy for Waypoint, the focused task manager.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f4;
+    --surface:#ffffff;
+    --surface2:#f3f0ea;
+    --text:#211e29;
+    --text-muted:#726c7a;
+    --text-faint:#a29cae;
+    --border:#e8e3ed;
+    --border-soft:#f0ecf3;
+    --accent:#4f3de0;
+    --accent-soft:#eeeafd;
+    --active:#2e6ff2;
+    --active-soft:#e7efff;
+    --suspended:#c9860f;
+    --suspended-soft:#fbf0dc;
+    --completed:#1e9e63;
+    --completed-soft:#e4f7ec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(720px 420px at 92% -8%, rgba(79,61,224,0.06), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Work Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+
+  .badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:14px;background:var(--accent-soft);
+    margin-bottom:18px;font-size:24px;
+  }
+
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;font-weight:500;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:36px;margin:0 0 10px;letter-spacing:-0.01em;
+  }
+  .updated{font-size:13px;color:var(--text-muted);margin:0;}
+
+  main{margin-top:26px;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:24px 26px;
+    margin-bottom:14px;
+    box-shadow:0 10px 24px -20px rgba(33,30,41,0.18);
+  }
+
+  h2{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17.5px;margin:0 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2 .num{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent);font-weight:500;
+  }
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:600;}
+
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:999px;padding:5px 12px;
+  }
+  .pill.active{color:var(--active);background:var(--active-soft);border-color:transparent;}
+  .pill.suspended{color:var(--suspended);background:var(--suspended-soft);border-color:transparent;}
+  .pill.completed{color:var(--completed);background:var(--completed-soft);border-color:transparent;}
+
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--accent);text-decoration:none;font-size:12.5px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="../index.html">← devIndi</a>
+    <div class="badge">🧭</div>
+    <p class="kicker">Build Kit · Task Manager</p>
+    <h1>Waypoint</h1>
+    <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <p>Waypoint is a cross-platform task manager built around one idea: do the work, don't manage the app. This policy explains what we collect to make that possible.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">01</span> Information we collect</h2>
+      <p><strong>Account.</strong> Waypoint uses username + password authentication rather than email — we store your username and a securely hashed password, nothing else identifying.</p>
+      <p><strong>Tasks &amp; comments.</strong> The tasks you create, their tags, priority, and lifecycle state (Active, Suspended, Completed, Deleted), plus any timestamped comments you add.</p>
+      <p><strong>Third-party holds.</strong> If you note that a task is "held" by someone else, that's stored as free text you type — it does not create an account or notify that person.</p>
+      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs (via Sentry) used only to catch and fix bugs.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> How we use it</h2>
+      <ul>
+        <li>Store and sync your tasks, tags, comments, and lifecycle state across devices.</li>
+        <li>Authenticate you on sign-in.</li>
+        <li>Diagnose crashes and fix bugs via Sentry error reports.</li>
+      </ul>
+      <p>Your tasks are private to your account — we don't read them for advertising, and we don't sell your data.</p>
+      <div class="pill-row">
+        <span class="pill active">Active</span>
+        <span class="pill suspended">Suspended</span>
+        <span class="pill completed">Completed</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">03</span> Where it's stored</h2>
+      <p>Waypoint runs on <strong>Supabase</strong> (hosted Postgres + Auth), with row-level security so only you can read or write your own tasks and comments. Data is encrypted in transit.</p>
+      <div class="pill-row">
+        <span class="pill">Supabase (Postgres, Auth)</span>
+        <span class="pill">Sentry (crash reporting)</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Your choices</h2>
+      <ul>
+        <li>Delete a task at any time — deleted tasks move to a Deleted state before permanent removal.</li>
+        <li>Request an export or full deletion of your account and data at any time — see contact below.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Children's privacy</h2>
+      <p>Waypoint is not directed at children under 13, and we don't knowingly collect data from them.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">06</span> Changes to this policy</h2>
+      <p>If this policy changes meaningfully, we'll update the date above and, where required, notify you in-app.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about your data? We're happy to help.</p>
+    <a href="mailto:privacy@devindi.in">privacy@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>
