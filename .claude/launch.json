@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "devindi-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8743", "--directory", "D:/Tushars/Stuff/devIndi"],
+      "port": 8743
+    }
+  ]
+}
