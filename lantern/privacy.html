@@ -130,62 +130,64 @@
 
   <main>
     <div class="card tint">
-      <p>Lantern is a gentle daily-structure companion built for ADHD and time-blind minds: capture what's on your mind, cap what "today" actually holds, and get a light nudge when it's time to move. This page explains what we collect and why.</p>
+      <p>Lantern works fully on your device, with no account required. This page explains exactly what the small amount of optional data we do handle is, why, and how to delete it.</p>
     </div>
 
     <div class="card">
       <h2><span class="num">01</span> Information we collect</h2>
-      <p><strong>Account.</strong> An email address (or anonymous sign-in) to keep your data yours across devices.</p>
-      <p><strong>Your tasks &amp; Regulars.</strong> What you capture — tasks, notes, scheduled Priority-1 items, and recurring "Regulars" — is stored so Lantern can build Today's list and remember what carries forward.</p>
-      <p><strong>Voice capture.</strong> If you use voice-to-text to add a task, your speech is sent to a speech-recognition service to be transcribed into text; we store the resulting text, not an audio recording.</p>
-      <p><strong>Morning check-ins.</strong> Your energy check-in responses, used only to shape that day's capacity.</p>
-      <p><strong>Notifications.</strong> A device push token, so nudges can reach you — you can turn these off in your device settings at any time.</p>
-      <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs, used only to keep the app working.</p>
+      <p><strong>Name &amp; email — only if you link a Google account.</strong> Lantern works anonymously by default; if you choose "Save my data" to make your tasks recoverable across devices, your Google name and email are stored for that purpose.</p>
+      <p><strong>Your tasks &amp; Regulars.</strong> What you capture — task titles, notes, scheduled items, and recurring "Regulars" — is stored (locally always, and in our backend whenever it's reachable) so Lantern can build Today's list and remember what carries forward across devices.</p>
+      <p>Nothing above is ever sold, shared with advertisers, or shared with any third party.</p>
     </div>
 
     <div class="card">
-      <h2><span class="num">02</span> How we use it</h2>
-      <ul>
-        <li>Build and persist your daily task list, Today's cap, and Regulars across sessions and devices.</li>
-        <li>Transcribe voice capture into a task, then discard the audio.</li>
-        <li>Send you the nudges and reminders you've enabled.</li>
-        <li>Diagnose crashes and improve reliability.</li>
-      </ul>
-      <p>Your tasks are personal — we don't read them for advertising, and we don't sell your data. Anything you mark for AI breakdown is only sent for that specific request, never used to build a profile of you.</p>
+      <h2><span class="num">02</span> What we don't collect</h2>
+      <p>No advertising or analytics SDKs are built into Lantern at all. We don't collect your location, financial or payment info, photos, contacts, health data, browsing history, device or advertising identifiers, or crash/diagnostic logs. Reminders are scheduled entirely on your device — no push token is collected or sent to us.</p>
     </div>
 
     <div class="card">
-      <h2><span class="num">03</span> Where it's stored</h2>
-      <p>Lantern runs on <strong>Supabase</strong> (hosted Postgres + Auth), with row-level security so only you can read or write your own tasks and Regulars. Data is encrypted in transit.</p>
+      <h2><span class="num">03</span> Voice capture</h2>
+      <p>Voice-to-text uses your device's own built-in speech recognition (Android/Google or iOS/Apple), which may briefly send audio to that platform's own servers to produce the transcription — governed by Google's or Apple's privacy policy, not ours. Lantern itself never receives or stores the audio, only the resulting text. Typing instead of speaking is always available.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Morning energy check-in</h2>
+      <p>Your daily energy check-in (high / low / "I'll see how it goes") stays entirely on your device — it's used only to shape how much "Suggest my day" fills up that day, and is never sent to us.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Break this down (AI)</h2>
+      <p>This feature splits a task into smaller steps. In the current release it always runs as a local, template-based feature — no task text leaves your device for it today. If a future update sends task text to an AI provider to generate real steps instead, this page — and Lantern's Play Store Data Safety declaration — will be updated first, and it will remain something you can decline.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">06</span> Where it's stored &amp; security</h2>
+      <p>Lantern's source of truth is local storage on your device. When our backend is reachable, the same data is mirrored to <strong>Supabase</strong> (hosted Postgres + Auth), scoped by row-level security so only your own account can ever read or write your rows. All traffic — to our backend and to Google during sign-in — is encrypted in transit (HTTPS/TLS).</p>
       <div class="pill-row">
         <span class="pill">Supabase (Postgres, Auth)</span>
-        <span class="pill">Speech-to-text provider (voice capture only)</span>
-        <span class="pill">Push notification service</span>
+        <span class="pill">Google Sign-In (optional)</span>
       </div>
     </div>
 
-    <div class="card">
-      <h2><span class="num">04</span> Your choices</h2>
-      <ul>
-        <li>Type instead of speaking — voice capture is entirely optional.</li>
-        <li>Turn off nudges and notifications in your device settings.</li>
-        <li>Request an export or deletion of your data at any time — see contact below.</li>
-      </ul>
+    <div class="card" id="delete">
+      <h2><span class="num">07</span> Deleting your data</h2>
+      <p><strong>Delete your content, right now, in-app.</strong> Open Lantern → Profile → Data &amp; privacy → <strong>Reset all data</strong>. This immediately erases every task, Regular, and setting, on-device and in the cloud backup — no waiting period.</p>
+      <p><strong>Delete your account entirely</strong> (the Google-linked identity itself, if you set one up) — since this can't yet be done from inside the app, email <a href="mailto:reach@devindi.in">reach@devindi.in</a> from the address you signed in with, and we'll confirm deletion within a few days.</p>
     </div>
 
     <div class="card">
-      <h2><span class="num">05</span> Children's privacy</h2>
-      <p>Lantern is not directed at children under 13, and we don't knowingly collect data from them.</p>
+      <h2><span class="num">08</span> Children's privacy</h2>
+      <p>Lantern is a general-audience productivity tool, not directed at children under 13, and we don't knowingly collect data from them.</p>
     </div>
 
     <div class="card">
-      <h2><span class="num">06</span> Changes to this policy</h2>
-      <p>If this policy changes meaningfully, we'll update the date above and, where required, notify you in-app.</p>
+      <h2><span class="num">09</span> Changes to this policy</h2>
+      <p>If what Lantern collects changes, this page changes first — the date above always reflects the latest revision. Meaningful changes (like the AI note above) will also be reflected in the app's Play Store listing.</p>
     </div>
   </main>
 
   <footer>
-    <p>Questions about your data? We're happy to help.</p>
+    <p>Questions, deletion requests, or anything else — we're happy to help.</p>
     <a href="mailto:reach@devindi.in">reach@devindi.in</a>
   </footer>
 </div>
