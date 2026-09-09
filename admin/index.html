@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — devIndi</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0d0f;
+    --card:#1a171c;
+    --card-border:rgba(244,243,240,0.08);
+    --ink:#f4f3f0;
+    --ink-soft:rgba(244,243,240,0.62);
+    --ink-faint:rgba(244,243,240,0.38);
+    --gold:#d9a441;
+    --gold-soft:rgba(217,164,65,0.14);
+    --err:#e2695f;
+    --err-soft:rgba(226,105,95,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(1100px 620px at 12% -8%, rgba(217,164,65,0.10), transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, rgba(255,255,255,0.04), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:24px;
+  }
+  a{color:inherit;}
+
+  .wordmark{
+    font-family:'Sora',sans-serif;font-weight:800;font-size:17px;letter-spacing:-0.01em;
+    display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:28px;
+  }
+  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
+
+  .card{
+    width:100%; max-width:360px;
+    background:var(--card); border:1px solid var(--card-border); border-radius:18px;
+    padding:32px 28px 28px;
+    box-shadow:0 24px 48px -24px rgba(0,0,0,0.55);
+  }
+  h1{
+    font-family:'Sora',sans-serif; font-weight:700; font-size:21px; letter-spacing:-0.01em;
+    margin:0 0 6px; text-align:center;
+  }
+  .sub{
+    font-size:13px; color:var(--ink-faint); text-align:center; margin:0 0 26px;
+  }
+
+  label{
+    display:block; font-size:12px; font-weight:600; letter-spacing:0.02em;
+    color:var(--ink-soft); margin:0 0 6px;
+  }
+  .field{margin-bottom:16px;}
+  input{
+    width:100%; padding:11px 13px; border-radius:10px;
+    border:1px solid var(--card-border); background:rgba(255,255,255,0.03);
+    color:var(--ink); font-size:14.5px; font-family:'Inter',sans-serif;
+    outline:none; transition:border-color .15s ease, background .15s ease;
+  }
+  input::placeholder{color:var(--ink-faint);}
+  input:focus{border-color:var(--gold); background:rgba(255,255,255,0.05);}
+
+  button{
+    width:100%; margin-top:6px; padding:12px 14px; border:none; border-radius:10px;
+    background:var(--gold); color:#1a1408; font-family:'Sora',sans-serif; font-weight:700;
+    font-size:14px; cursor:pointer; transition:filter .15s ease, transform .1s ease;
+  }
+  button:hover{filter:brightness(1.08);}
+  button:active{transform:translateY(1px);}
+  button:disabled{opacity:0.6; cursor:default;}
+
+  .error{
+    display:none; margin-top:14px; padding:9px 12px; border-radius:8px;
+    background:var(--err-soft); border:1px solid rgba(226,105,95,0.3);
+    color:var(--err); font-size:12.5px; text-align:center;
+  }
+  .error.show{display:block;}
+
+  .back{
+    display:block; text-align:center; margin-top:22px; font-size:12.5px;
+    color:var(--ink-faint); text-decoration:none;
+  }
+  .back:hover{color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+  <div style="width:100%;max-width:360px;">
+    <div class="wordmark"><span class="dot"></span>devIndi</div>
+    <div class="card">
+      <h1>Admin sign in</h1>
+      <p class="sub">Internal tools — devIndi team only.</p>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@devindi.in" required autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" id="submitBtn">Sign in</button>
+        <div class="error" id="errorMsg">Incorrect email or password.</div>
+      </form>
+    </div>
+    <a class="back" href="../index.html">← Back to devindi.in</a>
+  </div>
+
+<script>
+  // NOTE for future-Tushar: this is a static site with no server, so this
+  // "login" is a UI speed bump, not real access control — the credential
+  // check happens entirely in the visitor's browser. It keeps casual
+  // visitors out of the admin list, but anyone who reads this file's
+  // source (or the public GitHub repo) can see exactly how it works.
+  // Don't put anything here you wouldn't want a determined stranger to see.
+  const EXPECTED_HASH = 'af6eb2dea0d9f18b3873d5e5270a7288a638fe54681cc2e86b75dc3fd47ba61c';
+
+  async function sha256Hex(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  const form = document.getElementById('loginForm');
+  const errorMsg = document.getElementById('errorMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.remove('show');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Checking…';
+
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const hash = await sha256Hex(email + ':' + password);
+
+    if (hash === EXPECTED_HASH) {
+      sessionStorage.setItem('devindi_admin_ok', '1');
+      window.location.href = 'dashboard.html';
+    } else {
+      errorMsg.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign in';
+    }
+  });
+</script>
+
+</body>
+</html>

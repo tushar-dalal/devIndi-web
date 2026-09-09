@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ship Pipeline — devIndi</title>
+<meta name="description" content="How an Expo/EAS build becomes a live Google Play release, and how it cycles back through testing.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --paper:#F7F8FB;
+    --paper-2:#EEF0F7;
+    --card:#FFFFFF;
+    --ink:#171F39;
+    --ink-soft:#4E5875;
+    --ink-faint:#8790AC;
+    --line:#DBE0EE;
+    --line-strong:#B9C1DA;
+    --accent:#4650C7;      /* indigo — your build (Expo/EAS) */
+    --accent-2:#1C7A8C;    /* teal — Google Cloud identity bridge */
+    --accent-3:#A8690C;    /* amber — Play Console / release surface */
+    --good:#227A4C;        /* green — production / success */
+    --shadow: 0 1px 2px rgba(23,31,57,.06), 0 8px 24px -18px rgba(23,31,57,.25);
+    --font-display:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1220;
+      --paper-2:#151A2C;
+      --card:#131829;
+      --ink:#E7EAF6;
+      --ink-soft:#AAB2CC;
+      --ink-faint:#6B7492;
+      --line:#262E4A;
+      --line-strong:#37416A;
+      --accent:#8B93F5;
+      --accent-2:#5FC7D6;
+      --accent-3:#E0A94A;
+      --good:#5FCB8C;
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -18px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1220;
+    --paper-2:#151A2C;
+    --card:#131829;
+    --ink:#E7EAF6;
+    --ink-soft:#AAB2CC;
+    --ink-faint:#6B7492;
+    --line:#262E4A;
+    --line-strong:#37416A;
+    --accent:#8B93F5;
+    --accent-2:#5FC7D6;
+    --accent-3:#E0A94A;
+    --good:#5FCB8C;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -18px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{background:var(--paper); color:var(--ink); font-family:var(--font-display); margin:0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 24px 80px;}
+
+  .titleblock{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line-strong); border-radius:6px; overflow:hidden;
+    font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
+    background:var(--card); box-shadow:var(--shadow); margin-bottom:36px;
+  }
+  .titleblock div{ padding:10px 14px; border-left:1px solid var(--line);}
+  .titleblock div:first-child{border-left:none;}
+  .titleblock b{display:block; color:var(--ink-faint); font-size:9px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; font-weight:500;}
+  .titleblock span{color:var(--ink);}
+
+  h1{font-size:clamp(32px,4.6vw,46px); line-height:1.05; letter-spacing:-.01em; margin:0 0 10px; text-wrap:balance; font-weight:700;}
+  .lede{font-size:16.5px; line-height:1.55; color:var(--ink-soft); max-width:66ch; margin:0 0 44px;}
+  .lede b{color:var(--ink); font-weight:600;}
+
+  figure{margin:0 0 18px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 18px 12px; box-shadow:var(--shadow);}
+  figure svg{display:block; width:100%; height:auto;}
+  figcaption{font-size:12.5px; color:var(--ink-faint); padding:12px 6px 4px; border-top:1px solid var(--line); margin-top:10px;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:18px; font-size:12.5px; color:var(--ink-soft); margin:0 0 56px; padding:0 4px;}
+  .legend .item{display:flex; align-items:center; gap:7px;}
+  .legend .sw{width:13px; height:13px; border-radius:3px; flex:none;}
+  .legend .ln{width:20px; height:0; border-top:2px solid var(--ink-faint); flex:none;}
+  .legend .ln.dash{border-top-style:dashed;}
+
+  h2{font-size:22px; font-weight:700; letter-spacing:-.005em; margin:0 0 6px;}
+  .section-sub{font-size:13.5px; color:var(--ink-faint); margin:0 0 22px; max-width:70ch;}
+  section{margin-bottom:58px;}
+
+  .stagegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;}
+  .stage{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 20px 22px; box-shadow:var(--shadow);}
+  .stage-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .badge{width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:12px; color:#fff; flex:none;}
+  .stage h3{font-size:15.5px; font-weight:600; margin:0;}
+  .stage .cmd{display:block; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); background:var(--paper-2); border-radius:6px; padding:6px 9px; margin:0 0 12px; overflow-x:auto; white-space:pre;}
+  .stage p{font-size:13.6px; line-height:1.6; color:var(--ink-soft); margin:0 0 10px;}
+  .stage p:last-child{margin-bottom:0;}
+  .stage p b{color:var(--ink); font-weight:600;}
+  .lane-a .badge{background:var(--accent);}
+  .lane-b .badge{background:var(--accent-3);}
+  .lane-c .badge{background:var(--accent-2);}
+  .stage{border-top:3px solid var(--line-strong);}
+  .lane-a{border-top-color:var(--accent);}
+  .lane-b{border-top-color:var(--accent-3);}
+  .lane-c{border-top-color:var(--accent-2);}
+
+  .capgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
+  .cap{background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:15px 17px;}
+  .cap h4{font-size:13.5px; font-weight:600; margin:0 0 6px; display:flex; align-items:center; gap:7px;}
+  .cap h4 .dot{width:7px; height:7px; border-radius:50%; background:var(--accent-2); flex:none;}
+  .cap p{font-size:13px; line-height:1.55; color:var(--ink-soft); margin:0;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.3px; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  table caption{caption-side:top; text-align:left; padding:0 0 10px; font-size:12.5px; color:var(--ink-faint);}
+  th,td{text-align:left; padding:11px 16px; border-top:1px solid var(--line); vertical-align:top;}
+  thead th{border-top:none; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; background:var(--paper-2);}
+  tbody tr:hover{background:var(--paper-2);}
+  td.term{font-family:var(--font-mono); font-weight:600; color:var(--ink); white-space:nowrap;}
+  .tablewrap{overflow-x:auto;}
+
+  footer{font-size:12.5px; color:var(--ink-faint); border-top:1px solid var(--line); padding-top:20px; line-height:1.6; max-width:74ch;}
+  footer b{color:var(--ink-soft);}
+
+  @media (max-width:640px){
+    .titleblock{grid-template-columns:repeat(2,1fr);}
+    .titleblock div:nth-child(3){border-left:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="titleblock">
+    <div><b>Subject</b><span>Expo → Google Play release pipeline</span></div>
+    <div><b>Apps on this pipeline</b><span>Waypoint · Connect · Resonance · Chatpata</span></div>
+    <div><b>Stack</b><span>React Native + Expo (EAS) + Supabase + Play Console</span></div>
+    <div><b>Rev</b><span>2026-09-09</span></div>
+  </div>
+
+  <h1>Ship Pipeline</h1>
+  <p class="lede">How one <b>eas build</b> becomes a live Google Play release, and how it cycles back through testing. Two setups happen independently — your Expo project, and a Google Cloud service account — and they only meet at <b>eas submit</b>. That meeting point is the part most people can describe vaguely and few can actually explain.</p>
+
+  <section>
+    <figure>
+      <svg viewBox="0 0 1160 800" role="img" aria-label="Diagram: an Expo project builds through EAS Build into a signed .aab, while a Google Cloud project independently creates a service account key; EAS Submit combines both and calls the Google Play Developer API's Edits resource; Google Play Console places the release on a testing track that cascades from Internal to Closed (12 testers, 14 days) to a production-access review that unlocks Open and Production together; production feedback loops back to the Expo project, and EAS Update offers a parallel OTA path that bypasses Play Console entirely for JS-only fixes.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- lane backgrounds -->
+        <rect x="20" y="0" width="360" height="800" rx="14" fill="var(--accent)" opacity="0.055"/>
+        <rect x="400" y="0" width="360" height="800" rx="14" fill="var(--accent-3)" opacity="0.05"/>
+        <rect x="780" y="0" width="360" height="800" rx="14" fill="var(--accent-2)" opacity="0.055"/>
+
+        <text x="200" y="20" text-anchor="middle" font-family="var(--font-mono)" font-size="10" letter-spacing="0.06em" fill="var(--accent)">YOUR BUILD — EXPO / EAS</text>
+        <text x="960" y="20" text-anchor="middle" font-family="var(--font-mono)" font-size="10" letter-spacing="0.06em" fill="var(--accent-2)">GOOGLE CLOUD — IDENTITY BRIDGE</text>
+        <text x="580" y="296" text-anchor="middle" font-family="var(--font-mono)" font-size="10" letter-spacing="0.06em" fill="var(--accent-3)">GOOGLE PLAY — RELEASE SURFACE</text>
+
+        <!-- N1 Expo project -->
+        <g>
+          <rect x="40" y="40" width="320" height="100" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="66" cy="40" r="13" fill="var(--accent)"/>
+          <text x="66" y="44" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">1</text>
+          <text x="90" y="70" font-size="14" font-weight="600" fill="var(--ink)">Expo project</text>
+          <text x="58" y="97" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">React Native + TS</text>
+          <text x="58" y="112" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">app.json · eas.json</text>
+        </g>
+
+        <!-- N3 Google Cloud project -->
+        <g>
+          <rect x="800" y="40" width="320" height="100" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="826" cy="40" r="13" fill="var(--accent-2)"/>
+          <text x="826" y="44" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">3</text>
+          <text x="850" y="70" font-size="14" font-weight="600" fill="var(--ink)">Google Cloud project</text>
+          <text x="818" y="97" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">enable Play Android</text>
+          <text x="818" y="112" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">Developer API (IAM &amp; Admin)</text>
+        </g>
+
+        <!-- N2 EAS Build -->
+        <g>
+          <rect x="40" y="190" width="320" height="100" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="66" cy="190" r="13" fill="var(--accent)"/>
+          <text x="66" y="194" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">2</text>
+          <text x="90" y="220" font-size="14" font-weight="600" fill="var(--ink)">EAS Build (cloud)</text>
+          <text x="58" y="247" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">prebuild → gradle → sign</text>
+          <text x="58" y="262" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">→ signed .aab + versionCode</text>
+        </g>
+
+        <!-- N4 Service account + key -->
+        <g>
+          <rect x="800" y="190" width="320" height="100" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="826" cy="190" r="13" fill="var(--accent-2)"/>
+          <text x="826" y="194" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">4</text>
+          <text x="850" y="220" font-size="14" font-weight="600" fill="var(--ink)">Service account + key</text>
+          <text x="818" y="247" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">machine identity (not a</text>
+          <text x="818" y="262" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">Google user) · JSON key file</text>
+        </g>
+
+        <!-- OTA branch -->
+        <g>
+          <rect x="40" y="340" width="320" height="90" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <circle cx="66" cy="340" r="13" fill="var(--ink-faint)"/>
+          <text x="66" y="344" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">A</text>
+          <text x="90" y="368" font-size="13.5" font-weight="600" fill="var(--ink)">EAS Update (OTA)</text>
+          <text x="58" y="393" font-family="var(--font-mono)" font-size="10" fill="var(--ink-faint)">push a JS bundle to a</text>
+          <text x="58" y="407" font-family="var(--font-mono)" font-size="10" fill="var(--ink-faint)">channel — bypasses review</text>
+        </g>
+
+        <!-- N5 EAS Submit -->
+        <g>
+          <rect x="420" y="340" width="320" height="90" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="446" cy="340" r="13" fill="var(--accent-3)"/>
+          <text x="446" y="344" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">5</text>
+          <text x="470" y="368" font-size="14" font-weight="600" fill="var(--ink)">EAS Submit</text>
+          <text x="438" y="393" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">calls the Play Developer</text>
+          <text x="438" y="407" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">API's Edits resource</text>
+        </g>
+
+        <!-- Installed binaries (terminal of OTA) -->
+        <g>
+          <rect x="40" y="470" width="320" height="90" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="58" y="500" font-size="13.5" font-weight="600" fill="var(--ink)">Installed app binaries</text>
+          <text x="58" y="524" font-family="var(--font-mono)" font-size="10" fill="var(--ink-faint)">poll channel on launch,</text>
+          <text x="58" y="538" font-family="var(--font-mono)" font-size="10" fill="var(--ink-faint)">JS-only — still report to Sentry</text>
+        </g>
+
+        <!-- N6 Google Play Console -->
+        <g>
+          <rect x="420" y="470" width="320" height="90" rx="10" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <circle cx="446" cy="470" r="13" fill="var(--accent-3)"/>
+          <text x="446" y="474" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="#fff">6</text>
+          <text x="470" y="498" font-size="14" font-weight="600" fill="var(--ink)">Google Play Console</text>
+          <text x="438" y="523" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">release lands on a chosen</text>
+          <text x="438" y="537" font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-faint)">testing track</text>
+        </g>
+
+        <!-- Cascade boxes -->
+        <g>
+          <rect x="50" y="610" width="250" height="90" rx="9" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <text x="175" y="642" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Internal</text>
+          <text x="175" y="665" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">no review</text>
+          <text x="175" y="679" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">up to 100 testers</text>
+        </g>
+        <g>
+          <rect x="320" y="610" width="250" height="90" rx="9" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <text x="445" y="642" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Closed</text>
+          <text x="445" y="665" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">12 testers ·14 continuous days</text>
+          <text x="445" y="679" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">(new personal accounts)</text>
+        </g>
+        <g>
+          <rect x="590" y="610" width="250" height="90" rx="9" fill="var(--card)" stroke="var(--line-strong)" stroke-width="1.5"/>
+          <text x="715" y="642" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Open</text>
+          <text x="715" y="665" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">public opt-in listing</text>
+          <text x="715" y="679" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">unlocks with Production</text>
+        </g>
+        <g>
+          <rect x="860" y="610" width="250" height="90" rx="9" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
+          <text x="985" y="642" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Production</text>
+          <text x="985" y="665" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">staged rollout 5%→100%</text>
+          <text x="985" y="679" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">auto-halt on crash spike</text>
+        </g>
+
+        <!-- gate marker between Closed and Open -->
+        <circle cx="580" cy="655" r="15" fill="var(--paper)" stroke="var(--accent-3)" stroke-width="1.5"/>
+        <text x="580" y="659" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--accent-3)">~7d</text>
+        <text x="580" y="600" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-3)">production-access review</text>
+
+        <!-- connectors -->
+        <g stroke="var(--accent)" fill="none" stroke-width="2" color="var(--accent)">
+          <line x1="200" y1="140" x2="200" y2="190" marker-end="url(#arrow)"/>
+          <path d="M300,290 L300,312 L536,312 L536,340" marker-end="url(#arrow)"/>
+          <line x1="200" y1="290" x2="200" y2="340" marker-end="url(#arrow)" stroke-dasharray="5 4"/>
+        </g>
+        <g stroke="var(--accent-2)" fill="none" stroke-width="2" color="var(--accent-2)">
+          <line x1="960" y1="140" x2="960" y2="190" marker-end="url(#arrow)"/>
+          <path d="M860,290 L860,324 L624,324 L624,340" marker-end="url(#arrow)"/>
+        </g>
+        <g stroke="var(--ink-faint)" fill="none" stroke-width="1.75" stroke-dasharray="5 4" color="var(--ink-faint)">
+          <line x1="200" y1="430" x2="200" y2="470" marker-end="url(#arrow)"/>
+        </g>
+        <g stroke="var(--accent-3)" fill="none" stroke-width="2" color="var(--accent-3)">
+          <line x1="580" y1="430" x2="580" y2="470" marker-end="url(#arrow)"/>
+          <path d="M580,560 L580,586 L175,586 L175,610" marker-end="url(#arrow)"/>
+          <line x1="300" y1="655" x2="320" y2="655" marker-end="url(#arrow)"/>
+          <line x1="570" y1="655" x2="590" y2="655" marker-end="url(#arrow)"/>
+        </g>
+        <g stroke="var(--good)" fill="none" stroke-width="2" color="var(--good)">
+          <line x1="840" y1="655" x2="860" y2="655" marker-end="url(#arrow)"/>
+        </g>
+        <!-- feedback loop -->
+        <g stroke="var(--ink-faint)" fill="none" stroke-width="1.75" stroke-dasharray="6 5" color="var(--ink-faint)">
+          <path d="M985,700 L985,762 L15,762 L15,90 L40,90" marker-end="url(#arrow)"/>
+        </g>
+
+        <!-- edge labels with background chips -->
+        <g font-family="var(--font-mono)" font-size="10">
+          <g><rect x="204" y="158" width="176" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="210" y="170" fill="var(--accent)">eas build --platform android</text></g>
+          <g><rect x="612" y="90" width="182" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="618" y="102" fill="var(--accent-2)">create service account + key</text></g>
+          <g><rect x="304" y="296" width="150" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="310" y="308" fill="var(--accent)">.aab + versionCode ready</text></g>
+          <g><rect x="628" y="315" width="204" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="634" y="327" fill="var(--accent-2)">key + Play Console permission</text></g>
+          <g><rect x="204" y="308" width="188" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="210" y="320" fill="var(--ink-faint)">eas update --channel prod</text></g>
+          <g><rect x="204" y="443" width="150" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="210" y="455" fill="var(--ink-faint)">no Play Console step</text></g>
+          <g><rect x="588" y="443" width="220" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="594" y="455" fill="var(--accent-3)">Edits API: insert→upload→commit</text></g>
+          <g><rect x="204" y="575" width="220" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="210" y="587" fill="var(--accent-3)">release created; pick a track</text></g>
+          <g><rect x="356" y="753" width="450" height="16" rx="3" fill="var(--paper)" opacity="0.9"/><text x="362" y="765" fill="var(--ink-faint)">Android vitals + Sentry + tester feedback → next build</text></g>
+        </g>
+
+      </svg>
+      <figcaption>Solid arrows carry an artifact or credential forward; dashed arrows are the feedback loop and the OTA bypass. Numbers on nodes match the write-ups below.</figcaption>
+    </figure>
+
+    <div class="legend">
+      <div class="item"><span class="sw" style="background:var(--accent)"></span> Your build — local Expo project + EAS Build</div>
+      <div class="item"><span class="sw" style="background:var(--accent-2)"></span> Google Cloud — the identity bridge (service account)</div>
+      <div class="item"><span class="sw" style="background:var(--accent-3)"></span> Google Play — the release surface</div>
+      <div class="item"><span class="ln"></span> artifact / credential flow</div>
+      <div class="item"><span class="ln dash"></span> feedback loop or OTA bypass</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Stage by stage</h2>
+    <p class="section-sub">Each card separates what's mechanically happening (engineering) from why it matters to the roadmap (product) — the two things an interviewer is usually really asking for at once.</p>
+    <div class="stagegrid">
+
+      <div class="stage lane-a">
+        <div class="stage-head"><div class="badge">1</div><h3>Expo project</h3></div>
+        <span class="cmd">app.json · eas.json · src/</span>
+        <p><b>Engineering:</b> the React Native + TypeScript codebase. <span style="font-family:var(--font-mono)">app.json</span>/<span style="font-family:var(--font-mono)">app.config.ts</span> defines the app's identity — package name, <span style="font-family:var(--font-mono)">versionName</span>, icon, splash, permissions, and any config plugins that will later inject native code without you hand-editing an <span style="font-family:var(--font-mono)">/android</span> folder. <span style="font-family:var(--font-mono)">eas.json</span> defines build profiles (development / preview / production), each with its own env vars and distribution type. Supabase keys live as EAS environment variables, not hardcoded strings.</p>
+        <p><b>Product:</b> this is where "what the app is called and what it can access" originates — every permission declared here becomes a policy question Play Console will ask about later.</p>
+      </div>
+
+      <div class="stage lane-a">
+        <div class="stage-head"><div class="badge">2</div><h3>EAS Build (cloud)</h3></div>
+        <span class="cmd">eas build --platform android</span>
+        <p><b>Engineering:</b> Expo's build servers pull your project, resolve the chosen profile from <span style="font-family:var(--font-mono)">eas.json</span>, and run <span style="font-family:var(--font-mono)">expo prebuild</span> — generating a real native Gradle project from your config plugins (this is the step "managed workflow" hides from you day to day). It installs dependencies, bundles your JS with Metro/Hermes into bytecode, compiles the native Kotlin/Java shell around it, and signs the result — with a keystore EAS generates and holds for you, or one you upload yourself. Output is an <b>Android App Bundle (.aab)</b>, the format Play has required since 2021; EAS also assigns or increments the build's <span style="font-family:var(--font-mono)">versionCode</span>.</p>
+        <p><b>Product:</b> this is the build you'd watch in the EAS dashboard — logs, pass/fail, a QR code to install the artifact straight onto a test device before it ever touches Google.</p>
+      </div>
+
+      <div class="stage lane-c">
+        <div class="stage-head"><div class="badge">3</div><h3>Google Cloud project</h3></div>
+        <span class="cmd">console.cloud.google.com</span>
+        <p><b>Engineering:</b> a Google Cloud project is not the Play Console app — it's the IAM container that makes automation possible at all. You enable the <b>Google Play Android Developer API</b> inside it, then go to IAM &amp; Admin → Service Accounts and create one: a non-human, machine identity, exactly the same mechanism any Google API (Firebase, Sheets, Cloud Storage) uses for programmatic access.</p>
+        <p><b>Product:</b> this step is invisible to the roadmap but non-optional — there is no path from CI to a Play Store release that skips Google Cloud, because Play's publishing API has no other authentication story.</p>
+      </div>
+
+      <div class="stage lane-c">
+        <div class="stage-head"><div class="badge">4</div><h3>Service account + key</h3></div>
+        <span class="cmd">Manage keys → Create new key (JSON)</span>
+        <p><b>Engineering:</b> from the service account, you generate a long-lived JSON key and download it once. Separately, in <b>Play Console → Setup → API access</b>, the same Cloud project gets linked to your developer account, which makes the service account inviteable under <b>Users &amp; permissions</b>. There you grant it exactly what it needs — typically "view app information," "edit and delete draft apps," and "release to testing tracks / production" — scoped per app if you want least privilege.</p>
+        <p><b>Product:</b> this is a real access-control decision, the same category as giving a contractor Drive access. A service account over-scoped with production-release rights when it only needs internal-testing rights is a governance gap worth asking about, especially once more than one app shares it.</p>
+      </div>
+
+      <div class="stage lane-b">
+        <div class="stage-head"><div class="badge">5</div><h3>EAS Submit</h3></div>
+        <span class="cmd">eas submit --platform android</span>
+        <p><b>Engineering:</b> EAS Submit loads the service-account JSON key from EAS's own credential store, authenticates as that account, and calls the <b>Play Developer API's Edits resource</b>: <span style="font-family:var(--font-mono)">edits.insert</span> opens a change, <span style="font-family:var(--font-mono)">edits.bundles.upload</span> attaches the .aab, <span style="font-family:var(--font-mono)">edits.tracks.update</span> assigns it to a track, <span style="font-family:var(--font-mono)">edits.commit</span> publishes it. It is literally the scripted version of a human clicking "Create release" in the Play Console UI.</p>
+        <p><b>Product:</b> this is the automation that turns "download the .aab, log in, upload it by hand" into a CI step — the difference between a release being a chore and being a command.</p>
+      </div>
+
+      <div class="stage lane-b">
+        <div class="stage-head"><div class="badge">6</div><h3>Google Play Console</h3></div>
+        <span class="cmd">play.google.com/console</span>
+        <p><b>Engineering:</b> the release lands as a draft on whichever track you targeted. Play re-derives optimized, device-specific APKs from your single .aab at install time (this is what "Play App Signing" actually does), rather than shipping one universal APK to every device.</p>
+        <p><b>Product:</b> the console is also where the non-code side of a release lives — store listing copy, screenshots, the Data safety form declaring what the app collects, and content ratings. A code-perfect build still can't ship if these are stale.</p>
+      </div>
+
+      <div class="stage lane-b">
+        <div class="stage-head"><div class="badge">7</div><h3>Testing tracks → Production</h3></div>
+        <span class="cmd">Internal → Closed → Open / Production</span>
+        <p><b>Engineering:</b> Internal testing is instant, no review, up to 100 testers by email list. Closed testing is where a new personal developer account must clear <b>12 testers opted in for 14 continuous days</b> — the count resets if a tester drops out and rejoins. Clearing that gate lets you apply for <b>production access</b>; Google reviews within about a week, and that single review is what unlocks <i>both</i> Open testing and Production together, not Open first.</p>
+        <p><b>Product:</b> Production releases aren't all-or-nothing — a <b>staged rollout</b> ships to a percentage of new installs (say 5% → 20% → 50% → 100%) and can be halted if Android vitals show a crash-rate spike, which is the real safety net behind "ship confidently."</p>
+      </div>
+
+      <div class="stage lane-a">
+        <div class="stage-head"><div class="badge">A</div><h3>EAS Update (OTA)</h3></div>
+        <span class="cmd">eas update --channel production</span>
+        <p><b>Engineering:</b> pushes a new JS bundle to a <b>channel</b> (mapped to a build profile); already-installed binaries poll that channel on launch and swap the bundle in. It only works for JS-only changes — UI, logic, copy, most bug fixes. Anything touching native code — a new native module, a new permission, an SDK bump — still needs a full build-and-submit cycle.</p>
+        <p><b>Product:</b> this is the hotfix lever that skips the days-long Play review entirely, which is exactly why store policy limits what can ship this way — an OTA update can't change what the app fundamentally does.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>What else Play Console and Google Cloud are doing</h2>
+    <p class="section-sub">Beyond hosting the .aab — the parts that come up when someone asks "what's it actually capable of."</p>
+    <div class="capgrid">
+      <div class="cap"><h4><span class="dot"></span>Play App Signing</h4><p>Google holds the final signing key; your local keystore only signs the <i>upload</i>. That's what lets Google re-generate optimized per-device APKs from one .aab, and recover your signing identity if you ever lose your upload key.</p></div>
+      <div class="cap"><h4><span class="dot"></span>Android vitals</h4><p>Google's own aggregated crash rate, ANR (App Not Responding) rate, and battery/wakelock stats across every real install — a second, independent telemetry source alongside Sentry, and the trigger for an automatic staged-rollout halt.</p></div>
+      <div class="cap"><h4><span class="dot"></span>Pre-launch report</h4><p>Google auto-installs your build on a farm of physical devices and crawls it, flagging crashes and accessibility issues before a human tester ever sees the build.</p></div>
+      <div class="cap"><h4><span class="dot"></span>Play Integrity API</h4><p>Lets a backend verify a request genuinely came from your unmodified app, installed via Play, on a genuine device — the anti-cheat layer relevant to the real-time multiplayer games sharing this pipeline.</p></div>
+      <div class="cap"><h4><span class="dot"></span>Store listing experiments</h4><p>A/B tests icon, screenshots, and description copy against install conversion rate, run entirely inside the console.</p></div>
+      <div class="cap"><h4><span class="dot"></span>The Play Developer API is bigger than Submit</h4><p>EAS Submit only calls the Edits resource. The same API surface can pull reviews, financial/earnings reports, and validate in-app purchases server-side — worth knowing the door is already open.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Interview-ready glossary</h2>
+    <p class="section-sub">The pairs people conflate under pressure.</p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr><th>Term</th><th>What it actually means</th></tr></thead>
+      <tbody>
+        <tr><td class="term">AAB vs APK</td><td>.aab is the upload format — a bundle Google slices into per-device APKs at install time. You almost never hand-distribute an .aab; a plain .apk is still used for sideloading and CI test installs.</td></tr>
+        <tr><td class="term">versionCode vs versionName</td><td><span style="font-family:var(--font-mono)">versionCode</span> is an internal integer that must strictly increase every submitted build (EAS can auto-increment it remotely); <span style="font-family:var(--font-mono)">versionName</span> is the human string users see, e.g. "1.4.2."</td></tr>
+        <tr><td class="term">Upload key vs app signing key</td><td>The upload key (yours, in EAS credentials) proves a build came from you; the app signing key (Google's, under Play App Signing) is what actually ships to devices. Losing the upload key is recoverable; it was never the key that mattered to end users.</td></tr>
+        <tr><td class="term">prebuild / managed workflow</td><td>The "managed" Expo workflow means you never see the native <span style="font-family:var(--font-mono)">/android</span> folder — <span style="font-family:var(--font-mono)">expo prebuild</span> regenerates it from <span style="font-family:var(--font-mono)">app.json</span> + config plugins on every cloud build.</td></tr>
+        <tr><td class="term">Build vs Submit vs Update</td><td>Three separate EAS commands: <b>Build</b> compiles a native binary, <b>Submit</b> uploads it to a store, <b>Update</b> pushes a JS-only patch to already-installed binaries without either.</td></tr>
+        <tr><td class="term">Service account vs OAuth user</td><td>A service account is a machine identity with its own long-lived key — no login screen, no human session, built for CI. An OAuth user identity is you, clicking "Allow."</td></tr>
+        <tr><td class="term">Track vs release</td><td>A track (Internal/Closed/Open/Production, or a custom track) is a distribution channel; a release is one version sitting on one or more tracks at a given rollout percentage.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <footer>
+    <b>One Cloud project, many apps.</b> The Google Cloud project and its service account are set up once per Play Console developer account, not once per app — the same key can be invited into Waypoint, Connect, Resonance, and Chatpata's Play Console listings individually, with permissions scoped per app. Each app still gets its own EAS project, its own <span style="font-family:var(--font-mono)">eas.json</span>, and its own testing-track clock.
+    <br><br>
+    This page is intentionally unlisted — it isn't linked from devindi.in's navigation or sitemap.
+  </footer>
+
+</div>
+</body>
+</html>
