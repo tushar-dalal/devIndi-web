@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — Delete Your Account</title>
+<meta name="description" content="Request deletion of your Resonance account and data.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%88%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#150C24;--surface:#221735;--surface-tint:#2C1F4A;
+    --border:#3A2A57;--border-strong:#4B3872;
+    --text:#F5EFFF;--text-muted:#B6A6D9;--text-faint:#8676A8;
+    --pink:#FF6FA8;--purple:#9B84FF;--blue:#6FA8FF;--teal:#2DE0C2;--gold:#FFD666;--coral:#FF6F72;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(800px 500px at 90% -10%, rgba(155,132,255,0.18), transparent 60%),
+      radial-gradient(700px 460px at 0% 100%, rgba(45,224,194,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+
+  .dial{
+    width:100%;height:10px;border-radius:999px;margin-bottom:20px;
+    background:linear-gradient(90deg, var(--coral) 0%, var(--pink) 35%, var(--purple) 70%, var(--blue) 100%);
+    box-shadow:0 8px 24px -8px rgba(255,111,114,0.35);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--coral);margin:0 0 10px;font-weight:600;
+  }
+  h1{
+    font-family:'Fredoka',sans-serif;font-weight:700;font-size:38px;margin:0 0 10px;letter-spacing:-0.01em;
+    background:linear-gradient(90deg, var(--coral), var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 4px;max-width:56ch;}
+  .tab-row{display:flex;gap:8px;margin-top:16px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--border-strong);color:var(--text-muted);
+  }
+  .tab:hover{color:var(--text);}
+
+  main{margin-top:26px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:24px 26px;margin-bottom:14px;box-shadow:0 14px 30px -22px rgba(0,0,0,0.6);}
+  h2{font-family:'Fredoka',sans-serif;font-weight:600;font-size:19px;margin:0 0 12px;display:flex;align-items:center;gap:10px;color:var(--text);}
+  h2 .num{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gold);font-weight:600;}
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:700;}
+
+  label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-faint);margin:0 0 8px;font-weight:600;}
+  .field{margin-bottom:18px;}
+  .field:last-of-type{margin-bottom:0;}
+  input[type=text], input[type=email], textarea{
+    width:100%;background:var(--surface-tint);border:1px solid var(--border-strong);border-radius:12px;
+    padding:12px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14.5px;
+  }
+  input::placeholder, textarea::placeholder{color:var(--text-faint);}
+  input:focus, textarea:focus{outline:none;border-color:var(--purple);}
+  textarea{resize:vertical;min-height:96px;}
+  .hint{font-size:12px;color:var(--text-faint);margin-top:6px;}
+
+  button{
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13.5px;
+    color:#1D1030;background:linear-gradient(90deg, var(--coral), var(--pink));
+    border:none;padding:13px 24px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  }
+  button:hover{filter:brightness(1.06);}
+  button:disabled{opacity:0.6;cursor:default;filter:none;}
+
+  .status{margin-top:16px;font-size:13.5px;font-family:'IBM Plex Mono',monospace;padding:12px 14px;border-radius:12px;display:none;}
+  .status.ok{display:block;background:rgba(45,224,194,0.12);color:var(--teal);border:1px solid rgba(45,224,194,0.3);}
+  .status.err{display:block;background:rgba(255,111,114,0.12);color:var(--coral);border:1px solid rgba(255,111,114,0.3);}
+
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--teal);text-decoration:none;font-size:12.5px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="index.html">← Resonance</a>
+    <div class="dial" aria-hidden="true"></div>
+    <p class="kicker">Party Game · Delete Account</p>
+    <h1>Delete Your Account</h1>
+    <p class="lede">Request full deletion of your Resonance account and the data tied to it. You don't need to sign in to ask — just tell us who you are below.</p>
+    <div class="tab-row">
+      <a class="tab" href="privacy.html">Privacy Policy</a>
+      <a class="tab" href="terms.html">Terms</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2><span class="num">01</span> What gets deleted</h2>
+      <ul>
+        <li>Your account, username, and profile.</li>
+        <li>Match history, guesses, and score records tied to your account.</li>
+        <li>Purchase and entitlement records (the packs you own).</li>
+        <li>Any blocks you've placed on other players.</li>
+      </ul>
+      <p>Deletion is permanent and can't be undone. We process requests by hand, so it can take a few business days — we'll confirm at the reply email below, if you give us one.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> Request deletion</h2>
+      <form id="delete-form">
+        <div class="field">
+          <label for="username">Username you play under <span style="color:var(--coral)">*</span></label>
+          <input type="text" id="username" name="username" placeholder="Your in-game display name" required maxlength="60">
+          <p class="hint">This is how we find your account — there's no login on this page.</p>
+        </div>
+        <div class="field">
+          <label for="email">Email for confirmation (optional)</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" maxlength="254">
+          <p class="hint">The email tied to your Google or Apple sign-in, if you'd like us to confirm once it's done.</p>
+        </div>
+        <div class="field">
+          <label for="details">Anything else? (optional)</label>
+          <textarea id="details" name="details" placeholder="Extra details that help us find the right account, if needed." maxlength="1800"></textarea>
+        </div>
+        <button type="submit" id="submit-btn">Request Deletion</button>
+        <div class="status" id="status"></div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>Prefer email instead?</p>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
+  </footer>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://urcnxppkphbdzpymysky.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ZX-4DQRFv00hVrjz9YpnmQ_xGTt6hC_';
+
+const form = document.getElementById('delete-form');
+const statusEl = document.getElementById('status');
+const btn = document.getElementById('submit-btn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const details = document.getElementById('details').value.trim();
+
+  if (!username) return;
+
+  let message = 'Account deletion request.\nUsername: ' + username;
+  if (details) message += '\nDetails: ' + details;
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  statusEl.className = 'status';
+  statusEl.textContent = '';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/submit_contact_request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+      },
+      body: JSON.stringify({
+        p_category: 'deletion',
+        p_message: message,
+        p_reply_email: email || null,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || 'Something went wrong — please try again.');
+    }
+
+    statusEl.className = 'status ok';
+    statusEl.textContent = "Request received. We'll process it within a few business days" + (email ? ' and confirm at ' + email + '.' : '.');
+    form.reset();
+    btn.textContent = 'Request Deletion';
+    btn.disabled = false;
+  } catch (err) {
+    statusEl.className = 'status err';
+    statusEl.textContent = err.message || 'Something went wrong — please try again, or email reach@devindi.in.';
+    btn.textContent = 'Request Deletion';
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
