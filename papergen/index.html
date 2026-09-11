@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Generator — devIndi</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Internal tool: generate section-authentic SAT practice papers from a growing question bank.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>body{visibility:hidden;}</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c3-1 4-9 7-9s3 8 6 8"></path></svg>
+      <span>Paper Generator</span>
+    </div>
+    <nav class="navlist">
+      <button class="navitem active" data-view="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg>
+        Dashboard
+      </button>
+      <button class="navitem" data-view="new">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><line x1="9.5" y1="14" x2="14.5" y2="14"></line><line x1="12" y1="11.5" x2="12" y2="16.5"></line></svg>
+        New Paper
+      </button>
+      <button class="navitem" data-view="bank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"></path><path d="M3 12l9 4.5 9-4.5"></path><path d="M3 16.5l9 4.5 9-4.5"></path></svg>
+        Question Bank
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="avatar">TD</div>
+      <div class="who">
+        <span class="name">Tushar</span>
+        <span class="role">Tutor</span>
+      </div>
+      <span class="signout" id="signOutLink">Sign out</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- Dashboard -->
+    <section class="view active" id="view-dashboard">
+      <div class="pagehead">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="sub">Welcome back, Tushar. Here's how your question bank and papers are doing.</div>
+        </div>
+        <button class="btn btn-primary" data-goto="new">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          New Paper
+        </button>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></svg></div>
+          <div><div class="stat-num" id="stat-papers-week">0</div><div class="stat-label">Papers this week</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"></path><path d="M3 12l9 4.5 9-4.5"></path><path d="M3 16.5l9 4.5 9-4.5"></path></svg></div>
+          <div><div class="stat-num" id="stat-bank-size">0</div><div class="stat-label">Questions in bank</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8a33d" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 15H3l9-15z"></path><line x1="12" y1="10" x2="12" y2="14"></line><circle cx="12" cy="16.6" r="0.6" fill="#e8a33d" stroke="none"></circle></svg></div>
+          <div><div class="stat-num warn" id="stat-low-topics">0</div><div class="stat-label">Subtopics running low</div></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-title">Recent papers</div>
+          <div class="table-head"><span>Paper</span><span>Sections</span><span>Questions</span><span>Generated</span><span></span></div>
+          <div id="recent-papers-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Bank health</div>
+          <div class="sub" style="font-size:12.5px;">Subtopics thinnest relative to typical demand</div>
+          <div id="bank-health-list" style="display:flex; flex-direction:column; gap:16px;"></div>
+          <a href="#" data-goto="bank" style="margin-top:auto; font-size:13px;">Open question bank &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Paper -->
+    <section class="view" id="view-new">
+      <div class="pagehead">
+        <div>
+          <h1>New Paper</h1>
+          <div class="sub">Choose topics and difficulty for each. The paper fills to a full, section-authentic question count.</div>
+        </div>
+      </div>
+
+      <div class="newpaper-grid">
+        <div class="topics-col" id="topics-col"></div>
+
+        <div class="summary-panel">
+          <div class="summary-title">Paper summary</div>
+          <div id="summary-body"></div>
+          <div class="summary-divider"></div>
+          <div class="summary-total">
+            <span class="label">Total</span>
+            <span class="num" id="summary-total">0</span>
+          </div>
+          <div class="summary-hint" id="summary-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg>
+            <span>Select at least one subtopic to begin.</span>
+          </div>
+          <button class="btn btn-primary" id="btn-generate" disabled>Generate Paper</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Generating -->
+    <section class="view" id="view-generating">
+      <div class="overlay-wrap">
+        <div class="gen-card">
+          <div class="gen-head">
+            <span class="eyebrow">Generating paper</span>
+            <span class="name" id="gen-paper-name">—</span>
+          </div>
+          <div>
+            <div class="gen-progress-head"><span>Overall progress</span><span id="gen-overall-pct">0%</span></div>
+            <div class="gen-bar"><div class="gen-bar-fill" id="gen-overall-fill" style="width:0%"></div></div>
+          </div>
+          <div class="gen-steps" id="gen-steps"></div>
+          <div class="gen-note" id="gen-note">This usually takes under 2 minutes for a full paper.</div>
+          <div class="gen-error" id="gen-error" style="display:none;"></div>
+          <div id="gen-error-actions" style="display:none;">
+            <button class="btn btn-ghost" data-goto="new" style="width:100%;">Back to New Paper</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ready -->
+    <section class="view" id="view-ready">
+      <div class="overlay-wrap">
+        <div class="ready-card">
+          <div class="ready-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center; text-align:center;">
+            <span class="ready-title">Your paper is ready</span>
+            <span class="ready-sub" id="ready-filename">—</span>
+          </div>
+          <div class="ready-files">
+            <div class="ready-file">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="16.5" x2="15" y2="16.5"></line></svg>
+              <div><div class="ftitle">Question paper</div><div class="fmeta" id="ready-paper-meta">—</div></div>
+              <button class="btn btn-ghost btn-sm" id="btn-download-paper" style="margin-top:auto;">Download</button>
+            </div>
+            <div class="ready-file">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><circle cx="10.5" cy="13.2" r="1.1"></circle><line x1="13" y1="13.2" x2="15.5" y2="13.2"></line><circle cx="10.5" cy="16.7" r="1.1"></circle><line x1="13" y1="16.7" x2="15.5" y2="16.7"></line></svg>
+              <div><div class="ftitle">Answer key</div><div class="fmeta" id="ready-key-meta">—</div></div>
+              <button class="btn btn-ghost btn-sm" id="btn-download-key" style="margin-top:auto;">Download</button>
+            </div>
+          </div>
+          <div class="summary-divider" style="width:100%;"></div>
+          <div class="ready-summary" id="ready-summary"></div>
+          <div class="ready-actions">
+            <button class="btn btn-ghost" data-goto="dashboard">Back to Dashboard</button>
+            <button class="btn btn-primary" data-goto="new">Generate Another</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Question Bank -->
+    <section class="view" id="view-bank">
+      <div class="pagehead">
+        <div>
+          <h1>Question Bank</h1>
+          <div class="sub">Browse, import, and manage the questions papers are generated from.</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-ghost" id="btn-export-bank">Export bank</button>
+          <button class="btn btn-primary" id="btn-open-import">Import batch</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="bank-toolbar">
+          <select id="filter-subject"><option value="">All subjects</option><option>Math</option><option>English</option></select>
+          <select id="filter-domain"><option value="">All domains</option></select>
+          <input type="text" id="filter-search" placeholder="Search question text…">
+          <select id="filter-batch"><option value="">Delete batch…</option></select>
+          <button class="btn btn-ghost btn-sm" id="btn-delete-batch" disabled>Delete</button>
+          <span class="hint-link" id="bank-count-hint" style="margin-left:auto;"></span>
+        </div>
+        <div class="bank-table-wrap">
+          <table class="bank-table">
+            <thead>
+              <tr><th>ID</th><th>Subject / Domain</th><th>Subtopic</th><th>Diff</th><th>Type</th><th>Question</th><th>Used</th><th>Batch</th><th></th></tr>
+            </thead>
+            <tbody id="bank-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Import modal -->
+<div class="modal-backdrop hidden" id="import-modal">
+  <div class="modal">
+    <h2>Import question batch</h2>
+    <p class="sub" style="margin:0; font-size:13px;">
+      Upload (or paste) a single JSON file matching <a href="docs/import-schema.md" target="_blank">docs/import-schema.md</a> —
+      question text, choices/answers, and any figures (as inline SVG) all in one file.
+      Need one? See the <a href="docs/authoring-prompt.md" target="_blank">AI authoring prompt</a> — it produces this exact file, ready to upload.
+      Nothing is written to the bank unless every question in the file passes validation.
+    </p>
+    <div class="row">
+      <label for="import-batch-tag">Batch tag</label>
+      <input type="text" id="import-batch-tag" placeholder="e.g. 2026-09-11-algebra-batch">
+    </div>
+    <div class="row">
+      <input type="file" id="import-file" accept="application/json">
+    </div>
+    <textarea id="import-textarea" placeholder="…or paste JSON here"></textarea>
+    <div class="row">
+      <button class="btn btn-primary btn-sm" id="btn-run-import">Validate &amp; import</button>
+      <button class="btn btn-ghost btn-sm" id="btn-close-import">Cancel</button>
+    </div>
+    <div id="import-result" class="import-result" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="js/syllabus.js"></script>
+<script src="js/db.js"></script>
+<script src="js/selection.js"></script>
+<script src="js/import.js"></script>
+<script src="js/pdf.js"></script>
+<script>
+  // Gate: reuse the same admin session as ../admin — see admin/index.html
+  // for what this speed bump does and doesn't protect against. This is a
+  // static site with no server, so there is no real access control here.
+  if (sessionStorage.getItem('devindi_admin_ok') !== '1') {
+    window.location.replace('../admin/index.html');
+  } else {
+    document.body.style.visibility = 'visible';
+  }
+  document.getElementById('signOutLink').addEventListener('click', () => {
+    sessionStorage.removeItem('devindi_admin_ok');
+    window.location.href = '../admin/index.html';
+  });
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>
