@@ -121,7 +121,7 @@
     <div class="badge">🧭</div>
     <p class="kicker">Task Manager · Privacy</p>
     <h1>Waypoint</h1>
-    <p class="updated">Privacy Policy · Last updated September 8, 2026</p>
+    <p class="updated">Privacy Policy · Last updated September 15, 2026</p>
     <div class="tab-row">
       <a class="tab" href="terms.html">Terms</a>
       <a class="tab active" href="privacy.html">Privacy Policy</a>
@@ -139,6 +139,7 @@
       <p><strong>Tasks &amp; comments.</strong> The tasks you create, their tags, priority, and lifecycle state (Active, Suspended, Completed, Deleted), plus any timestamped comments you add.</p>
       <p><strong>Third-party holds.</strong> If you note that a task is "held" by someone else, that's stored as free text you type — it does not create an account or notify that person.</p>
       <p><strong>Device &amp; diagnostic data.</strong> App version, rough device type, and crash logs (via Sentry) used only to catch and fix bugs.</p>
+      <p><strong>Advertising &amp; purchase data.</strong> If ads are shown (see below), Google AdMob may collect an advertising identifier and device/network information to select and measure ads. If you buy Remove Ads, Google Play Billing handles the transaction and we read back only your purchase record — never any payment details.</p>
     </div>
 
     <div class="card">
@@ -147,8 +148,9 @@
         <li>Store and sync your tasks, tags, comments, and lifecycle state across devices.</li>
         <li>Authenticate you on sign-in.</li>
         <li>Diagnose crashes and fix bugs via Sentry error reports.</li>
+        <li>Show a banner ad, unless you've purchased Remove Ads.</li>
       </ul>
-      <p>Your tasks are private to your account — we don't read them for advertising, and we don't sell your data.</p>
+      <p>Your tasks are private to your account — we don't read your task content for advertising, and we don't sell your data.</p>
       <div class="pill-row">
         <span class="pill active">Active</span>
         <span class="pill suspended">Suspended</span>
@@ -162,24 +164,33 @@
       <div class="pill-row">
         <span class="pill">Supabase (Postgres, Auth)</span>
         <span class="pill">Sentry (crash reporting)</span>
+        <span class="pill">Google AdMob (ads)</span>
+        <span class="pill">Google Play Billing (purchases)</span>
       </div>
     </div>
 
     <div class="card">
-      <h2><span class="num">04</span> Your choices</h2>
+      <h2><span class="num">04</span> Ads &amp; in-app purchases</h2>
+      <p><strong>Ads.</strong> Waypoint shows a banner ad served by Google AdMob unless you've bought Remove Ads. AdMob may use an advertising identifier for ad selection and measurement, under <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">Google's own ads policy</a> — we don't see or store your ad interaction data ourselves.</p>
+      <p><strong>Remove Ads.</strong> This is a one-time purchase processed entirely by Google Play Billing. Your card details go directly to Google — Waypoint never receives them. We only read your purchase record back from Google Play, which is also why the purchase survives a reinstall on the same Google account automatically.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Your choices</h2>
       <ul>
         <li>Delete a task at any time — deleted tasks move to a Deleted state before permanent removal.</li>
+        <li>Restore a past purchase from Settings if Remove Ads doesn't carry over automatically.</li>
         <li>Request an export or full deletion of your account and data at any time — see contact below.</li>
       </ul>
     </div>
 
     <div class="card">
-      <h2><span class="num">05</span> Children's privacy</h2>
-      <p>Waypoint is not directed at children under 13, and we don't knowingly collect data from them.</p>
+      <h2><span class="num">06</span> Children's privacy</h2>
+      <p>Waypoint is not directed at children under 13, and we don't knowingly collect data from them. Ads shown in the app are not served using child-directed treatment.</p>
     </div>
 
     <div class="card">
-      <h2><span class="num">06</span> Changes to this policy</h2>
+      <h2><span class="num">07</span> Changes to this policy</h2>
       <p>If this policy changes meaningfully, we'll update the date above and, where required, notify you in-app.</p>
     </div>
   </main>
