@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Spend Tracker — devIndi</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Internal prototype: one view of AI subscription and API spend, in INR, with a Keep/Downgrade/Cancel verdict per subscription.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%B8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>body{visibility:hidden;}</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9085e9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-8"></path><path d="M15 8h5v5"></path></svg>
+      <span>AI Spend Tracker</span>
+    </div>
+    <nav class="navlist">
+      <button class="navitem active" data-view="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg>
+        Dashboard
+      </button>
+      <button class="navitem" data-view="subs">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line><line x1="7" y1="15" x2="11" y2="15"></line></svg>
+        Subscriptions
+      </button>
+      <button class="navitem" data-view="connections">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"></path><path d="M11 6l1.5-1.5a4 4 0 0 1 5.66 5.66L16.5 11.8"></path><path d="M13 18l-1.5 1.5a4 4 0 0 1-5.66-5.66L7.5 12.2"></path></svg>
+        Connections
+      </button>
+      <button class="navitem" data-view="team">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"></path><circle cx="17" cy="9" r="2.4"></circle><path d="M16 14.6c2.2 0 3.9 1.3 4.5 3.9"></path></svg>
+        Team
+      </button>
+      <button class="navitem" data-view="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+        Settings
+      </button>
+    </nav>
+    <div class="proto-note">Prototype · data stays in this browser. Not for other people's keys.</div>
+    <div class="sidebar-foot">
+      <div class="avatar" id="avatarInitials">T</div>
+      <div class="who">
+        <span class="name" id="whoName">Tushar</span>
+        <span class="role">Admin</span>
+      </div>
+      <span class="signout" id="signOutLink">Sign out</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- Dashboard -->
+    <section class="view active" id="view-dashboard">
+      <div class="pagehead">
+        <div>
+          <h1>AI spend</h1>
+          <div class="sub" id="dashSub">Everything you pay for AI, in one place.</div>
+        </div>
+        <div class="head-actions">
+          <select id="memberFilter" class="select" aria-label="Filter by team member"></select>
+          <div class="seg" id="currencySeg" role="group" aria-label="Display currency">
+            <button data-cur="INR">₹ INR</button><button data-cur="USD">$ USD</button>
+          </div>
+          <button class="btn btn-primary" id="syncAllBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"></path><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"></path><path d="M21 3v5h-5"></path><path d="M3 21v-5h5"></path></svg>
+            Sync now
+          </button>
+        </div>
+      </div>
+
+      <div id="banners"></div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">This month so far</div>
+          <div class="stat-num" id="statMonth">—</div>
+          <div class="stat-foot" id="statMonthFoot">metered usage + subscriptions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Metered · last 30 days</div>
+          <div class="stat-num" id="statMetered">—</div>
+          <div class="stat-foot" id="statMeteredFoot">API keys + Claude Code</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tokens · last 30 days</div>
+          <div class="stat-num" id="statTokens">—</div>
+          <div class="stat-foot" id="statTokensFoot">input · cache · output</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Subscriptions / month</div>
+          <div class="stat-num" id="statSubs">—</div>
+          <div class="stat-foot" id="statSubsFoot">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Budget used</div>
+          <div class="stat-num" id="statBudget">—</div>
+          <div class="budget-bar"><div class="budget-fill" id="budgetFill"></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <span id="chartTitle">Daily AI usage · last 30 days</span>
+          <span class="title-actions">
+            <label class="check small-check hidden" id="cacheToggle"><input type="checkbox" id="includeCache"> incl. cache</label>
+            <span class="seg seg-sm" id="metricSeg" role="group" aria-label="Chart measure"><button data-metric="cost">Cost</button><button data-metric="tokens">Tokens</button></span>
+            <button class="linkbtn" id="toggleTableBtn">Show as table</button>
+          </span>
+        </div>
+        <div class="legend" id="dailyLegend"></div>
+        <div class="chart-wrap" id="dailyChart"></div>
+        <div class="chart-table hidden" id="dailyTable"></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-title" id="byModelTitle">By model · last 30 days</div>
+          <div id="byModel"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title" id="byProviderTitle">By provider · last 30 days</div>
+          <div id="byProvider"></div>
+          <div class="panel-title sub-title">By person · last 30 days</div>
+          <div id="byMember"></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-title"><span>Renew-or-cut</span><a href="#" data-goto="subs" class="linkbtn">Manage →</a></div>
+          <div id="verdictList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Alerts</div>
+          <div id="alertList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subscriptions -->
+    <section class="view" id="view-subs">
+      <div class="pagehead">
+        <div>
+          <h1>Subscriptions</h1>
+          <div class="sub">Every flat-fee AI plan, with a Keep / Downgrade / Cancel verdict. Click a verdict to see the rule behind it.</div>
+        </div>
+        <button class="btn btn-primary" id="addSubBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add subscription
+        </button>
+      </div>
+      <div class="panel">
+        <div id="subsTable"></div>
+      </div>
+      <div class="panel rules-panel">
+        <div class="panel-title">How verdicts are decided</div>
+        <div class="muted">Rules run top to bottom; the first one that matches decides. No scoring model — v1 is deliberately simple so every verdict can be checked by hand.</div>
+        <ol class="rules-ol">
+          <li><b>Linked to a data source</b> (e.g. Claude Pro/Max ↔ Claude Code logs): zero usage in 30 days → <span class="v v-cancel">Cancel</span>; API-equivalent usage worth less than the monthly price → <span class="v v-downgrade">Downgrade</span>; used on fewer than 8 of 30 days → <span class="v v-downgrade">Downgrade</span>; otherwise <span class="v v-keep">Keep</span>.</li>
+          <li><b>No data source</b> (ChatGPT Plus, Cursor Individual — no usage API exists): last used more than 30 days ago → <span class="v v-cancel">Cancel</span>; marked “rarely” → <span class="v v-downgrade">Downgrade</span>; otherwise <span class="v v-keep">Keep</span>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Connections -->
+    <section class="view" id="view-connections">
+      <div class="pagehead">
+        <div>
+          <h1>Connections</h1>
+          <div class="sub">Read-only admin keys pull daily cost and token usage. Keys are only ever used to read reports — never to make requests that spend money.</div>
+        </div>
+      </div>
+      <div class="conn-grid" id="connGrid"></div>
+      <div class="panel">
+        <div class="panel-title">Not connectable yet</div>
+        <div class="muted">ChatGPT Plus has no usage API, and Cursor / GitHub Copilot usage APIs are gated to Teams/Business plans (PRD Phase 2). Track those as <a href="#" data-goto="subs">subscriptions</a> with a last-used date instead. Gemini, DeepSeek and Mistral are unverified and deliberately not listed.</div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section class="view" id="view-team">
+      <div class="pagehead">
+        <div>
+          <h1>Team</h1>
+          <div class="sub">Pool teammates' spend into one view. In this prototype there's no shared server, so pooling works by file: each teammate exports a usage summary (no API keys inside) and you import it here.</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-title">People in this view</div>
+          <div id="memberList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Share or pool</div>
+          <div class="muted">1. Teammate opens this page in their browser, connects their own accounts, then clicks <b>Export my summary</b>.<br>2. They send you the file. You click <b>Import teammate summary</b>.<br>Re-importing a newer file from the same person replaces their data.</div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" id="exportSummaryBtn">Export my summary</button>
+            <label class="btn btn-ghost btn-sm">Import teammate summary<input type="file" accept=".json,application/json" id="importSummaryInput" hidden></label>
+          </div>
+          <div class="result hidden" id="teamResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="view" id="view-settings">
+      <div class="pagehead">
+        <div>
+          <h1>Settings</h1>
+          <div class="sub">Currency, budget, alerts and backup.</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <form class="panel form" id="settingsForm">
+          <div class="panel-title">General</div>
+          <label class="field"><span>Your name (labels your data when pooled)</span><input type="text" name="memberName" required maxlength="40"></label>
+          <label class="field"><span>Display currency</span>
+            <select name="currency"><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select>
+          </label>
+          <label class="field"><span>Exchange rate — ₹ per $1</span><input type="number" name="fxRate" min="1" step="0.01" required></label>
+          <label class="field"><span>Monthly AI budget (₹, 0 = off)</span><input type="number" name="monthlyBudget" min="0" step="1"></label>
+          <label class="field"><span>Warn this many days before a renewal</span><input type="number" name="renewalLeadDays" min="0" max="30" step="1"></label>
+          <label class="field"><span>Auto-sync when the page opens if data is older than (hours)</span><input type="number" name="autoSyncHours" min="1" max="168" step="1"></label>
+
+          <div class="panel-title sub-title">WhatsApp alerts</div>
+          <label class="check"><input type="checkbox" name="whatsappOptIn"> Send alerts to WhatsApp (off by default)</label>
+          <label class="field"><span>WhatsApp number, with country code</span><input type="tel" name="whatsappNumber" placeholder="+91 98xxxxxxxx"></label>
+          <div class="muted small">Prototype limitation: there's no server to hold a WhatsApp Business API account, so each alert gets a “Send on WhatsApp” button that opens WhatsApp with the message pre-filled. Automatic delivery comes with the backend.</div>
+          <div class="btn-row"><button class="btn btn-primary btn-sm" type="submit">Save settings</button><span class="saved-note hidden" id="savedNote">Saved</span></div>
+        </form>
+
+        <div class="panel">
+          <div class="panel-title">Backup</div>
+          <div class="muted">Everything lives in this browser's storage. Export a backup to move browsers or keep a copy.</div>
+          <label class="check"><input type="checkbox" id="includeKeys"> Include API keys in the backup file (they'll be in plain text)</label>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" id="exportBackupBtn">Export backup</button>
+            <label class="btn btn-ghost btn-sm">Import backup<input type="file" accept=".json,application/json" id="importBackupInput" hidden></label>
+          </div>
+          <div class="result hidden" id="backupResult"></div>
+          <div class="panel-title sub-title danger">Danger zone</div>
+          <button class="btn btn-danger btn-sm" id="wipeBtn">Delete all data in this browser</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Subscription modal -->
+<div class="modal-backdrop hidden" id="subModal">
+  <form class="modal form" id="subForm">
+    <h2 id="subModalTitle">Add subscription</h2>
+    <label class="field"><span>Name</span><input type="text" name="name" required maxlength="60" placeholder="Claude Max" list="subPresets"></label>
+    <datalist id="subPresets"></datalist>
+    <div class="field-row">
+      <label class="field"><span>Price</span><input type="number" name="price" min="0" step="0.01" required></label>
+      <label class="field"><span>Currency</span><select name="currency"><option value="USD">USD</option><option value="INR">INR</option></select></label>
+      <label class="field"><span>Billed</span><select name="cycle"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
+    </div>
+    <label class="field"><span>Next renewal date</span><input type="date" name="renewalDate"></label>
+    <label class="field"><span>Whose subscription</span><select name="member"></select></label>
+    <label class="field"><span>Usage data source</span>
+      <select name="linkedProvider">
+        <option value="">None — I'll tell you how often I use it</option>
+        <option value="claudecode">Claude Code logs (for Claude Pro / Max)</option>
+        <option value="openai">OpenAI API usage</option>
+        <option value="anthropic">Anthropic Console usage</option>
+        <option value="openrouter">OpenRouter usage</option>
+      </select>
+    </label>
+    <div class="manual-only">
+      <div class="field-row">
+        <label class="field"><span>Last used</span><input type="date" name="lastUsed"></label>
+        <label class="field"><span>How often</span><select name="frequency"><option value="">—</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="rarely">Rarely</option></select></label>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm" type="submit">Save</button>
+      <button class="btn btn-ghost btn-sm" type="button" data-close>Cancel</button>
+      <button class="btn btn-danger btn-sm push-right hidden" type="button" id="deleteSubBtn">Delete</button>
+    </div>
+  </form>
+</div>
+
+<!-- Verdict explanation modal -->
+<div class="modal-backdrop hidden" id="ruleModal">
+  <div class="modal">
+    <h2 id="ruleModalTitle">Why this verdict</h2>
+    <div id="ruleModalBody"></div>
+    <div class="btn-row"><button class="btn btn-ghost btn-sm" type="button" data-close>Close</button></div>
+  </div>
+</div>
+
+<div class="tooltip hidden" id="tooltip" role="tooltip"></div>
+
+<script src="js/db.js"></script>
+<script src="js/pricing.js"></script>
+<script src="js/providers.js"></script>
+<script src="js/recommend.js"></script>
+<script>
+  // Gate: reuse the same admin session as ../admin — see admin/index.html
+  // for what this speed bump does and doesn't protect against. This is a
+  // static site with no server, so there is no real access control here.
+  if (sessionStorage.getItem('devindi_admin_ok') !== '1') {
+    window.location.replace('../admin/index.html');
+  } else {
+    document.body.style.visibility = 'visible';
+  }
+  document.getElementById('signOutLink').addEventListener('click', () => {
+    sessionStorage.removeItem('devindi_admin_ok');
+    window.location.href = '../admin/index.html';
+  });
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>

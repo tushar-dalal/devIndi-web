@@ -28,6 +28,9 @@ devIndi/
 │   ├── index.html          about Waypoint
 │   ├── privacy.html
 │   └── terms.html
+├── spendtracker/           unlisted admin tool: AI Spend Tracker prototype
+│   ├── index.html          (reached via admin/dashboard.html; data lives in IndexedDB)
+│   └── tools/pull.mjs      pulls the Anthropic Console cost report locally (its API blocks browsers)
 └── CNAME                   custom domain for GitHub Pages (devindi.in)
 ```
 
