@@ -561,10 +561,10 @@
     const missing = S.src && S.src.exists === false;
     return `<section class="connect">
       <div class="eyebrow">Worksheet Builder</div>
-      <h1 class="display">${missing ? "The Students folder isn't there." : "Worksheet Builder isn't running."}</h1>
+      <h1 class="display">${missing ? "The Students folder isn't there." : "Can't reach your laptop's Students folder."}</h1>
       <p class="lede">${missing
         ? `The server is looking for <b>${esc(S.src.root)}</b> and can't find it. Is the drive connected?`
-        : "It runs on this laptop and starts by itself when you sign in to Windows. To start it now, run:"}</p>
+        : `This page reads the folder through a small service on Tushar's laptop, so it only works on that laptop.${ON_LOCAL ? "" : " If Chrome asked to let this site access apps on this device, choose Allow."} The service starts by itself at Windows sign-in. To start it now, run:`}</p>
       ${missing ? "" : `<pre class="cmd">node D:\\Tushars\\Stuff\\devIndi\\worksheets\\server\\serve.mjs</pre>`}
       <div class="actions"><button class="btn primary" id="retry">Try again</button></div>
     </section>`;
@@ -1133,10 +1133,13 @@
 
   // ── Boot ────────────────────────────────────────────────
   // No folder picking: the local server already knows where the Students folder is.
+  // On devindi.in the page stays put and reads through the server on this laptop.
+  const ON_LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const API_BASE = ON_LOCAL ? "" : "http://localhost:4777";
   async function boot() {
     applyTheme();
     try {
-      const src = await Folder.httpSource();
+      const src = await Folder.httpSource(API_BASE);
       if (src.exists) { await openSource(src); return; }
       S.src = src;
     } catch (_) { S.src = null; }

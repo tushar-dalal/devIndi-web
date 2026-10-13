@@ -1,7 +1,7 @@
 // Worksheet Builder local server.
 //
-// Serves the app at http://localhost:4777 and gives it read access to the
-// Students folder, so the page never has to ask for a folder. Listens on
+// Gives the app (on devindi.in, or served here at http://localhost:4777)
+// access to the Students folder, so the page never has to ask for a folder. Listens on
 // 127.0.0.1 only. Writes are limited to the two things the app owns:
 // <Student>/prompt-log/*.md and <Student>/templates.json.
 //
@@ -18,6 +18,24 @@ const PORT = Number(process.env.WB_PORT || 4777);
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ALLOWED_HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`]);
 const MAX_WRITE = 2 * 1024 * 1024;
+// The live site (devindi.in) runs the app and reads the folder through this server.
+// Only these origins may read responses or send writes (writes need a preflight).
+const ALLOWED_ORIGINS = new Set(["https://devindi.in", "https://www.devindi.in"]);
+
+function corsHeaders(req) {
+  const origin = req.headers.origin;
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, PUT",
+    "Access-Control-Allow-Headers": "X-Worksheet-Builder, Content-Type",
+    "Access-Control-Expose-Headers": "X-Mtime",
+    // Chrome's private/local network access checks for public sites calling localhost.
+    "Access-Control-Allow-Private-Network": "true",
+    "Access-Control-Max-Age": "600",
+    "Vary": "Origin"
+  };
+}
 
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
@@ -73,8 +91,8 @@ async function api(req, res, url) {
     } catch { return send(res, 204, ""); } // missing file (e.g. no templates.json yet)
   }
   if (url.pathname === "/api/file" && req.method === "PUT") {
-    // The custom header forces a CORS preflight, which this server never approves,
-    // so other websites can't write here.
+    // The custom header forces a CORS preflight, which is only approved for
+    // devindi.in, so other websites can't write here.
     if (req.headers["x-worksheet-builder"] !== "1") return json(res, 403, { error: "missing header" });
     if (!canWrite(rel)) return json(res, 403, { error: "the app may only write prompt-log/*.md and templates.json" });
     const chunks = []; let size = 0;
@@ -104,7 +122,13 @@ const server = http.createServer(async (req, res) => {
   // Reject any Host other than localhost (blocks DNS-rebinding pages).
   if (!ALLOWED_HOSTS.has(req.headers.host)) return send(res, 421, "Wrong host");
   const url = new URL(req.url, `http://${req.headers.host}`);
+  const cors = corsHeaders(req);
+  for (const [k, v] of Object.entries(cors)) res.setHeader(k, v);
   try {
+    if (req.method === "OPTIONS") {
+      // Preflight: approved only for the allowed origins above.
+      return send(res, cors["Access-Control-Allow-Origin"] ? 204 : 403, "");
+    }
     if (url.pathname.startsWith("/api/")) await api(req, res, url);
     else if (req.method === "GET") await serveStatic(req, res, url);
     else send(res, 405, "Method not allowed");

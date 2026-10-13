@@ -12,23 +12,26 @@ const Folder = (() => {
 
   // ── Sources ────────────────────────────────────────────────
 
-  async function httpSource() {
-    const info = await fetch("/api/info", { cache: "no-store" }).then((r) => r.json());
+  // base: "" when the page is served by the local server itself, or
+  // "http://localhost:4777" when the page runs on devindi.in.
+  async function httpSource(base) {
+    base = base || "";
+    const info = await fetch(base + "/api/info", { cache: "no-store" }).then((r) => r.json());
     const q = (segs) => "path=" + encodeURIComponent(segs.join("/"));
     return {
       kind: "http", name: info.name, root: info.root, exists: info.exists, canWrite: true,
       async list(segs) {
-        const r = await fetch("/api/list?" + q(segs), { cache: "no-store" });
+        const r = await fetch(base + "/api/list?" + q(segs), { cache: "no-store" });
         return r.ok ? r.json() : null;
       },
       async file(segs) {
-        const r = await fetch("/api/file?" + q(segs), { cache: "no-store" });
+        const r = await fetch(base + "/api/file?" + q(segs), { cache: "no-store" });
         if (!r.ok || r.status === 204) return null;
         const blob = await r.blob();
         return new File([blob], segs[segs.length - 1], { lastModified: Number(r.headers.get("X-Mtime")) || Date.now() });
       },
       async write(segs, text) {
-        const r = await fetch("/api/file?" + q(segs), {
+        const r = await fetch(base + "/api/file?" + q(segs), {
           method: "PUT", headers: { "X-Worksheet-Builder": "1", "Content-Type": "text/plain; charset=utf-8" }, body: text
         });
         if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
