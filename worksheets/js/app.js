@@ -566,7 +566,8 @@
         ? `The server is looking for <b>${esc(S.src.root)}</b> and can't find it. Is the drive connected?`
         : `This page reads the folder through a small service on Tushar's laptop, so it only works on that laptop.${ON_LOCAL ? "" : " If Chrome asked to let this site access apps on this device, choose Allow."} The service starts by itself at Windows sign-in. To start it now, run:`}</p>
       ${missing ? "" : `<pre class="cmd">node D:\\Tushars\\Stuff\\devIndi\\worksheets\\server\\serve.mjs</pre>`}
-      <div class="actions"><button class="btn primary" id="retry">Try again</button></div>
+      <div class="actions"><button class="btn primary" id="retry">Try again</button>
+        ${ON_LOCAL || missing ? "" : `<a class="btn" href="http://localhost:4777/">Open the laptop copy instead</a>`}</div>
     </section>`;
   }
 
