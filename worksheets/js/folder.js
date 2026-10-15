@@ -137,7 +137,7 @@ const Folder = (() => {
 
   async function scanStudent(src, dir, masters) {
     const s = {
-      dir, name: dir, profile: null, subjects: [], hard: [], history: [], templates: [], classes: [], extra: [],
+      dir, name: dir, profile: null, subjects: [], hard: [], history: [], templates: [], classes: [], extra: [], record: [],
       prompts: [], errors: [], newest: 0, files: {}
     };
     const P = (...x) => [dir, ...x];
@@ -217,6 +217,21 @@ const Folder = (() => {
         if (!ok) s.errors.push(err(dir + "/extra-hours.json", `entry ${i + 1} needs a YYYY-MM-DD "date" and positive "hours"`));
         return ok;
       }).map((e) => Object.assign({}, e, { hours: Number(e.hours) }));
+    }
+
+    // class-record.json: Tushar's own billing record (e.g. from WhatsApp). Its hours
+    // are final: they override the Fathom length of a logged class on the same
+    // date and session, and add classes that were never recorded on Fathom.
+    const cr = await readJson(src, P("class-record.json"), s.errors, dir + "/class-record.json");
+    if (cr.data) {
+      track("class-record.json", cr.mtime);
+      const list = Array.isArray(cr.data.entries) ? cr.data.entries : [];
+      // hours 0 = "this logged session is already counted in another entry" (not billed, not counted).
+      s.record = list.filter((e, i) => {
+        const ok = e && DATE.test(e.date) && Number(e.hours) >= 0 && e.hours !== "" && e.hours != null;
+        if (!ok) s.errors.push(err(dir + "/class-record.json", `entry ${i + 1} needs a YYYY-MM-DD "date" and "hours" (0 or more)`));
+        return ok;
+      }).map((e) => Object.assign({ session: 1 }, e, { hours: Number(e.hours), session: Number(e.session) || 1 }));
     }
 
     // "<Name> - Class Log.md" → one record per class (for the Class counter).

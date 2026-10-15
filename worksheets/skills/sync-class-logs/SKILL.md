@@ -20,11 +20,12 @@ Per student `<S>` (Bhargav, Harika, Aadithyaa):
 - `<S>\<Subject>\syllabus.json`: one per subject folder (units → topics, with status)
 - `<S>\hard-topics.json`: specific struggles, flagged and resolved
 - `<S>\paper-history.json`: every paper given, with scores and mistakes
+- `<S>\class-record.json`: Tushar's own class-hours record for billing (see "When Tushar reports class hours")
 
 Shared:
 - `D:\Tushars\Students\_fathom_processed.txt`: Gmail message IDs already logged, one per line as `id | YYYY-MM-DD | Student`
 
-Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\`, `templates.json` or `extra-hours.json` (the app owns them), or the `rate` in student.json.
+Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\` or `templates.json` (the app owns them), or the `rate` in student.json. Only add to `extra-hours.json` when Tushar reports extra work (see "When Tushar reports class hours"); never edit or remove entries he made in the app.
 If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with "Add folder" (or request access to it), then continue.
 
 ## Steps
@@ -59,6 +60,17 @@ If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with
 
 ## When Tushar reports results in chat (no Fathom recap)
 E.g. "Adi got 23/27 on SAT English Paper 1, missed Q1, Q2, Q4, Q27": stage the student's `paper-history.json`, `hard-topics.json` and the subject's `syllabus.json`, then apply steps 5b–5d for that paper (score, per-question `correct` / `mistake`, `marked: true`, topic statuses, hard-topic items for repeated error patterns). Write and report the same way.
+
+## When Tushar reports class hours (his own billing record)
+E.g. a WhatsApp screenshot of "Class 5: 1.25" messages. These hours are final for billing and win over Fathom.
+Stage `<S>\class-record.json` (create it with `{ "schema": 1, "entries": [] }` if missing) and add one entry per class:
+`{ "date": "YYYY-MM-DD", "session": 1, "hours": 1.25, "label": "Class 5 (Sept)", "source": "whatsapp", "note": "…" }`.
+- Date = the message date (India time) unless the message clearly reports an earlier class (e.g. two classes in one message: match them to the Fathom classes in the class log).
+- Never add a class twice: skip any date+session already in class-record.json. A Fathom class on the same date needs an entry only to set its hours (note the Fathom length in `note` when they differ).
+- Extra work posted under the same "Class N" numbering (hours Tushar asks the parent to approve, e.g. "Would it be okay to log 8 hours?", or labelled as essay/paper work) is NOT a class: add it to `<S>\extra-hours.json` instead (`{ "id": "x-…", "date", "hours", "note", "source": "whatsapp", "added" }`).
+- If Fathom split one class into two sessions but the record has one class, give session 1 the full hours and add `{ "date", "session": 2, "hours": 0, "note": "Included in session 1" }`.
+- If a date is cut off or unclear, don't guess: ask Tushar.
+- Never edit the Fathom durations in the class log.
 
 ## Schemas (schema 1 — keep every field name exactly)
 Dates `YYYY-MM-DD`. Difficulty codes `M`, `MH`, `H`, `VH`, ramps like `"M>H"`. Paths inside files are relative to the student folder with `/`.

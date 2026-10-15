@@ -190,6 +190,17 @@ Each class is one `### YYYY-MM-DD (Day[, 2nd session]) — Subject: Topic` headi
 (e.g. `Source: Fathom recap "…", 86 min — <link>`). A class without a length is listed
 but not billed. Billing rounds each class up to the next 15 minutes × `student.json` `rate`.
 
+## class-record.json (Claude writes, from Tushar's own billing record)
+
+Tushar's own count of classes and hours (e.g. the WhatsApp group where he posts "Class 5: 1.25").
+**These hours are final.** An entry overrides the Fathom length of the logged class on the same
+`date` and `session`; an entry with no logged class adds one (classes before Fathom was used).
+```json
+{ "schema": 1, "entries": [ { "date": "2026-10-05", "session": 1, "hours": 2, "label": "Class 3 (Oct)", "source": "whatsapp", "note": "Fathom recorded 95 min" } ] }
+```
+`session` defaults to 1 (use 2 for a second class that day). `"hours": 0` folds that logged session into
+another entry (one class Fathom split in two). Classes are numbered per month on the Class counter.
+
 ## extra-hours.json (app writes)
 
 Billable work done outside class, entered on the Class counter page.

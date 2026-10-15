@@ -942,18 +942,41 @@
     return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
   }
 
+  // One student's classes, oldest first: the class log (Fathom) merged with
+  // class-record.json. A record entry for the same date + session sets the
+  // billed hours (Tushar's record wins); one with no logged class adds a class.
+  function allClasses(s) {
+    // s.classes is newest first in log order; reversing keeps a day's 2nd session after its 1st.
+    const logged = [...s.classes].reverse();
+    const perDay = {};
+    const out = logged.map((c) => {
+      const session = (perDay[c.date] = (perDay[c.date] || 0) + 1);
+      return Object.assign({}, c, { session, hours: c.minutes == null ? null : billedMinutes(c.minutes) / 60, rec: null });
+    });
+    for (const e of s.record || []) {
+      const hit = out.find((c) => c.date === e.date && c.session === e.session && !c.rec);
+      if (hit) { hit.rec = e; hit.hours = e.hours; }
+      else if (e.hours > 0) out.push({ date: e.date, session: e.session, note: e.session > 1 ? `${e.session === 2 ? "2nd" : e.session === 3 ? "3rd" : e.session + "th"} session` : "",
+        title: e.note || "Class (not recorded on Fathom)", minutes: null, link: null, hours: e.hours, rec: e, recordOnly: true });
+    }
+    // A 0-hour record entry folds that logged session into another class.
+    return out.filter((c) => !(c.rec && c.rec.hours === 0))
+      .sort((a, b) => a.date.localeCompare(b.date) || a.session - b.session);
+  }
+
   function classRows(month) {
     const rows = [];
     for (const s of S.data.students) {
       if (s.missing) continue;
       const rate = rateOf(s);
-      // Number each student's classes in date order, all time. s.classes is newest
-      // first in log order, so reversing keeps a day's 2nd session after its 1st.
-      const ordered = [...s.classes].reverse();
-      ordered.forEach((c, i) => {
-        if (month && c.date.slice(0, 7) !== month) return;
-        const billed = c.minutes == null ? 0 : billedMinutes(c.minutes);
-        rows.push({ kind: "class", date: c.date, s, c, n: i + 1, billed, hours: billed / 60, amount: rate ? (billed / 60) * rate.perHour : null, rate });
+      // Classes are numbered per month, the way Tushar counts them for billing.
+      const perMonth = {};
+      allClasses(s).forEach((c) => {
+        const ym = c.date.slice(0, 7);
+        const n = (perMonth[ym] = (perMonth[ym] || 0) + 1);
+        if (month && ym !== month) return;
+        const hours = c.hours || 0;
+        rows.push({ kind: "class", date: c.date, s, c, n, hours, amount: rate && c.hours != null ? hours * rate.perHour : null, rate });
       });
       // Extra hours (work done outside class), rounded up to 15 minutes like classes.
       for (const e of s.extra || []) {
@@ -1008,8 +1031,9 @@
       const amt = mine.reduce((a, r) => a + (r.amount || 0), 0);
       const nc = mine.filter((r) => r.kind === "class").length;
       const xh = mine.filter((r) => r.kind === "extra").reduce((a, r) => a + r.hours, 0);
-      const latest = s.classes[0];
-      const first = s.classes[s.classes.length - 1];
+      const merged = allClasses(s);
+      const latest = merged[merged.length - 1];
+      const first = merged[0];
       return `<div class="ccard">
         <div class="name"><span class="dot" style="background:${esc(color(s))}"></span>${esc(s.name)}</div>
         <div class="amt">${rate ? esc(money(amt, rate.currency)) : "—"}</div>
@@ -1017,7 +1041,7 @@
         <dl>
           <dt>Latest class</dt><dd>${latest ? `${esc(niceDate(latest.date))}${latest.note ? ` (${esc(latest.note)})` : ""}` : "—"}</dd>
           ${latest ? `<dd class="sub full">${esc(latest.title)}</dd>` : ""}
-          <dt>Classes so far</dt><dd>${s.classes.length}${first ? ` <span class="sub">since ${esc(niceDate(first.date))}</span>` : ""}</dd>
+          <dt>Classes so far</dt><dd>${merged.length}${first ? ` <span class="sub">since ${esc(niceDate(first.date))}</span>` : ""}</dd>
         </dl>
       </div>`;
     }).join("");
@@ -1037,12 +1061,13 @@
         <td class="d">${esc(niceDate(r.c.date))}${r.c.note ? `<span class="sub">${esc(r.c.note)}</span>` : ""}</td>
         ${who(r, `Class ${r.n}`)}
         <td class="t">${r.c.link ? `<a href="${esc(r.c.link)}" target="_blank" rel="noopener">${esc(r.c.title)}</a>` : esc(r.c.title)}</td>
-        <td class="n">${esc(fmtLen(r.c.minutes))}</td>
-        <td class="n">${r.c.minutes == null ? '<span style="color:var(--hard)">missing</span>' : fmtHours(r.hours)}</td>
+        <td class="n">${r.c.minutes == null ? (r.c.recordOnly ? '<span class="sub">no Fathom</span>' : "—") : esc(fmtLen(r.c.minutes))}</td>
+        <td class="n">${r.c.hours == null ? '<span style="color:var(--hard)">missing</span>' : fmtHours(r.hours)}${r.c.rec ? `<span class="sub" title="${esc(r.c.rec.label || "")}">your record</span>` : ""}</td>
         <td class="n">${r.amount == null ? "—" : esc(money(r.amount, r.rate.currency))}</td>
       </tr>`).join("");
     const shownH = shown.reduce((a, r) => a + r.hours, 0);
     const shownAmt = shown.reduce((a, r) => a + (r.amount || 0), 0);
+    // Length total covers only what was actually timed (Fathom or an extra-hours entry).
     const shownMin = shown.reduce((a, r) => a + (r.kind === "class" ? r.c.minutes || 0 : Math.round(r.e.hours * 60)), 0);
     const nShownC = shown.filter((r) => r.kind === "class").length;
     const nShownX = shown.length - nShownC;
@@ -1061,7 +1086,7 @@
 
     return `<div class="head head-row">
         <div><div class="eyebrow">All students</div><h2 class="display">Class counter</h2>
-        <p class="lede" style="margin-bottom:0">From the class logs. Each class is billed in 15-minute steps, rounded up.</p></div>
+        <p class="lede" style="margin-bottom:0">From the class logs, rounded up to 15 minutes. Hours from your own class record (marked “your record”) win over Fathom.</p></div>
         <div class="monthnav">
           <button class="x" data-month="-1" aria-label="Previous month">‹</button>
           <span>${esc(monthLabel(month))}</span>
