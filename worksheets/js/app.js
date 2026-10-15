@@ -27,6 +27,7 @@
     student: null, req: null,
     filter: "taught", search: "", closed: new Set(), openNotes: new Set(), justAdded: new Set(),
     promptText: "", promptEdited: false, saved: null, histSubject: "all",
+    month: Prompt.todayISO().slice(0, 7), classStudent: "all",
     shownTotal: 0
   };
 
@@ -120,6 +121,7 @@
   $("#refreshLink").addEventListener("click", refresh);
   $("#brand").addEventListener("click", () => { if (S.data) go("home", true); });
   $("#historyLink").addEventListener("click", () => go("history"));
+  $("#classesLink").addEventListener("click", () => go("classes"));
 
   // ── Navigation ──────────────────────────────────────────
   function go(view, back) {
@@ -149,6 +151,7 @@
     else if (S.view === "topics") toast("Pick at least one topic first");
   }
   function prev() {
+    if (S.view === "classes") { go("home", true); return; }
     if (S.view === "history") { go(S.req ? "type" : "home", true); return; }
     const i = stepIndex(S.view);
     if (i > 0) {
@@ -514,13 +517,14 @@
     const focusKey = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
     renderTrail();
     const main = $("#main");
-    const views = { connect: vConnect, home: vHome, type: vType, subject: vSubject, topics: vTopics, options: vOptions, review: vReview, history: vHistory };
-    if (S.data && !S.loading && S.view !== "connect" && S.view !== "home" && !stu()) S.view = "home";
+    const views = { connect: vConnect, home: vHome, type: vType, subject: vSubject, topics: vTopics, options: vOptions, review: vReview, history: vHistory, classes: vClasses };
+    if (S.data && !S.loading && !["connect", "home", "classes"].includes(S.view) && !stu()) S.view = "home";
     main.innerHTML = `<div class="view${S.changed ? (S.back ? " back" : "") : ""}" style="${S.changed ? "" : "animation:none"}">${(views[S.view] || vHome)()}</div>`;
     S.changed = false;
     bind[S.view] && bind[S.view](main);
     renderSumbar();
     $("#historyLink").hidden = !(S.student && S.data && S.view !== "history");
+    $("#classesLink").hidden = !(S.data && S.view !== "classes" && S.view !== "connect");
     $("#refreshLink").hidden = !S.src;
     if (focusKey) { const el = $(`[data-key="${CSS.escape(focusKey)}"]`); if (el) el.focus({ preventScroll: true }); }
     S.justAdded.clear();
@@ -530,6 +534,11 @@
     const t = $("#trail");
     if (!S.data || S.view === "connect" || S.view === "home") { t.innerHTML = ""; return; }
     const s = stu();
+    if (S.view === "classes") {
+      t.innerHTML = `<button data-go="home">Students</button><span class="sep">›</span><button class="current" disabled>Class counter</button>`;
+      $$("button[data-go]", t).forEach((b) => b.addEventListener("click", () => go("home", true)));
+      return;
+    }
     if (S.view === "history") {
       t.innerHTML = `<button data-go="home">Students</button><span class="sep">›</span>
         <button data-go="type" class="done"><span class="dot" style="background:${esc(color(s))}"></span>${esc(s.name)}</button><span class="sep">›</span>
@@ -907,6 +916,176 @@
       ${items.length ? `<div class="timeline">${list}</div>` : `<div class="empty">${ICON.leaf}<div>No papers logged for ${esc(s.name)} yet.</div></div>`}`;
   }
 
+  // ── Class counter ───────────────────────────────────────
+  // Classes come from each student's class log; the length is the Fathom
+  // duration. Billing rounds every class UP to the next 15 minutes
+  // (86 min → 1.5 h, 94 min → 1.75 h) and multiplies by student.json "rate".
+  const billedMinutes = (min) => (min > 0 ? Math.ceil(min / 15) * 15 : 0);
+  const fmtLen = (min) => {
+    if (min == null) return "—";
+    const h = Math.floor(min / 60), m = min % 60;
+    return h ? `${h} h${m ? ` ${m} min` : ""}` : `${m} min`;
+  };
+  const fmtHours = (h) => `${Number(h.toFixed(2))} h`;
+  const money = (n, cur) => (cur && cur !== "INR" ? cur + " " : "₹") + Math.round(n).toLocaleString("en-IN");
+  const rateOf = (s) => {
+    const r = s.profile && s.profile.rate;
+    return r && Number(r.perHour) > 0 ? { perHour: Number(r.perHour), currency: r.currency || "INR" } : null;
+  };
+  function monthLabel(ym) {
+    const [y, m] = ym.split("-").map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  }
+  function shiftMonth(ym, d) {
+    const [y, m] = ym.split("-").map(Number);
+    const x = new Date(y, m - 1 + d, 1);
+    return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function classRows(month) {
+    const rows = [];
+    for (const s of S.data.students) {
+      if (s.missing) continue;
+      const rate = rateOf(s);
+      // Number each student's classes in date order, all time. s.classes is newest
+      // first in log order, so reversing keeps a day's 2nd session after its 1st.
+      const ordered = [...s.classes].reverse();
+      ordered.forEach((c, i) => {
+        if (month && c.date.slice(0, 7) !== month) return;
+        const billed = c.minutes == null ? 0 : billedMinutes(c.minutes);
+        rows.push({ kind: "class", date: c.date, s, c, n: i + 1, billed, hours: billed / 60, amount: rate ? (billed / 60) * rate.perHour : null, rate });
+      });
+      // Extra hours (work done outside class), rounded up to 15 minutes like classes.
+      for (const e of s.extra || []) {
+        if (month && e.date.slice(0, 7) !== month) continue;
+        const hours = billedMinutes(Math.round(e.hours * 60)) / 60;
+        rows.push({ kind: "extra", date: e.date, s, e, n: 0, hours, amount: rate ? hours * rate.perHour : null, rate });
+      }
+    }
+    return rows.sort((a, b) => b.date.localeCompare(a.date) || a.s.name.localeCompare(b.s.name) || b.n - a.n);
+  }
+
+  // extra-hours.json lives in the student's folder; the app rewrites it whole.
+  async function writeExtra(s, entries) {
+    await S.src.write([s.dir, "extra-hours.json"], JSON.stringify({ schema: 1, entries }, null, 2));
+    s.extra = entries;
+  }
+  async function addExtra(dir, date, hours, note) {
+    const s = S.data.students.find((x) => x.dir === dir);
+    if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !(hours > 0)) { toast("Pick a student, a date and the hours"); return; }
+    const entry = { id: `x-${Date.now().toString(36)}`, date, hours, note, added: new Date().toISOString() };
+    try {
+      await writeExtra(s, [...(s.extra || []), entry].sort((a, b) => a.date.localeCompare(b.date)));
+      S.month = date.slice(0, 7);
+      toast(`Added ${fmtHours(hours)} for ${s.name} on ${niceDate(date)}`);
+      render();
+    } catch (e) { toast("Couldn't save: " + e.message); }
+  }
+  async function removeExtra(dir, id) {
+    const s = S.data.students.find((x) => x.dir === dir);
+    try {
+      await writeExtra(s, (s.extra || []).filter((e) => e.id !== id));
+      toast("Removed");
+      render();
+    } catch (e) { toast("Couldn't remove: " + e.message); }
+  }
+
+  function vClasses() {
+    const month = S.month;
+    const rows = classRows(month);
+    const students = S.data.students.filter((s) => !s.missing);
+    const total = rows.reduce((a, r) => a + (r.amount || 0), 0);
+    const hours = rows.reduce((a, r) => a + r.hours, 0);
+    const nClasses = rows.filter((r) => r.kind === "class").length;
+    const extraH = rows.filter((r) => r.kind === "extra").reduce((a, r) => a + r.hours, 0);
+    const curMonth = today().slice(0, 7);
+    const cur = (students.map(rateOf).find(Boolean) || {}).currency;
+
+    const cards = students.map((s) => {
+      const mine = rows.filter((r) => r.s === s);
+      const rate = rateOf(s);
+      const h = mine.reduce((a, r) => a + r.hours, 0);
+      const amt = mine.reduce((a, r) => a + (r.amount || 0), 0);
+      const nc = mine.filter((r) => r.kind === "class").length;
+      const xh = mine.filter((r) => r.kind === "extra").reduce((a, r) => a + r.hours, 0);
+      const latest = s.classes[0];
+      const first = s.classes[s.classes.length - 1];
+      return `<div class="ccard">
+        <div class="name"><span class="dot" style="background:${esc(color(s))}"></span>${esc(s.name)}</div>
+        <div class="amt">${rate ? esc(money(amt, rate.currency)) : "—"}</div>
+        <div class="calc">${nc} class${nc === 1 ? "" : "es"}${xh ? ` + ${fmtHours(xh)} extra` : ""} · ${fmtHours(h)} × ${rate ? esc(money(rate.perHour, rate.currency)) + "/h" : '<span style="color:var(--hard)">no rate in student.json</span>'}</div>
+        <dl>
+          <dt>Latest class</dt><dd>${latest ? `${esc(niceDate(latest.date))}${latest.note ? ` (${esc(latest.note)})` : ""}` : "—"}</dd>
+          ${latest ? `<dd class="sub full">${esc(latest.title)}</dd>` : ""}
+          <dt>Classes so far</dt><dd>${s.classes.length}${first ? ` <span class="sub">since ${esc(niceDate(first.date))}</span>` : ""}</dd>
+        </dl>
+      </div>`;
+    }).join("");
+
+    const filt = S.classStudent;
+    const shown = rows.filter((r) => filt === "all" || r.s.dir === filt);
+    const who = (r, sub) => `<td><span class="who"><span class="dot" style="background:${esc(color(r.s))}"></span>${esc(r.s.name)}</span><span class="sub">${sub}</span></td>`;
+    const table = shown.map((r) => r.kind === "extra" ? `<tr class="extra">
+        <td class="d">${esc(niceDate(r.e.date))}</td>
+        ${who(r, "Extra work")}
+        <td class="t">${esc(r.e.note || "Work outside class")}</td>
+        <td class="n">${esc(fmtLen(Math.round(r.e.hours * 60)))}</td>
+        <td class="n">${fmtHours(r.hours)}</td>
+        <td class="n">${r.amount == null ? "—" : esc(money(r.amount, r.rate.currency))}
+          <button class="x del" data-delextra="${esc(r.s.dir)}|${esc(r.e.id)}" aria-label="Remove this extra-hours entry" title="Remove">${ICON.x}</button></td>
+      </tr>` : `<tr>
+        <td class="d">${esc(niceDate(r.c.date))}${r.c.note ? `<span class="sub">${esc(r.c.note)}</span>` : ""}</td>
+        ${who(r, `Class ${r.n}`)}
+        <td class="t">${r.c.link ? `<a href="${esc(r.c.link)}" target="_blank" rel="noopener">${esc(r.c.title)}</a>` : esc(r.c.title)}</td>
+        <td class="n">${esc(fmtLen(r.c.minutes))}</td>
+        <td class="n">${r.c.minutes == null ? '<span style="color:var(--hard)">missing</span>' : fmtHours(r.hours)}</td>
+        <td class="n">${r.amount == null ? "—" : esc(money(r.amount, r.rate.currency))}</td>
+      </tr>`).join("");
+    const shownH = shown.reduce((a, r) => a + r.hours, 0);
+    const shownAmt = shown.reduce((a, r) => a + (r.amount || 0), 0);
+    const shownMin = shown.reduce((a, r) => a + (r.kind === "class" ? r.c.minutes || 0 : Math.round(r.e.hours * 60)), 0);
+    const nShownC = shown.filter((r) => r.kind === "class").length;
+    const nShownX = shown.length - nShownC;
+    const defStu = S.classStudent !== "all" ? S.classStudent : (students[0] || {}).dir;
+    const form = `<form class="xform" id="extraForm">
+        <div class="sect" style="font-size:20px">Add extra hours</div>
+        <p class="calc" style="margin:2px 0 14px">Work for a student outside class (marking, building material…). Billed at their hourly rate, rounded up to 15 minutes.</p>
+        <div class="xrow">
+          <label>Student<select id="xStu" required>${students.map((s) => `<option value="${esc(s.dir)}" ${s.dir === defStu ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
+          <label>Date<input type="date" id="xDate" required value="${esc(today())}" max="${esc(today())}"></label>
+          <label>Hours<input type="number" id="xHours" required min="0.05" max="24" step="any" placeholder="1.5"></label>
+          <label class="grow">What for (optional)<input type="text" id="xNote" maxlength="140" placeholder="e.g. built Unit 2 revision pack"></label>
+          <button class="btn primary" type="submit">Add</button>
+        </div>
+      </form>`;
+
+    return `<div class="head head-row">
+        <div><div class="eyebrow">All students</div><h2 class="display">Class counter</h2>
+        <p class="lede" style="margin-bottom:0">From the class logs. Each class is billed in 15-minute steps, rounded up.</p></div>
+        <div class="monthnav">
+          <button class="x" data-month="-1" aria-label="Previous month">‹</button>
+          <span>${esc(monthLabel(month))}</span>
+          <button class="x" data-month="1" aria-label="Next month" ${month >= curMonth ? "disabled" : ""}>›</button>
+        </div>
+      </div>
+      <section class="earn">
+        <div class="eyebrow">Earned in ${esc(monthLabel(month))}${month === curMonth ? " so far" : ""}</div>
+        <div class="big">${esc(money(total, cur))}</div>
+        <div class="calc">${nClasses} class${nClasses === 1 ? "" : "es"}${extraH ? ` + ${fmtHours(extraH)} extra work` : ""} · ${fmtHours(hours)} billed</div>
+      </section>
+      <div class="ccards">${cards}</div>
+      ${form}
+      <div class="head-row" style="margin:40px 0 14px">
+        <h3 class="sect">Classes in ${esc(monthLabel(month))}</h3>
+        <div class="seg filters">${[["all", "All"], ...students.map((s) => [s.dir, s.name])].map(([k, l]) => `<button data-cstu="${esc(k)}" class="${filt === k ? "on" : ""}">${esc(l)}</button>`).join("")}</div>
+      </div>
+      ${shown.length ? `<div class="tablewrap"><table class="ctable">
+        <thead><tr><th>Date</th><th>Student</th><th>Class</th><th class="n">Length</th><th class="n">Billed</th><th class="n">Amount</th></tr></thead>
+        <tbody>${table}</tbody>
+        <tfoot><tr><td colspan="3">${nShownC} class${nShownC === 1 ? "" : "es"}${nShownX ? ` + ${nShownX} extra-hours entr${nShownX === 1 ? "y" : "ies"}` : ""}</td><td class="n">${esc(fmtLen(shownMin))}</td><td class="n">${fmtHours(shownH)}</td><td class="n">${esc(money(shownAmt, cur))}</td></tr></tfoot>
+      </table></div>` : `<div class="empty">${ICON.leaf}<div>No classes logged in ${esc(monthLabel(month))}.</div></div>`}`;
+  }
+
   // ── Summary bar ─────────────────────────────────────────
   function renderSumbar() {
     const bar = $("#sumbar");
@@ -1056,6 +1235,19 @@
       const rb = $("#rebuild", main); if (rb) rb.addEventListener("click", () => { S.promptEdited = false; S.saved = null; render(); });
       const dl = $("#dlLog", main); if (dl) dl.addEventListener("click", downloadLog);
       const ts = $("#tplSave", main); ts.addEventListener("click", () => saveTemplate($("#tplName").value));
+    },
+    classes(main) {
+      $$("[data-month]", main).forEach((b) => b.addEventListener("click", () => { S.month = shiftMonth(S.month, Number(b.dataset.month)); render(); }));
+      $$("[data-cstu]", main).forEach((b) => b.addEventListener("click", () => { S.classStudent = b.dataset.cstu; render(); }));
+      $("#extraForm", main).addEventListener("submit", (e) => {
+        e.preventDefault();
+        addExtra($("#xStu").value, $("#xDate").value, Number($("#xHours").value), $("#xNote").value.trim());
+      });
+      $$("[data-delextra]", main).forEach((b) => b.addEventListener("click", () => {
+        const [dir, id] = b.dataset.delextra.split("|");
+        if (b.dataset.armed) removeExtra(dir, id);
+        else { b.dataset.armed = "1"; b.classList.add("armed"); b.title = "Click again to remove"; toast("Click × again to remove this entry"); }
+      }));
     },
     history(main) {
       $$("[data-hist]", main).forEach((b) => b.addEventListener("click", () => { S.histSubject = b.dataset.hist; render(); }));

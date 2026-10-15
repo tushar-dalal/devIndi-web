@@ -24,7 +24,7 @@ Per student `<S>` (Bhargav, Harika, Aadithyaa):
 Shared:
 - `D:\Tushars\Students\_fathom_processed.txt`: Gmail message IDs already logged, one per line as `id | YYYY-MM-DD | Student`
 
-Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\` or `templates.json` (the app owns them).
+Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\`, `templates.json` or `extra-hours.json` (the app owns them), or the `rate` in student.json.
 If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with "Add folder" (or request access to it), then continue.
 
 ## Steps
@@ -35,12 +35,13 @@ If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with
    a. Insert a new entry at the TOP of `## Session History (newest first)` (remove the `_No sessions logged yet..._` placeholder if present):
       ```
       ### YYYY-MM-DD (Day) — Subject: Topic
-      Source: Fathom recap "<title>", <duration> — <fathom call link>
+      Source: Fathom recap "<title>", <NN> min — <fathom call link>
       Related material: <matching files/folders in the student's folder>
       **What we covered**: per problem/topic, with method and outcome
       **Where they struggled**: specific misconceptions and error patterns
       **Next class: what and how**: what to check first, what to re-test, what new material to cover, and HOW (activity, format, timing), plus any logistics
       ```
+      The heading and Source line feed the Worksheet Builder's Class counter, which bills Tushar's classes: keep the heading exactly `### YYYY-MM-DD (Day) — …` (add `, 2nd session` inside the brackets for a second class that day) and always write the length as whole minutes, `NN min`, from the Fathom recording length. One heading per class; never merge two classes into one entry.
    b. Rewrite `## Current Status`: Last class, Next class should cover, Open homework, Recurring weak spots (merge with earlier ones).
 5. **Structured files** (same recap, same pass). Follow the schemas below exactly.
    a. `student.json`: set `lastClass` to the class date. If Tushar or the recap states a standing rule (a difficulty change, a cap such as "worksheets now 15 questions", an exclusion, a tool, a work habit), add or edit the matching `rules` entry. Give one-off rules an `until` date ("next weekend test only" → that weekend's Sunday). Don't invent rules from vague remarks.

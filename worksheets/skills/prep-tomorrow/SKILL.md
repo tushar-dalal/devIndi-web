@@ -47,5 +47,5 @@ When Tushar pastes a prompt from the Worksheet Builder app (it starts "Make a â€
 
 ## Rules
 - Don't edit or delete existing files, except: the class logs and JSON files via sync-class-logs, and appending to `paper-history.json` in step 7.
-- Never touch `prompt-log\` or `templates.json` (the app owns them).
+- Never touch `prompt-log\`, `templates.json` or `extra-hours.json` (the app owns them).
 - Never send or modify emails.

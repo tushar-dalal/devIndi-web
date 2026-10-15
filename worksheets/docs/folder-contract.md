@@ -68,6 +68,7 @@ General rules
 |---|---|---|
 | `name` | yes | Display name; must be unique across students. |
 | `color` | no | Small personal dot so the active student is unmistakable. |
+| `rate` | no | `{ "perHour": 1200, "currency": "INR" }` — used by the Class counter. |
 | `subjects` | no | Per-subject course name and level (Honors, AP), keyed by the subject folder name. |
 | `difficulty` | no | Per context: `home` (alone), `class` (with Tushar), `testPrep`. Key `default`, or a subject folder name to override. |
 | `rules[].type` | yes | `difficulty` · `emphasis` · `exclusion` · `tool` · `convention` · `habit` · `cap` |
@@ -181,6 +182,21 @@ General rules
 `type`: `worksheet` · `test` · `drill` · `revision` · `sat` · `pack` · `classwork` · `guide`.
 `questions` is optional for back-filled papers; `skills` and `mistakes` then carry the summary.
 A per-question `mistake` should name the actual error ("dropped ± when square-rooting").
+
+## <Student> - Class Log.md (read by the Class counter)
+
+Each class is one `### YYYY-MM-DD (Day[, 2nd session]) — Subject: Topic` heading under
+`## Session History`, followed by a `Source:` line holding the class length as `NN min`
+(e.g. `Source: Fathom recap "…", 86 min — <link>`). A class without a length is listed
+but not billed. Billing rounds each class up to the next 15 minutes × `student.json` `rate`.
+
+## extra-hours.json (app writes)
+
+Billable work done outside class, entered on the Class counter page.
+```json
+{ "schema": 1, "entries": [ { "id": "x-…", "date": "2026-10-14", "hours": 1.5, "note": "built Unit 2 revision pack", "added": "<ISO time>" } ] }
+```
+Billed like classes: rounded up to 15 minutes × `rate`.
 
 ## templates.json (app writes)
 

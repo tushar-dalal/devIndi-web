@@ -137,7 +137,7 @@ const Folder = (() => {
 
   async function scanStudent(src, dir, masters) {
     const s = {
-      dir, name: dir, profile: null, subjects: [], hard: [], history: [], templates: [],
+      dir, name: dir, profile: null, subjects: [], hard: [], history: [], templates: [], classes: [], extra: [],
       prompts: [], errors: [], newest: 0, files: {}
     };
     const P = (...x) => [dir, ...x];
@@ -207,6 +207,31 @@ const Folder = (() => {
     const tpl = await readJson(src, P("templates.json"), s.errors, dir + "/templates.json");
     if (tpl.data && Array.isArray(tpl.data.templates)) s.templates = tpl.data.templates.filter((t) => t && t.name && t.request);
 
+    // extra-hours.json (app-written): billable work done outside class.
+    const ex = await readJson(src, P("extra-hours.json"), s.errors, dir + "/extra-hours.json");
+    if (ex.data) {
+      track("extra-hours.json", ex.mtime);
+      const list = Array.isArray(ex.data.entries) ? ex.data.entries : [];
+      s.extra = list.filter((e, i) => {
+        const ok = e && DATE.test(e.date) && Number(e.hours) > 0;
+        if (!ok) s.errors.push(err(dir + "/extra-hours.json", `entry ${i + 1} needs a YYYY-MM-DD "date" and positive "hours"`));
+        return ok;
+      }).map((e) => Object.assign({}, e, { hours: Number(e.hours) }));
+    }
+
+    // "<Name> - Class Log.md" → one record per class (for the Class counter).
+    const logName = list.find((e) => e.kind === "file" && e.name.toLowerCase() === `${dir} - class log.md`.toLowerCase())
+      || list.find((e) => e.kind === "file" && / - Class Log\.md$/i.test(e.name));
+    if (logName) {
+      const f = await src.file(P(logName.name));
+      if (f) {
+        track(logName.name, f.lastModified);
+        s.classes = parseClassLog(await f.text(), `${dir}/${logName.name}`, s.errors);
+      }
+    } else {
+      s.errors.push(err(`${dir}/`, "has no class log, so the Class counter can't count this student's classes.", "warn"));
+    }
+
     // prompt-log/*.md — newest first; only the header is parsed.
     const pl = await src.list(P("prompt-log"));
     if (pl) {
@@ -222,6 +247,36 @@ const Folder = (() => {
       s.prompts.sort((a, b) => b.name.localeCompare(a.name));
     }
     return s;
+  }
+
+  // ── Class log parsing ──────────────────────────────────────
+  // Each class is a "### YYYY-MM-DD (Day[, note]) — Subject: Topic" heading in
+  // "Session History", followed by "Source: Fathom recap "…", 86 min — <link>".
+  // Durations may also be written "1 h 26 min" / "1h 26m".
+  function parseClassLog(text, label, errors) {
+    const out = [];
+    const parts = text.split(/^### /m).slice(1);
+    for (const part of parts) {
+      const head = part.split(/\r?\n/)[0];
+      const m = head.match(/^(\d{4}-\d{2}-\d{2})\s*(?:\(([^)]*)\))?\s*[—–-]+\s*(.*)$/);
+      if (!m) continue;
+      const body = part.slice(head.length);
+      const src = (body.match(/^Source:.*$/m) || [""])[0];
+      let minutes = null;
+      const hm = src.match(/(\d+)\s*h(?:ours?|rs?)?\s*(\d+)\s*m(?:in(?:utes?)?)?\b/i);
+      const mOnly = src.match(/(\d+)\s*min(?:utes?)?\b/i);
+      const hOnly = src.match(/(\d+(?:\.\d+)?)\s*h(?:ours?|rs?)?\b/i);
+      if (hm) minutes = Number(hm[1]) * 60 + Number(hm[2]);
+      else if (mOnly) minutes = Number(mOnly[1]);
+      else if (hOnly) minutes = Math.round(Number(hOnly[1]) * 60);
+      const note = (m[2] || "").split(",").slice(1).join(",").trim();
+      const title = m[3].trim();
+      const link = (src.match(/https?:\/\/\S+/) || [null])[0];
+      if (minutes === null) errors.push(err(label, `class on ${m[1]} ("${title.slice(0, 40)}") has no duration, so it isn't billed. Add "NN min" to its Source line.`, "warn"));
+      out.push({ date: m[1], note, title, subject: title.split(":")[0].trim(), minutes, link });
+    }
+    out.sort((a, b) => b.date.localeCompare(a.date));
+    return out;
   }
 
   // ── Validation (fail loudly, name the file and the reason) ────

@@ -2,8 +2,8 @@
 //
 // Gives the app (on devindi.in, or served here at http://localhost:4777)
 // access to the Students folder, so the page never has to ask for a folder. Listens on
-// 127.0.0.1 only. Writes are limited to the two things the app owns:
-// <Student>/prompt-log/*.md and <Student>/templates.json.
+// 127.0.0.1 only. Writes are limited to the files the app owns:
+// <Student>/prompt-log/*.md, templates.json and extra-hours.json.
 //
 //   node worksheets/server/serve.mjs
 //   WB_STUDENTS="E:\Other\Students" WB_PORT=4800 node worksheets/server/serve.mjs
@@ -53,7 +53,7 @@ function inside(base, rel) {
 
 function canWrite(rel) {
   const segs = String(rel).split("/").filter(Boolean);
-  if (segs.length === 2 && segs[1] === "templates.json") return true;
+  if (segs.length === 2 && (segs[1] === "templates.json" || segs[1] === "extra-hours.json")) return true;
   return segs.length === 3 && segs[1] === "prompt-log" && /\.md$/i.test(segs[2]);
 }
 
@@ -94,7 +94,7 @@ async function api(req, res, url) {
     // The custom header forces a CORS preflight, which is only approved for
     // devindi.in, so other websites can't write here.
     if (req.headers["x-worksheet-builder"] !== "1") return json(res, 403, { error: "missing header" });
-    if (!canWrite(rel)) return json(res, 403, { error: "the app may only write prompt-log/*.md and templates.json" });
+    if (!canWrite(rel)) return json(res, 403, { error: "the app may only write prompt-log/*.md, templates.json and extra-hours.json" });
     const chunks = []; let size = 0;
     for await (const c of req) { size += c.length; if (size > MAX_WRITE) return json(res, 413, { error: "too large" }); chunks.push(c); }
     try {

@@ -298,6 +298,47 @@ button.pill:hover { border-color: var(--ink); color: var(--ink); }
 .tl .note { margin: 6px 0 0; padding: 0; border: 0; background: none; color: var(--muted); font-size: 13px; }
 .histfilter { margin: 0 0 22px; }
 
+/* ── Class counter ─────────────────────────────────────── */
+.monthnav { display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-size: 20px; letter-spacing: -.01em; }
+.monthnav span { min-width: 150px; text-align: center; }
+.monthnav .x { font-size: 20px; width: 34px; height: 34px; }
+.monthnav .x[disabled] { opacity: .3; cursor: default; }
+.earn { margin: 28px 0 22px; padding: 28px; border-radius: 16px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+.earn .big { font-family: var(--serif); font-size: clamp(44px, 6vw, 68px); line-height: 1.05; letter-spacing: -.03em; margin: 6px 0 4px; font-variant-numeric: tabular-nums; color: var(--accent); }
+.calc { color: var(--muted); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.ccards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.ccard { background: var(--surface); border: 1px solid var(--hair); border-radius: 16px; padding: 20px; }
+.ccard .name { font-family: var(--serif); font-size: 24px; letter-spacing: -.015em; display: flex; align-items: center; gap: 10px; }
+.ccard .amt { font-family: var(--serif); font-size: 30px; margin: 10px 0 2px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.ccard dl { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--hair); display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.ccard dt { color: var(--muted); }
+.ccard dd { margin: 0; text-align: right; }
+.sub { display: block; color: var(--muted); font-size: 12px; }
+.ccard dd .sub { display: inline; }
+.ccard dd.full { grid-column: 1 / -1; text-align: left; margin-bottom: 6px; }
+.sect { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: -.015em; margin: 0; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--hair); border-radius: 16px; background: var(--surface); }
+.ctable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+.ctable th { text-align: left; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 12px 14px; border-bottom: 1px solid var(--hair); }
+.ctable td { padding: 12px 14px; border-top: 1px solid var(--hair); vertical-align: top; }
+.ctable tbody tr:first-child td { border-top: 0; }
+.ctable .n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ctable .d { white-space: nowrap; }
+.ctable .t a { text-decoration: none; }
+.ctable .t a:hover { text-decoration: underline; }
+.ctable .who { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.ctable tfoot td { font-weight: 600; border-top: 1px solid var(--hair-strong); background: var(--surface-2); }
+
+.xform { margin-top: 22px; padding: 20px; border: 1px dashed var(--hair-strong); border-radius: 16px; }
+.xrow { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.xrow label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--muted); }
+.xrow label.grow { flex: 1; min-width: 200px; }
+.xrow input, .xrow select { height: 40px; border: 1px solid var(--hair-strong); border-radius: 10px; background: var(--surface); padding: 0 10px; font-size: 14px; color: var(--ink); }
+.xrow input[type=number] { width: 96px; }
+.ctable tr.extra td { background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.ctable .del { display: inline-grid; width: 24px; height: 24px; vertical-align: middle; margin-left: 4px; }
+.ctable .del.armed { background: var(--hard-bg); color: var(--hard); }
+
 /* ── Summary bar ───────────────────────────────────────── */
 .sumbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--hair); transform: translateY(110%); transition: transform .25s var(--ease); }
 .sumbar.show { transform: none; }
