@@ -404,7 +404,16 @@ const Folder = (() => {
     d.papers.forEach((p, i) => {
       if (!p || !p.title) { errors.push(err(label, `paper ${i + 1} has no "title"`)); return; }
       if (!p.date || !DATE.test(p.date)) errors.push(err(label, `"${p.title}" needs "date" as YYYY-MM-DD`, "warn"));
-      out.push(Object.assign({ topics: [], questions: [], mistakes: [], skills: [], files: {} }, p));
+      const paper = Object.assign({ topics: [], questions: [], mistakes: [], skills: [], files: {} }, p);
+      // Tolerate marking written as result/error/points and a bare-number score,
+      // so a paper's mistakes still reach the prompt.
+      paper.questions = (paper.questions || []).map((q) => {
+        if (!q || q.correct !== undefined || !q.result) return q;
+        const r = String(q.result).toLowerCase();
+        return Object.assign({}, q, { correct: r === "correct", mistake: q.mistake || q.error || (r === "skipped" ? "skipped" : null) });
+      });
+      if (typeof paper.score === "number") paper.score = { got: paper.score, of: paper.total || null };
+      out.push(paper);
     });
     out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     return out;

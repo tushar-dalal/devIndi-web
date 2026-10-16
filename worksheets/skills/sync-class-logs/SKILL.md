@@ -21,6 +21,7 @@ Per student `<S>` (Bhargav, Harika, Aadithyaa):
 - `<S>\hard-topics.json`: specific struggles, flagged and resolved
 - `<S>\paper-history.json`: every paper given, with scores and mistakes
 - `<S>\class-record.json`: Tushar's own class-hours record for billing (see "When Tushar reports class hours")
+- `<S>\extra-hours.json`: billable work outside class; only add entries Tushar reports, never edit or remove ones he made in the app
 
 Shared:
 - `D:\Tushars\Students\_fathom_processed.txt`: Gmail message IDs already logged, one per line as `id | YYYY-MM-DD | Student`
