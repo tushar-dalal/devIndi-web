@@ -31,7 +31,7 @@ devIndi/
 ├── spendtracker/           unlisted admin tool: AI Spend Tracker prototype
 │   ├── index.html          (reached via admin/dashboard.html; data lives in IndexedDB)
 │   └── tools/pull.mjs      pulls the Anthropic Console cost report locally (its API blocks browsers)
-├── worksheets/             unlisted admin tool: Worksheet Builder (paper prompts for Claude)
+├── worksheets/             unlisted admin tool: Class Manager (paper prompts for Claude)
 │   ├── index.html          runs on devindi.in; reads the folder via the laptop service on localhost:4777
 │   ├── server/             serve.mjs reads D:\Tushars\Students; install-startup.ps1 starts it at sign-in
 │   ├── skills/             sync-class-logs + prep-tomorrow skill sources (keep the JSON files current)

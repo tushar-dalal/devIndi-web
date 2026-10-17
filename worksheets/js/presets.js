@@ -1,4 +1,4 @@
-// Fixed vocabulary for Worksheet Builder: paper types, difficulty levels,
+// Fixed vocabulary for Class Manager: paper types, difficulty levels,
 // topic statuses, and the built-in SAT master syllabi (carried over from the
 // old Paper Generator's syllabus.js, re-keyed with stable topic ids so
 // syllabus.json "topicStatus" maps and hard-topics.json can point at them).

@@ -14,7 +14,7 @@
       "port": 8743
     },
     {
-      "name": "worksheet-builder",
+      "name": "class-manager",
       "runtimeExecutable": "node",
       "runtimeArgs": [
         "D:/Tushars/Stuff/devIndi/worksheets/server/serve.mjs"

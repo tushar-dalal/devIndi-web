@@ -32,7 +32,7 @@ const Folder = (() => {
       },
       async write(segs, text) {
         const r = await fetch(base + "/api/file?" + q(segs), {
-          method: "PUT", headers: { "X-Worksheet-Builder": "1", "Content-Type": "text/plain; charset=utf-8" }, body: text
+          method: "PUT", headers: { "X-Class-Manager": "1", "Content-Type": "text/plain; charset=utf-8" }, body: text
         });
         if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
       }
@@ -241,7 +241,9 @@ const Folder = (() => {
       const f = await src.file(P(logName.name));
       if (f) {
         track(logName.name, f.lastModified);
-        s.classes = parseClassLog(await f.text(), `${dir}/${logName.name}`, s.errors);
+        const logText = await f.text();
+        s.classes = parseClassLog(logText, `${dir}/${logName.name}`, s.errors);
+        s.status = parseStatus(logText);
       }
     } else {
       s.errors.push(err(`${dir}/`, "has no class log, so the Class counter can't count this student's classes.", "warn"));
@@ -254,7 +256,8 @@ const Folder = (() => {
         const file = await src.file(P("prompt-log", f.name));
         if (!file) continue;
         const text = await file.text();
-        const m = text.match(/^<!--\s*worksheet-builder request:\s*([\s\S]*?)\s*-->/);
+        // Older logs carry the app's previous internal marker; read both.
+        const m = text.match(/^<!--\s*(?:class-manager|worksheet-builder) request:\s*([\s\S]*?)\s*-->/);
         let request = null;
         if (m) { try { request = JSON.parse(m[1]); } catch (_) { /* hand-edited log; still listed */ } }
         s.prompts.push({ name: f.name, path: "prompt-log/" + f.name, mtime: file.lastModified, request });
@@ -291,6 +294,24 @@ const Folder = (() => {
       out.push({ date: m[1], note, title, subject: title.split(":")[0].trim(), minutes, link });
     }
     out.sort((a, b) => b.date.localeCompare(a.date));
+    return out;
+  }
+
+  // The class log's "## Current Status" block: "- **Label:** text" bullets, some
+  // with indented sub-bullets. Returns { "last class": {text, items}, … } keyed
+  // by lower-case label, for the student cards.
+  function parseStatus(text) {
+    const m = text.match(/^##\s*Current Status[^\n]*\n([\s\S]*?)(?=^---|^##\s)/m);
+    if (!m) return null;
+    const out = {};
+    let cur = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      const top = line.match(/^-\s+\*\*([^*]+?):?\*\*:?\s*(.*)$/);
+      const sub = line.match(/^\s{2,}[-*]\s+(.*)$/);
+      if (top) { cur = { text: top[2].trim(), items: [] }; out[top[1].trim().toLowerCase()] = cur; }
+      else if (sub && cur) cur.items.push(sub[1].trim());
+      else if (cur && line.trim() && !/^\s*$/.test(line)) cur.text += " " + line.trim();
+    }
     return out;
   }
 

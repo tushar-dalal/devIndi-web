@@ -1,7 +1,7 @@
 # Students folder contract (schema 1)
 
 This is the contract between **Claude in chat** (which writes these files) and the
-**Worksheet Builder** app (which reads them). The app ignores anything it doesn't
+**Class Manager** app (which reads them). The app ignores anything it doesn't
 recognise. PDFs and school files stay exactly where they are.
 
 ```
@@ -229,5 +229,5 @@ After each class recap:
 2. `<Subject>/syllabus.json` → move topics forward (`taught`, `lastPractised`); add new topics or units that arrived from school with status `received`.
 3. `hard-topics.json` → add one item per specific struggle (topic + exact issue + date + source). Mark `resolved: true` with `resolvedOn` when a re-test goes cleanly.
 
-After a paper is made from a Worksheet Builder prompt: append it to `paper-history.json` (with `questions`).
+After a paper is made from a Class Manager prompt: append it to `paper-history.json` (with `questions`).
 After results are reported: fill `score`, per-question `correct` / `mistake`, `marked: true`. Set the topic status to `tested` or `weak`, and update `hard-topics.json`.

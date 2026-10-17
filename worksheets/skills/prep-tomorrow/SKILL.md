@@ -1,6 +1,6 @@
 ---
 name: "prep-tomorrow"
-description: "Prepare all material for tomorrow's tutoring classes (Bhargav, Harika, Aadithyaa), skipping students already prepared, and log every paper made into the student's paper-history.json. Use for /prep-tomorrow, 'prepare tomorrow's classes', or when Tushar pastes a Worksheet Builder prompt."
+description: "Prepare all material for tomorrow's tutoring classes (Bhargav, Harika, Adithyaa), skipping students already prepared, and log every paper made into the student's paper-history.json. Use for /prep-tomorrow, 'prepare tomorrow's classes', or when Tushar pastes a Class Manager prompt."
 ---
 
 # Prep Tomorrow's Classes
@@ -10,11 +10,11 @@ Start replies with "Hi Tushar!".
 ## Students and folders (Tushar's laptop, D:\Tushars\Students)
 - **Bhargav**: AP Calculus 2, SAT Math (Hard/Very Hard only). Folder `Bhargav\` — `AP Calculus 2\<Topic>\`, `AP Calculus 2\In-Class Work\`, `SAT Math\Practice Papers\`
 - **Harika**: Algebra II. Folder `Harika\Algebra II\Unit N - <Topic>\`. Medium difficulty for anything she does alone; extra weight on quadratics with real solutions; calculator, never Gaussian elimination.
-- **Aadithyaa (Adi)**: Physics, AP Statistics, SAT English (medium-hard), English essays, Heartlinks. Folder `Aadithyaa\<Subject>\Unit N\`. Show calculator routes alongside hand methods.
+- **Adithyaa (Adi)**: Physics, AP Statistics, SAT English (medium-hard), English essays, Heartlinks. Folder `Adithyaa\<Subject>\Unit N\`. Show calculator routes alongside hand methods.
 
 These one-liners are a summary. **The source of truth for each student's rules is `<S>\student.json`**; if they differ, follow student.json.
 
-Each student folder also holds the Worksheet Builder files (schemas are in the sync-class-logs skill):
+Each student folder also holds the Class Manager files (schemas are in the sync-class-logs skill):
 `student.json` (rules), `<Subject>\syllabus.json` (topics + status), `hard-topics.json` (specific struggles), `paper-history.json` (every paper given: topics, question types, scores, mistakes).
 
 If D:\Tushars\Students isn't connected, request access to it first.
@@ -42,8 +42,8 @@ If D:\Tushars\Students isn't connected, request access to it first.
    b. Add a line to the student's project doc (`students/<name>.md`) under Materials made / the subject section: date, file names, what it targets.
 8. **Report.** One line per student: prepared (files + what they target) or skipped (which existing files cover the plan). Mention anything needing Tushar's decision.
 
-## Worksheet Builder prompts
-When Tushar pastes a prompt from the Worksheet Builder app (it starts "Make a … for <Student>" and ends "This paper is for <Student> only"), follow that prompt exactly: its scope, counts, difficulty, rules, layout, file names and folder. Then append the paper to `paper-history.json` as it says, with the `prompt` field set to the prompt-log path it gives. Use steps 5 (build rules) and 7 above for anything the prompt leaves open.
+## Class Manager prompts
+When Tushar pastes a prompt from the Class Manager app (it starts "Make a … for <Student>" and ends "This paper is for <Student> only"), follow that prompt exactly: its scope, counts, difficulty, rules, layout, file names and folder. Then append the paper to `paper-history.json` as it says, with the `prompt` field set to the prompt-log path it gives. Use steps 5 (build rules) and 7 above for anything the prompt leaves open.
 
 ## Rules
 - Don't edit or delete existing files, except: the class logs and JSON files via sync-class-logs, and appending to `paper-history.json` in step 7.

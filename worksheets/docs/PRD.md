@@ -1,4 +1,4 @@
-# Worksheet Builder — PRD
+# Class Manager — PRD
 
 **Owner:** Tushar Dalal · **Date:** 2026-10-13 · **Status:** v1 built (`worksheets/`)
 **Source:** *Tutoring Worksheet System — How I Work (Pre-PRD Brief)*, 2026-10-13
@@ -7,7 +7,7 @@
 
 ## 1. Problem
 
-Tushar tutors three US high-school students one-to-one (Harika, Aadithyaa "Adi", Bhargav).
+Tushar tutors three US high-school students one-to-one (Harika, Adithyaa "Adi", Bhargav).
 Each needs very different papers: different subjects, difficulty by context, exclusions,
 tools, conventions and weak spots. Today every paper request is typed freehand into a
 Claude chat. That is slow, and it goes wrong in predictable ways:

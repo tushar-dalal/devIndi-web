@@ -1,4 +1,4 @@
-// Worksheet Builder local server.
+// Class Manager local server.
 //
 // Gives the app (on devindi.in, or served here at http://localhost:4777)
 // access to the Students folder, so the page never has to ask for a folder. Listens on
@@ -28,7 +28,7 @@ function corsHeaders(req) {
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, PUT",
-    "Access-Control-Allow-Headers": "X-Worksheet-Builder, Content-Type",
+    "Access-Control-Allow-Headers": "X-Class-Manager, Content-Type",
     "Access-Control-Expose-Headers": "X-Mtime",
     // Chrome's private/local network access checks for public sites calling localhost.
     "Access-Control-Allow-Private-Network": "true",
@@ -93,7 +93,7 @@ async function api(req, res, url) {
   if (url.pathname === "/api/file" && req.method === "PUT") {
     // The custom header forces a CORS preflight, which is only approved for
     // devindi.in, so other websites can't write here.
-    if (req.headers["x-worksheet-builder"] !== "1") return json(res, 403, { error: "missing header" });
+    if (req.headers["x-class-manager"] !== "1") return json(res, 403, { error: "missing header" });
     if (!canWrite(rel)) return json(res, 403, { error: "the app may only write prompt-log/*.md, templates.json and extra-hours.json" });
     const chunks = []; let size = 0;
     for await (const c of req) { size += c.length; if (size > MAX_WRITE) return json(res, 413, { error: "too large" }); chunks.push(c); }
@@ -138,9 +138,9 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.on("error", (e) => {
-  if (e.code === "EADDRINUSE") { console.log(`Worksheet Builder is already running on port ${PORT}.`); process.exit(0); }
+  if (e.code === "EADDRINUSE") { console.log(`Class Manager is already running on port ${PORT}.`); process.exit(0); }
   throw e;
 });
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Worksheet Builder: http://localhost:${PORT}  (Students folder: ${STUDENTS})`);
+  console.log(`Class Manager: http://localhost:${PORT}  (Students folder: ${STUDENTS})`);
 });

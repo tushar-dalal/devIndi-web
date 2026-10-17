@@ -1,4 +1,4 @@
-/* Worksheet Builder: calm, editorial, paper-like. One accent (terracotta). */
+/* Class Manager: calm, editorial, paper-like. One accent (terracotta). */
 
 :root {
   --bg: #F7F4EE;
@@ -161,6 +161,17 @@ button.pill:hover { border-color: var(--ink); color: var(--ink); }
 .card .quick { position: relative; z-index: 2; }
 .card .issues { position: relative; z-index: 2; font-size: 12.5px; color: var(--hard); background: none; border: 0; padding: 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
 
+.cards:has(.sblock) { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.sblock { border-top: 1px solid var(--hair); padding-top: 12px; }
+.sblock .eyebrow { margin-bottom: 6px; }
+.sblock .when { letter-spacing: .04em; text-transform: none; font-weight: 600; color: var(--ink); }
+.sblock p { margin: 0; font-size: 14px; line-height: 1.5; }
+.sblock ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; }
+.sblock li + li { margin-top: 4px; }
+.sblock.next .eyebrow { color: var(--accent); }
+.sblock.clamp { max-height: 9.6em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.morebtn { position: relative; z-index: 2; align-self: flex-start; background: none; border: 0; padding: 0; font-size: 13px; color: var(--accent); font-weight: 600; margin-top: -4px; }
+.morebtn:hover { text-decoration: underline; }
 .homefoot { display: flex; align-items: center; gap: 14px; margin-top: 36px; color: var(--muted); font-size: 13px; flex-wrap: wrap; }
 
 /* ── Errors ────────────────────────────────────────────── */

@@ -1,20 +1,20 @@
 ---
 name: "sync-class-logs"
-description: "Pull new Fathom class recaps from Gmail and log them into Bhargav's, Harika's and Aadithyaa's class log files on demand, and keep each student's Worksheet Builder files (student.json, syllabus.json, hard-topics.json, paper-history.json) in step. Use for /sync-class-logs or 'sync my class logs', and when Tushar reports a student's score or mistakes."
+description: "Pull new Fathom class recaps from Gmail and log them into Bhargav's, Harika's and Adithyaa's class log files on demand, and keep each student's Class Manager files (student.json, syllabus.json, hard-topics.json, paper-history.json) in step. Use for /sync-class-logs or 'sync my class logs', and when Tushar reports a student's score or mistakes."
 ---
 
 # Sync Class Logs
 
 Run the Fathom → student records sync right now (same job as the scheduled 7:15 / 8:45 / 11:00 AM tasks).
-One sync updates the class log **and** the structured files the Worksheet Builder app reads to build paper prompts. Stale structured files mean wrong prompts, so both always move together.
+One sync updates the class log **and** the structured files the Class Manager app reads to build paper prompts. Stale structured files mean wrong prompts, so both always move together.
 
 ## Students
 - **Bhargav** (Bhargav Kondapalli): AP Calculus 2, SAT Math
 - **Harika**: Algebra II
-- **Aadithyaa** (also spelled Adithyaa / Aadithya; Adithyaa Shankar; "Adi"): Physics, AP Statistics (folder `Statistics`), SAT English, Heartlinks research paper
+- **Adithyaa** (Adithyaa Shankar, "Adi"; recaps may misspell his name, e.g. with a double A, and it's still him. Always write it Adithyaa): Physics, AP Statistics (folder `Statistics`), SAT English, Heartlinks research paper
 
 ## Files (Tushar's computer, folder D:\Tushars\Students)
-Per student `<S>` (Bhargav, Harika, Aadithyaa):
+Per student `<S>` (Bhargav, Harika, Adithyaa):
 - `<S>\<S> - Class Log.md`: the narrative log
 - `<S>\student.json`: profile + standing rules
 - `<S>\<Subject>\syllabus.json`: one per subject folder (units → topics, with status)
@@ -43,7 +43,7 @@ If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with
       **Where they struggled**: specific misconceptions and error patterns
       **Next class: what and how**: what to check first, what to re-test, what new material to cover, and HOW (activity, format, timing), plus any logistics
       ```
-      The heading and Source line feed the Worksheet Builder's Class counter, which bills Tushar's classes: keep the heading exactly `### YYYY-MM-DD (Day) — …` (add `, 2nd session` inside the brackets for a second class that day) and always write the length as whole minutes, `NN min`, from the Fathom recording length. One heading per class; never merge two classes into one entry.
+      The heading and Source line feed the Class Manager's Class counter, which bills Tushar's classes: keep the heading exactly `### YYYY-MM-DD (Day) — …` (add `, 2nd session` inside the brackets for a second class that day) and always write the length as whole minutes, `NN min`, from the Fathom recording length. One heading per class; never merge two classes into one entry.
    b. Rewrite `## Current Status`: Last class, Next class should cover, Open homework, Recurring weak spots (merge with earlier ones).
 5. **Structured files** (same recap, same pass). Follow the schemas below exactly.
    a. `student.json`: set `lastClass` to the class date. If Tushar or the recap states a standing rule (a difficulty change, a cap such as "worksheets now 15 questions", an exclusion, a tool, a work habit), add or edit the matching `rules` entry. Give one-off rules an `until` date ("next weekend test only" → that weekend's Sunday). Don't invent rules from vague remarks.

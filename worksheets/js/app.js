@@ -1,4 +1,4 @@
-// Worksheet Builder UI: Student → Paper → Subject → Topics → Options → Review,
+// Class Manager UI: Student → Paper → Subject → Topics → Options → Review,
 // plus a per-student History. State lives in S; each step owns the screen
 // and re-renders from S. Only the active student's records are ever read.
 
@@ -14,10 +14,11 @@
   // ── Preferences (per-viewer conveniences only) ──────────
   const prefs = (() => {
     let p = {};
-    try { p = JSON.parse(localStorage.getItem("worksheet-builder") || "{}"); } catch (_) { p = {}; }
+    // Carries over settings saved under the app's previous name.
+    try { p = JSON.parse(localStorage.getItem("class-manager") || localStorage.getItem("worksheet-builder") || "{}"); } catch (_) { p = {}; }
     return {
       get: (k, d) => (p[k] === undefined ? d : p[k]),
-      set: (k, v) => { p[k] = v; try { localStorage.setItem("worksheet-builder", JSON.stringify(p)); } catch (_) { /* fine */ } }
+      set: (k, v) => { p[k] = v; try { localStorage.setItem("class-manager", JSON.stringify(p)); } catch (_) { /* fine */ } }
     };
   })();
 
@@ -456,7 +457,7 @@
   }
   function logBody(text) {
     const reqJson = JSON.stringify(S.req).replace(/>/g, "\\u003e");
-    return `<!-- worksheet-builder request: ${reqJson} -->\n# ${S.req.options.title}\n\nStudent: ${stu().name} · ${new Date().toLocaleString()}\n\n${text}\n`;
+    return `<!-- class-manager request: ${reqJson} -->\n# ${S.req.options.title}\n\nStudent: ${stu().name} · ${new Date().toLocaleString()}\n\n${text}\n`;
   }
 
   async function copyAndLog(logIt) {
@@ -569,7 +570,7 @@
   function vConnect() {
     const missing = S.src && S.src.exists === false;
     return `<section class="connect">
-      <div class="eyebrow">Worksheet Builder</div>
+      <div class="eyebrow">Class Manager</div>
       <h1 class="display">${missing ? "The Students folder isn't there." : "Can't reach your laptop's Students folder."}</h1>
       <p class="lede">${missing
         ? `The server is looking for <b>${esc(S.src.root)}</b> and can't find it. Is the drive connected?`
@@ -578,6 +579,45 @@
       <div class="actions"><button class="btn primary" id="retry">Try again</button>
         ${ON_LOCAL || missing ? "" : `<a class="btn" href="http://localhost:4777/">Open the laptop copy instead</a>`}</div>
     </section>`;
+  }
+
+  // "Latest class" and "Next up" for a student card, from the class log's
+  // Current Status block (rewritten by /sync-class-logs after every class).
+  const plain = (t) => String(t || "").replace(/\*\*|__|`/g, "").trim();
+  function statusBlocks(s) {
+    const st = s.status || {};
+    const last = st["last class"];
+    const next = st["next class should cover"] || st["next class"];
+    const latestLogged = s.classes && s.classes[0];
+    let lastHead = "", lastBody = "";
+    if (last) {
+      // "2026-10-15 (Thu), 82 min — Algebra II: …" or "2026-10-16 (Fri, morning), 116 min — …"
+      const mm = plain(last.text).match(/^(\d{4}-\d{2}-\d{2})\s*(?:\(([^)]*)\))?\s*,?\s*([^—–]*?)\s*[—–]\s*([\s\S]*)$/);
+      if (mm) {
+        const extra = (mm[2] || "").split(",").slice(1).join(",").trim(); // "morning", "2nd session"
+        lastHead = [niceDate(mm[1]), extra, mm[3].trim()].filter(Boolean).join(" · ");
+        lastBody = mm[4];
+      }
+      else lastBody = plain(last.text);
+    } else if (latestLogged) {
+      lastHead = [niceDate(latestLogged.date), latestLogged.minutes ? fmtLen(latestLogged.minutes) : ""].filter(Boolean).join(" · ");
+      lastBody = latestLogged.title;
+    }
+    const open = S.expanded && S.expanded.has(s.dir);
+    const nextItems = next ? next.items.map(plain) : [];
+    const nextText = next ? plain(next.text) : "";
+    const long = nextText.length + nextItems.join(" ").length > 260;
+    return `<div class="sblock">
+        <div class="eyebrow">Latest class${lastHead ? ` · <span class="when">${esc(lastHead)}</span>` : ""}</div>
+        <p>${lastBody ? esc(lastBody) : '<span class="meta">No class logged yet</span>'}</p>
+      </div>
+      <div class="sblock next${long && !open ? " clamp" : ""}">
+        <div class="eyebrow">Next up</div>
+        ${nextText ? `<p>${esc(nextText)}</p>` : ""}
+        ${nextItems.length ? `<ul>${nextItems.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+        ${!nextText && !nextItems.length ? '<p class="meta">Nothing planned in the class log yet</p>' : ""}
+      </div>
+      ${long ? `<button class="morebtn" data-more="${esc(s.dir)}">${open ? "Show less" : "Show all"}</button>` : ""}`;
   }
 
   function vHome() {
@@ -604,7 +644,8 @@
         <div class="name"><span class="dot" style="background:${esc(color(s))}"></span>${esc(s.name)}${P.nickname ? `<span class="meta" style="font-family:var(--sans);font-size:14px">“${esc(P.nickname)}”</span>` : ""}</div>
         <div class="meta">${esc([P.grade, P.school || P.city].filter(Boolean).join(" · ") || "—")}</div>
         <div class="pills">${s.subjects.map((x) => `<span class="pill">${esc(x.name)}</span>`).join("") || '<span class="meta">No subjects with a syllabus yet</span>'}</div>
-        <div class="meta">${P.lastClass ? `Last class ${esc(niceDate(P.lastClass))}` : "No class logged"} · updated ${esc(relTime(s.newest))}</div>
+        ${statusBlocks(s)}
+        <div class="meta">Files updated ${esc(relTime(s.newest))}</div>
         <div class="row">
           ${hw ? `<span class="pill hard">${hw} hard topic${hw === 1 ? "" : "s"} this week</span>` : '<span class="pill ok">No new hard topics</span>'}
           ${hw ? `<button class="btn small quick" data-quick="${esc(s.dir)}">Hard-topics paper ${ICON.arrow}</button>` : ""}
@@ -617,7 +658,7 @@
     return `<div class="head">
         <div class="eyebrow">${real.length} student${real.length === 1 ? "" : "s"} · ${esc(S.src.name)}</div>
         <h1 class="display">${greet}, Tushar</h1>
-        <p class="lede">Who is this paper for?</p>
+        <p class="lede">Where each student stands, and what comes next.</p>
       </div>
       ${d.students.length ? `<div class="cards">${cards}</div>` :
         `<div class="empty">${ICON.leaf}<div>No student folders found in “${esc(S.src.name)}”. Is this the Students folder?</div></div>`}
@@ -1174,6 +1215,12 @@
         go("type");
       }));
       $$("[data-quick]", main).forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); quickHard(b.dataset.quick); }));
+      $$("[data-more]", main).forEach((b) => b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        S.expanded = S.expanded || new Set();
+        S.expanded.has(b.dataset.more) ? S.expanded.delete(b.dataset.more) : S.expanded.add(b.dataset.more);
+        render();
+      }));
       $$("[data-showerr]", main).forEach((b) => b.addEventListener("click", () => { const d = $("#errors"); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth" }); } }));
     },
     type(main) {
