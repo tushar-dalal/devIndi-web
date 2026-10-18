@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShiftDrop — Privacy Policy</title>
+<meta name="description" content="Privacy Policy for ShiftDrop, the drag-and-Shift file converter for Windows.">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff6ef;--surface:#ffffff;--surface2:#fdeadf;
+    --text:#3a2117;--text-muted:#80604f;--text-faint:#b39383;
+    --border:#f3dccd;--accent:#ef4a2a;--accent-soft:#fde3d3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:radial-gradient(720px 420px at 92% -8%, rgba(239,74,42,0.10), transparent 60%), var(--bg);
+    color:var(--text);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 22px 90px;}
+  header{padding:44px 0 8px;}
+  .back{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-muted);
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;
+  }
+  .back:hover{color:var(--text);}
+  .badge{width:52px;height:52px;border-radius:14px;margin-bottom:18px;display:block;}
+  .kicker{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;font-weight:600;
+  }
+  h1{font-family:'Outfit',sans-serif;font-weight:800;font-size:36px;margin:0 0 10px;letter-spacing:-0.01em;}
+  .updated{font-size:13px;color:var(--text-muted);margin:0 0 12px;}
+  .tab-row{display:flex;gap:8px;}
+  .tab{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;
+    text-decoration:none;border:1px solid var(--border);
+  }
+  .tab.active{background:var(--accent);color:#ffffff;border-color:transparent;}
+  .tab:not(.active){color:var(--text-muted);}
+  .tab:not(.active):hover{color:var(--text);}
+  main{margin-top:26px;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 26px;
+    margin-bottom:14px;box-shadow:0 10px 24px -20px rgba(58,33,23,0.25);
+  }
+  h2{font-family:'Outfit',sans-serif;font-weight:700;font-size:17.5px;margin:0 0 12px;display:flex;align-items:center;gap:10px;}
+  h2 .num{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--accent);font-weight:600;}
+  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  ul:last-child{margin-bottom:0;}
+  li{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin-bottom:6px;}
+  strong{color:var(--text);font-weight:600;}
+  code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--surface2);border-radius:5px;padding:1px 5px;color:var(--text);}
+  footer{
+    margin-top:32px;padding-top:22px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  }
+  footer p{font-size:12.5px;color:var(--text-faint);margin:0;}
+  footer a{color:var(--accent);text-decoration:none;font-size:12.5px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="index.html">← ShiftDrop</a>
+    <img class="badge" src="icon.png" alt="" width="52" height="52">
+    <p class="kicker">Windows utility · Privacy</p>
+    <h1>ShiftDrop</h1>
+    <p class="updated">Privacy Policy · Last updated October 18, 2026</p>
+    <div class="tab-row">
+      <a class="tab" href="terms.html">Terms</a>
+      <a class="tab active" href="privacy.html">Privacy Policy</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <p>ShiftDrop converts and edits files on your own computer. The short version of this policy: <strong>we don't collect anything.</strong> There is no account, no analytics, no ads, and the app never connects to the internet.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">01</span> Your files</h2>
+      <p>Every conversion and edit happens locally on your PC. Files you drop on the wheel are read from your disk and the results are written next to them. Nothing is uploaded, copied to a server, or shared with anyone, including us.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> What stays on your computer</h2>
+      <ul>
+        <li><strong>Settings.</strong> Your tray choices (enabled, Explorer-only, start with Windows) are stored in your Windows user registry.</li>
+        <li><strong>A local error log</strong> at <code>%LOCALAPPDATA%\ShiftDrop\shiftdrop.log</code>. It records which actions ran and any errors, including file names, so you can troubleshoot. It never leaves your PC unless you choose to send it to us.</li>
+      </ul>
+      <p>Uninstalling ShiftDrop removes both.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">03</span> Downloading ShiftDrop</h2>
+      <p>The installer is hosted on GitHub, so GitHub's own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">privacy statement</a> covers the download itself. This website uses Google Fonts, which receives standard request information (such as your IP address) when the page loads.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Feedback</h2>
+      <p>If you send feedback through the devIndi feedback form or by email, we receive only what you choose to write, and use it only to reply and improve ShiftDrop.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Changes to this policy</h2>
+      <p>If a future version ever changes how data is handled, for example by adding an update check, we'll update this page and the date above before releasing it.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Questions about your data? We're happy to help.</p>
+    <a href="mailto:reach@devindi.in">reach@devindi.in</a>
+  </footer>
+</div>
+
+</body>
+</html>

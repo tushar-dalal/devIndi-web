@@ -28,6 +28,10 @@ devIndi/
 │   ├── index.html          about Waypoint
 │   ├── privacy.html
 │   └── terms.html
+├── shiftdrop/              ShiftDrop (Windows app) — about/download page, privacy, terms, icon.png
+│   ├── index.html          download links point at the GitHub Release `shiftdrop-v1.0.0`
+│   ├── privacy.html        (the installer is >100 MB, too big to commit; it lives on the release)
+│   └── terms.html
 ├── spendtracker/           unlisted admin tool: AI Spend Tracker prototype
 │   ├── index.html          (reached via admin/dashboard.html; data lives in IndexedDB)
 │   └── tools/pull.mjs      pulls the Anthropic Console cost report locally (its API blocks browsers)
