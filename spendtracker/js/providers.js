@@ -314,12 +314,12 @@ const PROVIDERS = {
   claudecode: ClaudeCodeProvider
 };
 
-// Fixed series order + colors (validated for the dark surface: dataviz
-// validate_palette.js, all checks pass). Color follows the provider, never rank.
+// Fixed series order + shades (black-and-white design: four grays, darkest first).
+// Shade follows the provider, never rank; legends and tooltips always name it.
 const PROVIDER_ORDER = ["openai", "anthropic", "openrouter", "claudecode"];
 const PROVIDER_COLORS = {
-  openai: "#3987e5",
-  anthropic: "#d95926",
-  openrouter: "#199e70",
-  claudecode: "#c98500"
+  openai: "#0a0a0a",
+  anthropic: "#555555",
+  openrouter: "#8f8f8f",
+  claudecode: "#c4c4c4"
 };

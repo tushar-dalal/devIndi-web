@@ -121,7 +121,7 @@ function renderCheckbox(state, small) {
   const on = state === "on" || state === "mixed";
   const bg = state === "mixed" ? "background:var(--ink-faint);border-color:var(--ink-faint);" : "";
   const check = state === "on"
-    ? `<svg width="${small ? 10 : 12}" height="${small ? 10 : 12}" viewBox="0 0 24 24" fill="none" stroke="#06211f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>`
+    ? `<svg width="${small ? 10 : 12}" height="${small ? 10 : 12}" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>`
     : "";
   return `<div class="${cls} ${on ? "on" : ""}" style="${bg}">${check}</div>`;
 }
@@ -291,7 +291,7 @@ async function updateSummary() {
   if (grandTotal === 0) {
     genBtn.disabled = true;
     hint.className = "summary-hint";
-    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg><span>Select at least one subtopic to begin.</span>`;
+    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg><span>Select at least one subtopic to begin.</span>`;
     return;
   }
 
@@ -304,11 +304,11 @@ async function updateSummary() {
   if (deficits.length > 0) {
     genBtn.disabled = false;
     hint.className = "summary-hint err";
-    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2695f" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><circle cx="12" cy="16" r="0.6" fill="#e2695f"></circle></svg><span>${deficits.length} subtopic(s) are short on questions — generation will fail fast and name them.</span>`;
+    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><circle cx="12" cy="16" r="0.6" fill="currentColor"></circle></svg><span>${deficits.length} subtopic(s) are short on questions — generation will fail fast and name them.</span>`;
   } else {
     genBtn.disabled = false;
     hint.className = "summary-hint";
-    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg><span>Bank coverage looks sufficient for this mix.</span>`;
+    hint.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg><span>Bank coverage looks sufficient for this mix.</span>`;
   }
 }
 
@@ -334,7 +334,7 @@ function renderGenSteps() {
     const row = document.createElement("div");
     row.className = "gen-step pending";
     row.innerHTML = `
-      <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#3a3f45" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle></svg>
+      <svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#c4c4c4" stroke-width="1.75"><circle cx="12" cy="12" r="9"></circle></svg>
       <span class="label">${step.label}</span>
       <span class="count">&mdash;</span>`;
     el.appendChild(row);
@@ -348,9 +348,9 @@ function setStepState(key, state, countText) {
   row.querySelector(".count").textContent = countText;
   const ico = row.querySelector(".ico");
   if (state === "done") {
-    ico.outerHTML = `<svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#1fc8bd" stroke="none"></circle><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#06211f" stroke-width="2"></path></svg>`;
+    ico.outerHTML = `<svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"></circle><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#ffffff" stroke-width="2"></path></svg>`;
   } else if (state === "active") {
-    ico.outerHTML = `<svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="34 12"></circle></svg>`;
+    ico.outerHTML = `<svg class="ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="34 12"></circle></svg>`;
   }
 }
 

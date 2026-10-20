@@ -489,7 +489,7 @@ function renderDailyChart(n) {
       const tw = tip.offsetWidth;
       tip.style.left = Math.min(e.clientX + 14, window.innerWidth - tw - 8) + "px";
       tip.style.top = e.clientY + 14 + "px";
-      el.setAttribute("fill", "rgba(255,255,255,0.04)");
+      el.setAttribute("fill", "rgba(10,10,10,0.04)");
     });
     el.addEventListener("mouseleave", () => { tip.classList.add("hidden"); el.setAttribute("fill", "transparent"); });
   });
@@ -573,7 +573,7 @@ function renderBreakdowns(n) {
     label: m.model, value: m.value, color: PROVIDER_COLORS[m.provider],
     meta: `${providerName(m.provider)} · ${tokenSplit(m.t)}${tokens ? " · " + money(m.cost) : ""}`
   }));
-  if (rest.length) modelItems.push({ label: `Other (${rest.length} models)`, value: rest.reduce((s, m) => s + m.value, 0), color: "#5b616b" });
+  if (rest.length) modelItems.push({ label: `Other (${rest.length} models)`, value: rest.reduce((s, m) => s + m.value, 0), color: "#e2e2e0" });
   $("byModel").innerHTML = modelItems.length ? hbars(modelItems, Math.max(...modelItems.map((i) => i.value)), fmtMetric) : empty;
 
   const provItems = PROVIDER_ORDER.map((p) => {
@@ -934,7 +934,7 @@ document.addEventListener("submit", async (e) => {
   const key = form.key.value.trim();
   const rekeyId = form.dataset.rekey;
   if (p.keyPattern && !p.keyPattern.test(key)) {
-    msg.innerHTML = `<span style="color:#f3a09c">That doesn't look like an ${esc(p.name)} ${esc(p.keyLabel.toLowerCase())}. ${esc(p.keyHelp)}</span>`;
+    msg.innerHTML = `<span style="text-decoration:underline dashed;text-underline-offset:3px">That doesn't look like an ${esc(p.name)} ${esc(p.keyLabel.toLowerCase())}. ${esc(p.keyHelp)}</span>`;
     return;
   }
   const existing = rekeyId ? S.connections.find((c) => c.id === rekeyId) : null;

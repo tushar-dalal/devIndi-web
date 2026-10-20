@@ -3,101 +3,112 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ship Pipeline — devIndi</title>
+<title>Ship Pipeline · devIndi</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <meta name="description" content="How an Expo/EAS build becomes a live Google Play release, and how it cycles back through testing.">
 <meta name="robots" content="noindex, nofollow">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap');
 
   :root{
-    --paper:#F7F8FB;
-    --paper-2:#EEF0F7;
+    --paper:#FFFFFF;
+    --paper-2:#F5F5F4;
     --card:#FFFFFF;
-    --ink:#171F39;
-    --ink-soft:#4E5875;
-    --ink-faint:#8790AC;
-    --line:#DBE0EE;
-    --line-strong:#B9C1DA;
-    --accent:#4650C7;      /* indigo — your build (Expo/EAS) */
-    --accent-2:#1C7A8C;    /* teal — Google Cloud identity bridge */
-    --accent-3:#A8690C;    /* amber — Play Console / release surface */
-    --good:#227A4C;        /* green — production / success */
-    --shadow: 0 1px 2px rgba(23,31,57,.06), 0 8px 24px -18px rgba(23,31,57,.25);
-    --font-display:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --ink:#0A0A0A;
+    --ink-soft:#5F5F5F;
+    --ink-faint:#8A8A8A;
+    --line:#E7E7E5;
+    --line-strong:#CFCFCC;
+    --accent:#0A0A0A;      /* black: your build (Expo/EAS) */
+    --accent-2:#4A4A4A;    /* dark gray: Google Cloud identity bridge */
+    --accent-3:#7A7A7A;    /* mid gray: Play Console / release surface */
+    --good:#0A0A0A;        /* production / success */
+    --shadow:none;
+    --font-display:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#0E1220;
-      --paper-2:#151A2C;
-      --card:#131829;
-      --ink:#E7EAF6;
-      --ink-soft:#AAB2CC;
-      --ink-faint:#6B7492;
-      --line:#262E4A;
-      --line-strong:#37416A;
-      --accent:#8B93F5;
-      --accent-2:#5FC7D6;
-      --accent-3:#E0A94A;
-      --good:#5FCB8C;
-      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -18px rgba(0,0,0,.6);
+      --paper:#0A0A0A;
+      --paper-2:#161616;
+      --card:#0A0A0A;
+      --ink:#FAFAFA;
+      --ink-soft:#A1A1A1;
+      --ink-faint:#7A7A7A;
+      --line:#262626;
+      --line-strong:#3A3A3A;
+      --accent:#FAFAFA;
+      --accent-2:#BDBDBD;
+      --accent-3:#8F8F8F;
+      --good:#FAFAFA;
+      --shadow:none;
     }
   }
   :root[data-theme="dark"]{
-    --paper:#0E1220;
-    --paper-2:#151A2C;
-    --card:#131829;
-    --ink:#E7EAF6;
-    --ink-soft:#AAB2CC;
-    --ink-faint:#6B7492;
-    --line:#262E4A;
-    --line-strong:#37416A;
-    --accent:#8B93F5;
-    --accent-2:#5FC7D6;
-    --accent-3:#E0A94A;
-    --good:#5FCB8C;
-    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -18px rgba(0,0,0,.6);
+    --paper:#0A0A0A;
+    --paper-2:#161616;
+    --card:#0A0A0A;
+    --ink:#FAFAFA;
+    --ink-soft:#A1A1A1;
+    --ink-faint:#7A7A7A;
+    --line:#262626;
+    --line-strong:#3A3A3A;
+    --accent:#FAFAFA;
+    --accent-2:#BDBDBD;
+    --accent-3:#8F8F8F;
+    --good:#FAFAFA;
+    --shadow:none;
   }
 
   *{box-sizing:border-box;}
   html{background:var(--paper);}
   body{background:var(--paper); color:var(--ink); font-family:var(--font-display); margin:0;}
-  .wrap{max-width:1180px; margin:0 auto; padding:40px 24px 80px;}
+  ::selection{background:var(--ink); color:var(--paper);}
+  body{-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,40px) 96px;}
+  .topnav{position:sticky; top:0; z-index:10; background:var(--paper); border-bottom:1px solid var(--line);}
+  .topnav .in{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,40px); height:64px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-weight:600; font-size:18px; letter-spacing:-0.04em;}
+  .brand .sq{width:10px; height:10px; background:var(--ink);}
+  .brand .tag{font-family:var(--font-mono); font-weight:400; font-size:11px; letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--ink); border-radius:999px; padding:3px 9px;}
+  .topnav a.back{font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); text-decoration:none;}
+  .topnav a.back:hover{color:var(--ink);}
 
   .titleblock{
     display:grid; grid-template-columns:repeat(4,1fr);
-    border:1px solid var(--line-strong); border-radius:6px; overflow:hidden;
+    border:1px solid var(--ink); border-radius:0; overflow:hidden;
     font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
-    background:var(--card); box-shadow:var(--shadow); margin-bottom:36px;
+    background:var(--card); margin:clamp(40px,6vw,72px) 0 40px;
   }
   .titleblock div{ padding:10px 14px; border-left:1px solid var(--line);}
   .titleblock div:first-child{border-left:none;}
-  .titleblock b{display:block; color:var(--ink-faint); font-size:9px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; font-weight:500;}
+  .titleblock b{display:block; color:var(--ink-faint); font-size:10px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; font-weight:500;}
   .titleblock span{color:var(--ink);}
 
-  h1{font-size:clamp(32px,4.6vw,46px); line-height:1.05; letter-spacing:-.01em; margin:0 0 10px; text-wrap:balance; font-weight:700;}
-  .lede{font-size:16.5px; line-height:1.55; color:var(--ink-soft); max-width:66ch; margin:0 0 44px;}
+  h1{font-size:clamp(48px,8vw,112px); line-height:.94; letter-spacing:-.055em; margin:0 0 20px; text-wrap:balance; font-weight:500;}
+  h1 em{font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; letter-spacing:-.03em;}
+  .lede{font-size:18px; line-height:1.55; color:var(--ink-soft); max-width:66ch; margin:0 0 44px;}
   .lede b{color:var(--ink); font-weight:600;}
 
-  figure{margin:0 0 18px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 18px 12px; box-shadow:var(--shadow);}
+  figure{margin:0 0 18px; background:var(--card); border:1px solid var(--line); border-radius:0; padding:22px 18px 12px;}
   figure svg{display:block; width:100%; height:auto;}
   figcaption{font-size:12.5px; color:var(--ink-faint); padding:12px 6px 4px; border-top:1px solid var(--line); margin-top:10px;}
 
   .legend{display:flex; flex-wrap:wrap; gap:18px; font-size:12.5px; color:var(--ink-soft); margin:0 0 56px; padding:0 4px;}
   .legend .item{display:flex; align-items:center; gap:7px;}
-  .legend .sw{width:13px; height:13px; border-radius:3px; flex:none;}
+  .legend .sw{width:13px; height:13px; border-radius:0; flex:none;}
   .legend .ln{width:20px; height:0; border-top:2px solid var(--ink-faint); flex:none;}
   .legend .ln.dash{border-top-style:dashed;}
 
-  h2{font-size:22px; font-weight:700; letter-spacing:-.005em; margin:0 0 6px;}
+  h2{font-size:clamp(28px,3.4vw,40px); font-weight:500; letter-spacing:-.045em; line-height:1; margin:0 0 12px; padding-top:28px; border-top:1px solid var(--ink);}
   .section-sub{font-size:13.5px; color:var(--ink-faint); margin:0 0 22px; max-width:70ch;}
   section{margin-bottom:58px;}
 
-  .stagegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;}
-  .stage{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 20px 22px; box-shadow:var(--shadow);}
+  .stagegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:0; border-left:1px solid var(--line);}
+  .stage{background:var(--card); border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; padding:24px;}
   .stage-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
-  .badge{width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:12px; color:#fff; flex:none;}
-  .stage h3{font-size:15.5px; font-weight:600; margin:0;}
+  .badge{width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:12px; color:var(--paper); flex:none;}
+  .stage h3{font-size:19px; font-weight:500; letter-spacing:-.03em; margin:0;}
   .stage .cmd{display:block; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); background:var(--paper-2); border-radius:6px; padding:6px 9px; margin:0 0 12px; overflow-x:auto; white-space:pre;}
   .stage p{font-size:13.6px; line-height:1.6; color:var(--ink-soft); margin:0 0 10px;}
   .stage p:last-child{margin-bottom:0;}
@@ -110,22 +121,25 @@
   .lane-b{border-top-color:var(--accent-3);}
   .lane-c{border-top-color:var(--accent-2);}
 
-  .capgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
-  .cap{background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:15px 17px;}
-  .cap h4{font-size:13.5px; font-weight:600; margin:0 0 6px; display:flex; align-items:center; gap:7px;}
-  .cap h4 .dot{width:7px; height:7px; border-radius:50%; background:var(--accent-2); flex:none;}
+  .capgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0; border-top:1px solid var(--line); border-left:1px solid var(--line);}
+  .cap{background:var(--card); border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; padding:22px 24px;}
+  .cap h4{font-size:16px; font-weight:500; letter-spacing:-.02em; margin:0 0 6px; display:flex; align-items:center; gap:7px;}
+  .cap h4 .dot{width:7px; height:7px; border-radius:0; background:var(--ink); flex:none;}
   .cap p{font-size:13px; line-height:1.55; color:var(--ink-soft); margin:0;}
 
-  table{width:100%; border-collapse:collapse; font-size:13.3px; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  table{width:100%; border-collapse:collapse; font-size:13.3px; background:var(--card); border:0; border-radius:0; overflow:hidden;}
   table caption{caption-side:top; text-align:left; padding:0 0 10px; font-size:12.5px; color:var(--ink-faint);}
   th,td{text-align:left; padding:11px 16px; border-top:1px solid var(--line); vertical-align:top;}
-  thead th{border-top:none; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; background:var(--paper-2);}
+  thead th{border-top:none; border-bottom:1px solid var(--ink); font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); font-weight:400; background:transparent;}
+  th:first-child,td:first-child{padding-left:0;}
   tbody tr:hover{background:var(--paper-2);}
   td.term{font-family:var(--font-mono); font-weight:600; color:var(--ink); white-space:nowrap;}
   .tablewrap{overflow-x:auto;}
 
   footer{font-size:12.5px; color:var(--ink-faint); border-top:1px solid var(--line); padding-top:20px; line-height:1.6; max-width:74ch;}
   footer b{color:var(--ink-soft);}
+
+  figure svg text[fill="#fff"]{fill:var(--paper);}
 
   @media (max-width:640px){
     .titleblock{grid-template-columns:repeat(2,1fr);}
@@ -134,6 +148,13 @@
 </style>
 </head>
 <body>
+
+<header class="topnav">
+  <div class="in">
+    <a class="brand" href="../admin/dashboard.html"><span class="sq"></span>devIndi<span class="tag">Admin</span></a>
+    <a class="back" href="../admin/dashboard.html">← All pages</a>
+  </div>
+</header>
 
 <div class="wrap">
 
@@ -144,7 +165,7 @@
     <div><b>Rev</b><span>2026-09-09</span></div>
   </div>
 
-  <h1>Ship Pipeline</h1>
+  <h1>Ship <em>pipeline</em></h1>
   <p class="lede">How one <b>eas build</b> becomes a live Google Play release, and how it cycles back through testing. Two setups happen independently — your Expo project, and a Google Cloud service account — and they only meet at <b>eas submit</b>. That meeting point is the part most people can describe vaguely and few can actually explain.</p>
 
   <section>

@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paper Generator — devIndi</title>
+<title>Paper Generator · devIndi</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Internal tool: generate section-authentic SAT practice papers from a growing question bank.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/app.css">
 <style>body{visibility:hidden;}</style>
 </head>
@@ -18,7 +18,7 @@
 <div class="shell">
   <aside class="sidebar">
     <div class="brand">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c3-1 4-9 7-9s3 8 6 8"></path></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c3-1 4-9 7-9s3 8 6 8"></path></svg>
       <span>Paper Generator</span>
     </div>
     <nav class="navlist">
@@ -62,15 +62,15 @@
 
       <div class="stat-grid">
         <div class="stat-card">
-          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></svg></div>
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></svg></div>
           <div><div class="stat-num" id="stat-papers-week">0</div><div class="stat-label">Papers this week</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"></path><path d="M3 12l9 4.5 9-4.5"></path><path d="M3 16.5l9 4.5 9-4.5"></path></svg></div>
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"></path><path d="M3 12l9 4.5 9-4.5"></path><path d="M3 16.5l9 4.5 9-4.5"></path></svg></div>
           <div><div class="stat-num" id="stat-bank-size">0</div><div class="stat-label">Questions in bank</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8a33d" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 15H3l9-15z"></path><line x1="12" y1="10" x2="12" y2="14"></line><circle cx="12" cy="16.6" r="0.6" fill="#e8a33d" stroke="none"></circle></svg></div>
+          <div class="stat-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 15H3l9-15z"></path><line x1="12" y1="10" x2="12" y2="14"></line><circle cx="12" cy="16.6" r="0.6" fill="currentColor" stroke="none"></circle></svg></div>
           <div><div class="stat-num warn" id="stat-low-topics">0</div><div class="stat-label">Subtopics running low</div></div>
         </div>
       </div>
@@ -111,7 +111,7 @@
             <span class="num" id="summary-total">0</span>
           </div>
           <div class="summary-hint" id="summary-hint">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg>
             <span>Select at least one subtopic to begin.</span>
           </div>
           <button class="btn btn-primary" id="btn-generate" disabled>Generate Paper</button>
@@ -145,19 +145,19 @@
     <section class="view" id="view-ready">
       <div class="overlay-wrap">
         <div class="ready-card">
-          <div class="ready-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg></div>
+          <div class="ready-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg></div>
           <div style="display:flex; flex-direction:column; gap:6px; align-items:center; text-align:center;">
             <span class="ready-title">Your paper is ready</span>
             <span class="ready-sub" id="ready-filename">—</span>
           </div>
           <div class="ready-files">
             <div class="ready-file">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="16.5" x2="15" y2="16.5"></line></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="16.5" x2="15" y2="16.5"></line></svg>
               <div><div class="ftitle">Question paper</div><div class="fmeta" id="ready-paper-meta">—</div></div>
               <button class="btn btn-ghost btn-sm" id="btn-download-paper" style="margin-top:auto;">Download</button>
             </div>
             <div class="ready-file">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1fc8bd" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><circle cx="10.5" cy="13.2" r="1.1"></circle><line x1="13" y1="13.2" x2="15.5" y2="13.2"></line><circle cx="10.5" cy="16.7" r="1.1"></circle><line x1="13" y1="16.7" x2="15.5" y2="16.7"></line></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v4h4"></path><circle cx="10.5" cy="13.2" r="1.1"></circle><line x1="13" y1="13.2" x2="15.5" y2="13.2"></line><circle cx="10.5" cy="16.7" r="1.1"></circle><line x1="13" y1="16.7" x2="15.5" y2="16.7"></line></svg>
               <div><div class="ftitle">Answer key</div><div class="fmeta" id="ready-key-meta">—</div></div>
               <button class="btn btn-ghost btn-sm" id="btn-download-key" style="margin-top:auto;">Download</button>
             </div>
