@@ -32,10 +32,14 @@
 
   var ua = navigator.userAgent || '';
   var forced = lsGet('dvi_force') === '1';
+  // Do Not Track / GPC switches off visitor tracking, but admin sign-ins,
+  // failed attempts and admin page views are always logged (on /admin/ only).
+  var dntSkip = false;
   if (!forced) {
     if (navigator.webdriver || /bot|crawl|spider|slurp|headless|lighthouse|facebookexternalhit|bingpreview|embedly|whatsapp|telegrambot/i.test(ua)) return;
     var dnt = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1' || window.doNotTrack === '1';
-    if (dnt && cfg.respectDoNotTrack !== false) return;
+    dntSkip = dnt && cfg.respectDoNotTrack !== false;
+    if (dntSkip && !/^\/admin\//.test(location.pathname)) return;
   }
 
   var endpoint = cfg.supabaseUrl.replace(/\/+$/, '') + '/rest/v1/';
@@ -168,6 +172,9 @@
     push(row('admin_view'), true);
     return;
   }
+
+  // On the sign-in screen, a Do Not Track browser gets only the sign-in log above.
+  if (dntSkip) return;
 
   // ---- pageview
   var params = new URLSearchParams(location.search);
