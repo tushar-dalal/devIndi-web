@@ -90,3 +90,21 @@ every future submission is delivered automatically, no further action needed.
 To point submissions at a different address, change the URL in the `fetch(...)`
 call inside `feedback.html`'s `<script>` block
 (`https://formsubmit.co/ajax/reach@devindi.in`).
+
+## Website analytics (`analytics/`, `admin/analytics.html`)
+
+Every public page (and the admin sign-in screen) loads `analytics/config.js` +
+`analytics/track.js`, which send pageviews, sources, device info, clicks, time on
+page, scroll depth, form submits, JS errors, admin sign-ins and session recordings
+(rrweb, inputs masked) to Supabase. Pages behind the admin login only log an
+`admin_view`. Results show in **Admin → Website Analytics**.
+
+One-time setup:
+
+1. Supabase → **Authentication → Users → Add user** with the same email/password as the admin login.
+2. Put that email into `analytics/supabase-setup.sql` (replace `admin@example.com`) and run the file in the **SQL Editor**.
+3. Copy the Project URL and anon/publishable key from **Project Settings → API** into `analytics/config.js`.
+
+Visitors can only insert rows; only that admin user can read or delete them.
+Add the two `<script>` tags to any new public page. Track a custom action with
+`devindiAnalytics.track('name', { any: 'props' })`, or add `data-track="name"` to an element.

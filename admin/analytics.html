@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Analytics — devIndi Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%88%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0d0f;
+    --card:#1a171c;
+    --card-2:#221e25;
+    --card-border:rgba(244,243,240,0.08);
+    --ink:#f4f3f0;
+    --ink-soft:rgba(244,243,240,0.62);
+    --ink-faint:rgba(244,243,240,0.38);
+    --grid:rgba(244,243,240,0.07);
+    --gold:#d9a441;
+    --gold-soft:rgba(217,164,65,0.14);
+    --good:#6fbf8a;
+    --good-soft:rgba(111,191,138,0.12);
+    --err:#e2695f;
+    --err-soft:rgba(226,105,95,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 620px at 12% -8%, rgba(217,164,65,0.10), transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, rgba(255,255,255,0.04), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    visibility:hidden;
+    font-size:14px;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px;}
+  @media (max-width:600px){ .wrap{padding:0 16px 60px;} }
+
+  header.site{display:flex;align-items:center;justify-content:space-between;padding:28px 0 18px;gap:12px;flex-wrap:wrap;}
+  .wordmark{font-family:'Sora',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
+  .wordmark .tag{font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);border-radius:999px;padding:3px 9px;margin-left:4px;}
+  .who{font-size:12.5px;color:var(--ink-faint);display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .who a{text-decoration:none;}
+  .who a:hover{color:var(--ink-soft);}
+
+  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:6px 0 18px;}
+  .pagehead h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(24px,4vw,32px);letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead p{margin:0;color:var(--ink-soft);font-size:13.5px;}
+
+  .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:3px;}
+  .seg button{background:none;border:0;color:var(--ink-soft);font:600 12.5px 'Inter',sans-serif;padding:7px 11px;border-radius:7px;cursor:pointer;}
+  .seg button.on{background:var(--gold-soft);color:var(--gold);}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;user-select:none;}
+  .toggle input{accent-color:var(--gold);}
+  .btn{background:var(--card);border:1px solid var(--card-border);color:var(--ink);font:600 12.5px 'Inter',sans-serif;padding:8px 12px;border-radius:9px;cursor:pointer;}
+  .btn:hover{border-color:var(--gold);}
+  .btn.primary{background:var(--gold);color:#1a1408;border-color:var(--gold);}
+  .btn.danger:hover{border-color:var(--err);color:var(--err);}
+
+  nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--card-border);margin:8px 0 22px;overflow-x:auto;scrollbar-width:none;}
+  nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-faint);font:600 13.5px 'Inter',sans-serif;padding:11px 12px;cursor:pointer;white-space:nowrap;}
+  nav.tabs button.on{color:var(--ink);border-bottom-color:var(--gold);}
+  nav.tabs button:hover{color:var(--ink-soft);}
+
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:16px;}
+  .grid.wide{grid-template-columns:1fr;}
+  @media (max-width:600px){ .grid{grid-template-columns:1fr;} }
+  .card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:18px 18px 16px;min-width:0;}
+  .card h2{font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;margin:0 0 3px;}
+  .card .hint{font-size:12px;color:var(--ink-faint);margin:0 0 14px;}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+
+  .kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px;}
+  .kpi{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:14px 16px;}
+  .kpi .label{font-size:11.5px;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  .kpi .value{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;margin-top:6px;letter-spacing:-0.01em;}
+  .kpi .sub{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px;box-shadow:0 0 0 3px var(--good-soft);}
+
+  .bars{display:flex;flex-direction:column;gap:7px;}
+  .bar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;position:relative;padding:5px 8px;border-radius:7px;}
+  .bar-row .fill{position:absolute;left:0;top:0;bottom:0;background:var(--gold-soft);border-radius:7px;}
+  .bar-row .lbl{position:relative;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+  .bar-row .lbl small{color:var(--ink-faint);margin-left:6px;}
+  .bar-row .val{position:relative;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--ink-soft);text-align:right;white-space:nowrap;}
+  .empty{font-size:12.5px;color:var(--ink-faint);padding:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-weight:600;color:var(--ink-faint);font-size:11px;letter-spacing:0.05em;text-transform:uppercase;padding:7px 10px;border-bottom:1px solid var(--card-border);white-space:nowrap;}
+  td{padding:8px 10px;border-bottom:1px solid var(--grid);vertical-align:top;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  tr.clickable{cursor:pointer;}
+  tr.clickable:hover td{background:rgba(255,255,255,0.025);}
+  tr.sel td{background:var(--gold-soft);}
+  .muted{color:var(--ink-faint);}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12px;}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--card-2);color:var(--ink-soft);white-space:nowrap;}
+  .pill.good{background:var(--good-soft);color:var(--good);}
+  .pill.bad{background:var(--err-soft);color:var(--err);}
+  .pill.gold{background:var(--gold-soft);color:var(--gold);}
+
+  .chart{position:relative;}
+  .chart svg{display:block;width:100%;}
+  .tip{position:fixed;pointer-events:none;background:#000;border:1px solid var(--card-border);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5;z-index:50;display:none;box-shadow:0 10px 24px rgba(0,0,0,.5);}
+  .tip b{font-family:'Sora',sans-serif;}
+
+  select{background:var(--card-2);color:var(--ink);border:1px solid var(--card-border);border-radius:8px;padding:7px 9px;font:500 12.5px 'Inter',sans-serif;max-width:100%;}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+
+  .banner{border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .banner.info{background:var(--gold-soft);border:1px solid rgba(217,164,65,0.3);}
+  .banner.warn{background:var(--err-soft);border:1px solid rgba(226,105,95,0.3);color:#f2b3ac;}
+
+  .heat-stage{position:relative;overflow:hidden;border:1px solid var(--card-border);border-radius:10px;background:#fff;}
+  .heat-inner{position:absolute;left:0;top:0;transform-origin:0 0;}
+  .heat-inner iframe{border:0;display:block;background:#fff;}
+  .heat-inner canvas{position:absolute;left:0;top:0;pointer-events:none;}
+
+  .timeline{list-style:none;margin:0;padding:0;max-height:420px;overflow:auto;}
+  .timeline li{display:grid;grid-template-columns:56px 110px minmax(0,1fr);gap:10px;padding:7px 0;border-bottom:1px solid var(--grid);font-size:12.5px;}
+  .timeline .t{color:var(--ink-faint);font-variant-numeric:tabular-nums;}
+  .timeline .d{overflow-wrap:anywhere;}
+  #player{margin-top:14px;}
+  #player .rr-player{background:var(--card-2) !important;box-shadow:none !important;}
+
+  .gate{max-width:420px;margin:60px auto;}
+  .gate .card{padding:26px;}
+  .gate label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin:12px 0 6px;}
+  .gate input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--card-border);background:rgba(255,255,255,0.03);color:var(--ink);font:14px 'Inter',sans-serif;}
+  .gate .btn{width:100%;margin-top:16px;padding:11px;}
+  .gate .error{color:var(--err);font-size:12.5px;margin-top:10px;min-height:1em;}
+  ol.steps{padding-left:20px;line-height:1.7;color:var(--ink-soft);font-size:13.5px;}
+  ol.steps code{background:var(--card-2);padding:1px 6px;border-radius:5px;font-size:12.5px;color:var(--ink);}
+  .loading{color:var(--ink-faint);padding:40px 0;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <a class="wordmark" href="dashboard.html"><span class="dot"></span>devIndi<span class="tag">Admin</span></a>
+    <div class="who"><span id="whoami"></span><a href="dashboard.html">← All pages</a><a href="#" id="logoutLink">Sign out</a></div>
+  </header>
+
+  <div id="app"><div class="loading">Loading…</div></div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script src="../analytics/config.js"></script>
+<script src="../analytics/track.js" data-mode="admin" defer></script>
+<script src="supabase-auth.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // Same browser-side gate as the other admin pages; the data itself is
+  // protected by Supabase (only the admin account can read it).
+  if (sessionStorage.getItem('devindi_admin_ok') !== '1') { location.replace('index.html'); return; }
+  document.body.style.visibility = 'visible';
+
+  const cfg = window.DEVINDI_ANALYTICS || {};
+  const auth = window.devindiAuth;
+  const API = (cfg.supabaseUrl || '').replace(/\/+$/, '') + '/rest/v1/';
+  const app = document.getElementById('app');
+  const tip = document.getElementById('tip');
+
+  document.getElementById('logoutLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('devindi_admin_ok');
+    auth.signOut();
+    location.href = 'index.html';
+  });
+
+  // ---------- small helpers ----------
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = (n) => (n == null || isNaN(n)) ? '–' : Math.round(n).toLocaleString('en-IN');
+  const pct = (n) => (n == null || isNaN(n)) ? '–' : Math.round(n * 100) + '%';
+  const dur = (ms) => {
+    if (!ms || ms < 1000) return ms ? '<1s' : '0s';
+    const s = Math.round(ms / 1000);
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ' + String(s % 60).padStart(2, '0') + 's';
+    return Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm';
+  };
+  const when = (iso) => new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  const shortId = (id) => String(id || '').slice(0, 6);
+  const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const by = (f) => (a, b) => f(b) - f(a);
+  function countBy(list, key) {
+    const m = new Map();
+    for (const x of list) { const k = typeof key === 'function' ? key(x) : x[key]; if (k == null || k === '') continue; m.set(k, (m.get(k) || 0) + 1); }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }
+  function uniqBy(list, keyFn, valFn) {
+    const m = new Map();
+    for (const x of list) { const k = keyFn(x); if (k == null) continue; if (!m.has(k)) m.set(k, new Set()); m.get(k).add(valFn(x)); }
+    return [...m.entries()].map(([k, s]) => [k, s.size]).sort((a, b) => b[1] - a[1]);
+  }
+  function percentile(sorted, p) {
+    if (!sorted.length) return null;
+    const i = Math.min(sorted.length - 1, Math.max(0, Math.ceil(p * sorted.length) - 1));
+    return sorted[i];
+  }
+
+  // Time zone -> country. Visitors' IPs are never stored; the browser's time zone is the location signal.
+  const TZ_COUNTRY = {
+    'Asia/Kolkata': 'India', 'Asia/Calcutta': 'India', 'Asia/Dubai': 'UAE', 'Asia/Karachi': 'Pakistan', 'Asia/Dhaka': 'Bangladesh',
+    'Asia/Kathmandu': 'Nepal', 'Asia/Colombo': 'Sri Lanka', 'Asia/Singapore': 'Singapore', 'Asia/Kuala_Lumpur': 'Malaysia',
+    'Asia/Bangkok': 'Thailand', 'Asia/Jakarta': 'Indonesia', 'Asia/Manila': 'Philippines', 'Asia/Ho_Chi_Minh': 'Vietnam',
+    'Asia/Shanghai': 'China', 'Asia/Hong_Kong': 'Hong Kong', 'Asia/Taipei': 'Taiwan', 'Asia/Tokyo': 'Japan', 'Asia/Seoul': 'South Korea',
+    'Asia/Riyadh': 'Saudi Arabia', 'Asia/Qatar': 'Qatar', 'Asia/Jerusalem': 'Israel', 'Europe/Istanbul': 'Turkey',
+    'Europe/London': 'United Kingdom', 'Europe/Dublin': 'Ireland', 'Europe/Paris': 'France', 'Europe/Berlin': 'Germany',
+    'Europe/Amsterdam': 'Netherlands', 'Europe/Brussels': 'Belgium', 'Europe/Madrid': 'Spain', 'Europe/Rome': 'Italy',
+    'Europe/Zurich': 'Switzerland', 'Europe/Vienna': 'Austria', 'Europe/Stockholm': 'Sweden', 'Europe/Oslo': 'Norway',
+    'Europe/Copenhagen': 'Denmark', 'Europe/Helsinki': 'Finland', 'Europe/Warsaw': 'Poland', 'Europe/Prague': 'Czechia',
+    'Europe/Lisbon': 'Portugal', 'Europe/Athens': 'Greece', 'Europe/Kiev': 'Ukraine', 'Europe/Kyiv': 'Ukraine', 'Europe/Moscow': 'Russia',
+    'America/New_York': 'United States', 'America/Chicago': 'United States', 'America/Denver': 'United States',
+    'America/Los_Angeles': 'United States', 'America/Phoenix': 'United States', 'America/Anchorage': 'United States',
+    'America/Detroit': 'United States', 'Pacific/Honolulu': 'United States', 'America/Toronto': 'Canada', 'America/Vancouver': 'Canada',
+    'America/Edmonton': 'Canada', 'America/Winnipeg': 'Canada', 'America/Halifax': 'Canada', 'America/Mexico_City': 'Mexico',
+    'America/Sao_Paulo': 'Brazil', 'America/Argentina/Buenos_Aires': 'Argentina', 'America/Bogota': 'Colombia', 'America/Lima': 'Peru',
+    'America/Santiago': 'Chile', 'Africa/Lagos': 'Nigeria', 'Africa/Nairobi': 'Kenya', 'Africa/Johannesburg': 'South Africa',
+    'Africa/Cairo': 'Egypt', 'Australia/Sydney': 'Australia', 'Australia/Melbourne': 'Australia', 'Australia/Brisbane': 'Australia',
+    'Australia/Perth': 'Australia', 'Australia/Adelaide': 'Australia', 'Pacific/Auckland': 'New Zealand'
+  };
+  function country(tz) {
+    if (!tz) return 'Unknown';
+    if (TZ_COUNTRY[tz]) return TZ_COUNTRY[tz];
+    if (/^America\/(Indiana|Kentucky|North_Dakota)\//.test(tz)) return 'United States';
+    const parts = tz.split('/');
+    return parts[parts.length - 1].replace(/_/g, ' ') + ' (' + parts[0] + ')';
+  }
+
+  // Where a session came from.
+  function hostOf(url) { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return null; } }
+  function channel(pv) {
+    if (!pv) return 'Direct';
+    const host = hostOf(pv.referrer);
+    const med = (pv.utm_medium || '').toLowerCase();
+    if (med === 'email' || /mail\./.test(host || '')) return 'Email';
+    if (pv.utm_source || pv.utm_campaign) return 'Campaign';
+    if (!host || host === location.hostname.replace(/^www\./, '')) return 'Direct';
+    if (/(^|\.)(chatgpt\.com|openai\.com|perplexity\.ai|claude\.ai|gemini\.google\.com|copilot\.microsoft\.com)$/.test(host)) return 'AI assistants';
+    if (/(^|\.)(google\.|bing\.com|duckduckgo\.com|yahoo\.|yandex\.|baidu\.com|ecosia\.org|search\.brave\.com)/.test(host)) return 'Search';
+    if (/(^|\.)(facebook\.com|fb\.com|instagram\.com|t\.co|twitter\.com|x\.com|linkedin\.com|lnkd\.in|reddit\.com|youtube\.com|whatsapp\.com|wa\.me|telegram\.org|t\.me|pinterest\.|threads\.net|quora\.com)/.test(host)) return 'Social';
+    return 'Referral';
+  }
+  function bucket(w) { return !w ? 'desktop' : w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop'; }
+  const pageName = (p) => p === '/' ? '/ (home)' : p;
+
+  // ---------- Supabase reads ----------
+  async function rest(path, opts) {
+    const token = await auth.token();
+    if (!token) throw Object.assign(new Error('Signed out'), { code: 'auth' });
+    const res = await fetch(API + path, Object.assign({}, opts, {
+      headers: Object.assign({ apikey: cfg.anonKey, Authorization: 'Bearer ' + token }, (opts && opts.headers) || {})
+    }));
+    if (res.status === 401) throw Object.assign(new Error('Signed out'), { code: 'auth' });
+    if (!res.ok) { const t = await res.text(); throw new Error('Supabase ' + res.status + ': ' + t.slice(0, 200)); }
+    return res.status === 204 ? null : res.json();
+  }
+  async function fetchAll(table, select, filter) {
+    const out = [];
+    let last = 0;
+    for (;;) {
+      const rows = await rest(`${table}?select=${select}&id=gt.${last}${filter ? '&' + filter : ''}&order=id.asc&limit=1000`);
+      out.push(...rows);
+      if (rows.length < 1000) break;
+      last = rows[rows.length - 1].id;
+    }
+    return out;
+  }
+
+  // ---------- state ----------
+  const RANGES = { today: 'Today', '7d': '7 days', '30d': '30 days', '90d': '90 days' };
+  const state = {
+    range: lsGet('dvi_an_range') || '7d',
+    hideMine: lsGet('dvi_an_hide') !== '0',
+    tab: lsGet('dvi_an_tab') || 'overview',
+    raw: [], access: [], recIndex: [], loadedAt: null,
+    sessionLimit: 50, selectedSession: null
+  };
+  if (!RANGES[state.range]) state.range = '7d';
+  function rangeStart() {
+    const d = new Date();
+    if (state.range === 'today') { d.setHours(0, 0, 0, 0); return d; }
+    const days = parseInt(state.range, 10);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - (days - 1));
+    return d;
+  }
+
+  // ---------- gates ----------
+  function showSetup() {
+    app.innerHTML = `
+      <div class="gate" style="max-width:640px">
+        <div class="card">
+          <h2>Connect analytics to Supabase</h2>
+          <p class="hint">Tracking is off until these steps are done.</p>
+          <ol class="steps">
+            <li>In Supabase, open your project → <b>Authentication → Users → Add user</b>. Use the same email and password as this admin login.</li>
+            <li>Open <code>analytics/supabase-setup.sql</code>, put that email where it says <code>admin@example.com</code>, then run the whole file in <b>SQL Editor</b>.</li>
+            <li>From <b>Project Settings → API</b>, copy the Project URL and the anon / publishable key into <code>analytics/config.js</code>.</li>
+            <li>Commit and push. Visits start appearing here within seconds.</li>
+          </ol>
+        </div>
+      </div>`;
+  }
+  function showSignIn(message) {
+    app.innerHTML = `
+      <div class="gate">
+        <div class="card">
+          <h2>Sign in to view analytics</h2>
+          <p class="hint">Uses your Supabase admin account.</p>
+          <form id="sbForm">
+            <label for="sbEmail">Email</label><input id="sbEmail" type="email" required autocomplete="username">
+            <label for="sbPass">Password</label><input id="sbPass" type="password" required autocomplete="current-password">
+            <button class="btn primary" type="submit">Sign in</button>
+            <div class="error" id="sbErr">${esc(message || '')}</div>
+          </form>
+        </div>
+      </div>`;
+    document.getElementById('sbForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('sbErr');
+      err.textContent = 'Signing in…';
+      try {
+        await auth.signIn(document.getElementById('sbEmail').value.trim(), document.getElementById('sbPass').value);
+        start();
+      } catch (ex) { err.textContent = ex.message; }
+    });
+  }
+
+  async function start() {
+    if (!auth.configured()) { showSetup(); return; }
+    if (!(await auth.token())) { showSignIn(); return; }
+    const s = auth.session();
+    document.getElementById('whoami').textContent = s && s.email ? 'Signed in as ' + s.email : '';
+    renderShell();
+    await load();
+  }
+
+  async function load() {
+    const body = document.getElementById('tabBody');
+    body.innerHTML = '<div class="loading">Loading data…</div>';
+    try {
+      const since = rangeStart().toISOString();
+      const [raw, access, recIndex] = await Promise.all([
+        fetchAll('analytics_events', '*', 'created_at=gte.' + encodeURIComponent(since)),
+        fetchAll('analytics_events', 'id,created_at,visitor_id,session_id,type,path,device,browser,os,tz,lang,screen_w,screen_h',
+          'type=in.(admin_login,admin_login_failed,admin_view)'),
+        fetchAll('analytics_recordings', 'id,session_id,page_id,path,seq,created_at', 'created_at=gte.' + encodeURIComponent(since))
+      ]);
+      Object.assign(state, { raw, access, recIndex, loadedAt: new Date() });
+      document.getElementById('updated').textContent = 'Updated ' + state.loadedAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+      renderTab();
+    } catch (ex) {
+      if (ex.code === 'auth') { showSignIn('Your Supabase sign-in expired. Please sign in again.'); return; }
+      body.innerHTML = `<div class="banner warn">Couldn't load analytics: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  // ---------- model ----------
+  function model() {
+    const adminVisitors = new Set(state.access.filter((e) => e.type === 'admin_login').map((e) => e.visitor_id));
+    const events = state.raw.filter((e) =>
+      !['admin_login', 'admin_login_failed', 'admin_view'].includes(e.type) &&
+      !(state.hideMine && (e.is_admin || adminVisitors.has(e.visitor_id))));
+    events.sort((a, b) => a.id - b.id);
+
+    const pageviews = events.filter((e) => e.type === 'pageview');
+    const engage = events.filter((e) => e.type === 'engage');
+    const clicks = events.filter((e) => e.type === 'click');
+
+    // per page view: engaged time, deepest scroll, load time
+    const views = new Map();
+    for (const pv of pageviews) views.set(pv.page_id, { pv, ms: 0, scroll: null, load: null });
+    for (const e of engage) {
+      const v = views.get(e.page_id);
+      if (!v) continue;
+      v.ms += e.duration_ms || 0;
+      if (e.scroll_pct != null) v.scroll = Math.max(v.scroll || 0, e.scroll_pct);
+      if (e.props && e.props.load_ms) v.load = e.props.load_ms;
+    }
+
+    // sessions
+    const sessions = new Map();
+    for (const e of events) {
+      let s = sessions.get(e.session_id);
+      if (!s) {
+        s = { id: e.session_id, visitor: e.visitor_id, start: e.created_at, end: e.created_at, events: [], pages: [], ms: 0 };
+        sessions.set(e.session_id, s);
+      }
+      s.events.push(e);
+      s.end = e.created_at;
+      if (e.type === 'pageview') s.pages.push(e);
+      if (e.type === 'engage') s.ms += e.duration_ms || 0;
+    }
+    const sessList = [...sessions.values()].filter((s) => s.pages.length);
+    for (const s of sessList) {
+      s.first = s.pages[0];
+      s.channel = channel(s.first);
+      s.converted = s.events.some((e) => e.type === 'form_submit' || (e.type === 'click' && e.name === 'download'));
+      s.engaged = s.pages.length > 1 || s.ms >= 10000 || s.converted;
+    }
+    sessList.sort((a, b) => new Date(b.start) - new Date(a.start));
+
+    // A visit is "new" only when it's that browser's very first one on the site.
+    for (const s of sessList) s.returning = !(s.first.props && s.first.props.new_visitor);
+
+    return { events, pageviews, engage, clicks, views, sessions: sessList, adminVisitors };
+  }
+
+  // ---------- shell ----------
+  const TABS = [
+    ['overview', 'Overview'], ['sources', 'Sources & audience'], ['journeys', 'Journeys'],
+    ['behavior', 'Clicks & events'], ['heatmaps', 'Heatmaps'], ['sessions', 'Sessions & recordings'], ['admin', 'Admin sign-ins']
+  ];
+  function renderShell() {
+    app.innerHTML = `
+      <div class="pagehead">
+        <div><h1>Website Analytics</h1><p>Everything visitors do on devindi.in, up to the admin sign-in screen. <span class="muted" id="updated"></span></p></div>
+        <div class="filters">
+          <div class="seg" id="rangeSeg">${Object.entries(RANGES).map(([k, v]) => `<button data-r="${k}" class="${k === state.range ? 'on' : ''}">${v}</button>`).join('')}</div>
+          <label class="toggle"><input type="checkbox" id="hideMine" ${state.hideMine ? 'checked' : ''}> Hide my own visits</label>
+          <button class="btn" id="refresh">Refresh</button>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">${TABS.map(([k, v]) => `<button data-t="${k}" class="${k === state.tab ? 'on' : ''}">${v}</button>`).join('')}</nav>
+      <div id="tabBody"></div>`;
+    document.getElementById('rangeSeg').addEventListener('click', (e) => {
+      const r = e.target.getAttribute('data-r'); if (!r) return;
+      state.range = r; lsSet('dvi_an_range', r);
+      [...e.currentTarget.children].forEach((b) => b.classList.toggle('on', b === e.target));
+      load();
+    });
+    document.getElementById('hideMine').addEventListener('change', (e) => {
+      state.hideMine = e.target.checked; lsSet('dvi_an_hide', e.target.checked ? '1' : '0'); renderTab();
+    });
+    document.getElementById('refresh').addEventListener('click', load);
+    document.getElementById('tabs').addEventListener('click', (e) => {
+      const t = e.target.getAttribute('data-t'); if (!t) return;
+      state.tab = t; lsSet('dvi_an_tab', t);
+      [...e.currentTarget.children].forEach((b) => b.classList.toggle('on', b === e.target));
+      renderTab();
+    });
+  }
+
+  function renderTab() {
+    const m = model();
+    const body = document.getElementById('tabBody');
+    const fn = { overview, sources, journeys, behavior, heatmaps, sessionsTab, admin: adminTab }[state.tab === 'sessions' ? 'sessionsTab' : state.tab] || overview;
+    body.innerHTML = '';
+    if (!state.raw.length && state.tab !== 'admin') {
+      body.insertAdjacentHTML('beforeend', `<div class="banner info">No visits recorded in this period yet. If the site is live and this stays empty, check that the email in <code>supabase-setup.sql</code> matches the account you're signed in with.</div>`);
+    }
+    fn(body, m);
+  }
+
+  // ---------- building blocks ----------
+  function card(parent, title, hint, inner, cls) {
+    const el = document.createElement('div');
+    el.className = 'card' + (cls ? ' ' + cls : '');
+    el.innerHTML = `<h2>${esc(title)}</h2>${hint ? `<p class="hint">${esc(hint)}</p>` : ''}`;
+    if (typeof inner === 'string') el.insertAdjacentHTML('beforeend', inner); else if (inner) el.appendChild(inner);
+    parent.appendChild(el);
+    return el;
+  }
+  function grid(parent, cls) { const g = document.createElement('div'); g.className = 'grid' + (cls ? ' ' + cls : ''); parent.appendChild(g); return g; }
+  function barList(items, opts) {
+    opts = opts || {};
+    const top = items.slice(0, opts.limit || 10);
+    if (!top.length) return '<div class="empty">Nothing yet.</div>';
+    const max = Math.max(...top.map((i) => i.value)) || 1;
+    return '<div class="bars">' + top.map((i) => `
+      <div class="bar-row" title="${esc(i.title || i.label)}">
+        <div class="fill" style="width:${(i.value / max * 100).toFixed(1)}%"></div>
+        <div class="lbl">${esc(i.label)}${i.sub ? `<small>${esc(i.sub)}</small>` : ''}</div>
+        <div class="val">${i.valText != null ? esc(i.valText) : fmt(i.value)}</div>
+      </div>`).join('') + '</div>';
+  }
+  function table(cols, rows, opts) {
+    opts = opts || {};
+    if (!rows.length) return '<div class="empty">Nothing yet.</div>';
+    return `<div class="tbl-wrap"><table><thead><tr>${cols.map((c) => `<th class="${c.num ? 'num' : ''}">${esc(c.label)}</th>`).join('')}</tr></thead><tbody>` +
+      rows.map((r, i) => `<tr ${opts.rowAttr ? opts.rowAttr(r, i) : ''}>${cols.map((c) => `<td class="${c.num ? 'num' : ''}">${c.html ? c.html(r) : esc(c.get(r))}</td>`).join('')}</tr>`).join('') +
+      '</tbody></table></div>';
+  }
+  function showTip(html, x, y) {
+    tip.innerHTML = html; tip.style.display = 'block';
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.min(window.innerWidth - w - 8, x + 14) + 'px';
+    tip.style.top = Math.max(8, y - h - 10) + 'px';
+  }
+  function hideTip() { tip.style.display = 'none'; }
+
+  // Visitors per day (or hour for "Today"): one gold series, hover for details.
+  function timeChart(container, m) {
+    const today = state.range === 'today';
+    const start = rangeStart();
+    const count = today ? 24 : Math.max(1, Math.ceil((new Date().setHours(23, 59, 59) - start) / 86400000));
+    const buckets = Array.from({ length: count }, (_, i) => {
+      const d = new Date(start);
+      if (today) d.setHours(i); else d.setDate(d.getDate() + i);
+      return { d, visitors: new Set(), sessions: new Set(), views: 0 };
+    });
+    for (const pv of m.pageviews) {
+      const t = new Date(pv.created_at);
+      const i = today ? t.getHours() : Math.floor((new Date(t).setHours(0, 0, 0, 0) - start) / 86400000);
+      const b = buckets[i];
+      if (!b) continue;
+      b.visitors.add(pv.visitor_id); b.sessions.add(pv.session_id); b.views++;
+    }
+    const W = Math.max(280, container.clientWidth || 600), H = 190, padL = 30, padB = 22, padT = 8;
+    const max = Math.max(1, ...buckets.map((b) => b.visitors.size));
+    const niceMax = max <= 4 ? max : Math.ceil(max / 4) * 4;
+    const plotW = W - padL, plotH = H - padB - padT;
+    const bw = plotW / buckets.length;
+    const barW = Math.max(2, Math.min(28, bw - 2));
+    let svg = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Visitors per ${today ? 'hour' : 'day'}">`;
+    const steps = niceMax % 2 === 0 ? 2 : 1;
+    for (let g = 0; g <= steps; g++) {
+      const v = niceMax * g / steps, y = padT + plotH - plotH * g / steps;
+      svg += `<line x1="${padL}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--grid)"/>`;
+      svg += `<text x="${padL - 6}" y="${y + 4}" fill="var(--ink-faint)" font-size="10.5" text-anchor="end">${fmt(v)}</text>`;
+    }
+    buckets.forEach((b, i) => {
+      const v = b.visitors.size;
+      const h = v ? Math.max(2, plotH * v / niceMax) : 0;
+      const x = padL + i * bw + (bw - barW) / 2, y = padT + plotH - h, r = Math.min(4, barW / 2, h);
+      if (h) svg += `<path d="M${x},${y + h} V${y + r} Q${x},${y} ${x + r},${y} H${x + barW - r} Q${x + barW},${y} ${x + barW},${y + r} V${y + h} Z" fill="var(--gold)"/>`;
+      svg += `<rect class="hit" data-i="${i}" x="${padL + i * bw}" y="${padT}" width="${bw}" height="${plotH}" fill="transparent"/>`;
+    });
+    const label = (b) => today ? b.d.toLocaleTimeString('en-IN', { hour: 'numeric' }) : b.d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const ticks = [0, Math.floor((buckets.length - 1) / 2), buckets.length - 1].filter((v, i, a) => a.indexOf(v) === i);
+    for (const i of ticks) {
+      const x = padL + i * bw + bw / 2;
+      svg += `<text x="${x}" y="${H - 5}" fill="var(--ink-faint)" font-size="10.5" text-anchor="${i === 0 ? 'start' : i === buckets.length - 1 ? 'end' : 'middle'}">${label(buckets[i])}</text>`;
+    }
+    svg += '</svg>';
+    container.innerHTML = svg;
+    container.querySelectorAll('.hit').forEach((r) => {
+      r.addEventListener('mousemove', (e) => {
+        const b = buckets[+r.getAttribute('data-i')];
+        showTip(`<b>${esc(label(b))}</b><br>${fmt(b.visitors.size)} visitors<br>${fmt(b.sessions.size)} sessions<br>${fmt(b.views)} pageviews`, e.clientX, e.clientY);
+      });
+      r.addEventListener('mouseleave', hideTip);
+    });
+  }
+
+  // ---------- tabs ----------
+  function overview(body, m) {
+    const visitors = new Set(m.pageviews.map((p) => p.visitor_id)).size;
+    const sess = m.sessions.length;
+    const engaged = m.sessions.filter((s) => s.engaged).length;
+    const viewList = [...m.views.values()];
+    const avgTime = viewList.length ? viewList.reduce((a, v) => a + v.ms, 0) / viewList.length : null;
+    const avgSess = sess ? m.sessions.reduce((a, s) => a + s.ms, 0) / sess : null;
+    const liveSince = Date.now() - 5 * 60 * 1000;
+    const live = new Set(m.events.filter((e) => new Date(e.created_at) > liveSince).map((e) => e.visitor_id)).size;
+    const newVisitors = new Set(m.sessions.filter((s) => !s.returning).map((s) => s.visitor)).size;
+
+    const lastLogin = state.access.filter((e) => e.type === 'admin_login').slice(-1)[0];
+    const failed = state.access.filter((e) => e.type === 'admin_login_failed' && new Date(e.created_at) >= rangeStart()).length;
+    if (lastLogin || failed) {
+      const mine = lastLogin && lastLogin.visitor_id === lsGet('dvi_vid');
+      body.insertAdjacentHTML('beforeend', `<div class="banner ${failed ? 'warn' : 'info'}">
+        ${lastLogin ? `Last admin sign-in: <b>${esc(when(lastLogin.created_at))}</b> · ${esc(lastLogin.device)} · ${esc(lastLogin.browser)} on ${esc(lastLogin.os)} ${mine ? '<span class="pill good">this browser</span>' : '<span class="pill bad">another browser</span>'}` : ''}
+        ${failed ? ` · <b>${failed}</b> failed sign-in attempt${failed > 1 ? 's' : ''} in this period` : ''}
+        <a href="#" data-goto="admin" style="margin-left:auto;color:var(--gold)">See all →</a></div>`);
+      body.querySelector('[data-goto]').addEventListener('click', (e) => { e.preventDefault(); document.querySelector('[data-t="admin"]').click(); });
+    }
+
+    body.insertAdjacentHTML('beforeend', `<div class="kpis">
+      <div class="kpi"><div class="label">Visitors</div><div class="value">${fmt(visitors)}</div><div class="sub">${fmt(newVisitors)} new</div></div>
+      <div class="kpi"><div class="label">Visits (sessions)</div><div class="value">${fmt(sess)}</div><div class="sub">${sess ? (m.pageviews.length / sess).toFixed(1) : '–'} pages per visit</div></div>
+      <div class="kpi"><div class="label">Pageviews</div><div class="value">${fmt(m.pageviews.length)}</div><div class="sub">${fmt(m.clicks.length)} clicks</div></div>
+      <div class="kpi"><div class="label">Avg. time on page</div><div class="value">${dur(avgTime)}</div><div class="sub">visit: ${dur(avgSess)}</div></div>
+      <div class="kpi"><div class="label">Bounce rate</div><div class="value">${sess ? pct(1 - engaged / sess) : '–'}</div><div class="sub">1 page, under 10s</div></div>
+      <div class="kpi"><div class="label">Live now</div><div class="value">${live ? '<span class="live-dot"></span>' : ''}${fmt(live)}</div><div class="sub">active in last 5 min</div></div>
+    </div>`);
+
+    const chartCard = card(grid(body, 'wide'), state.range === 'today' ? 'Visitors per hour' : 'Visitors per day', 'Hover a bar for visits and pageviews.', '<div class="chart"></div>');
+    timeChart(chartCard.querySelector('.chart'), m);
+
+    const g = grid(body);
+    card(g, 'Top pages', 'Pageviews', barList(countBy(m.pageviews, 'path').map(([p, n]) => ({ label: pageName(p), value: n }))));
+    card(g, 'Where visitors come from', 'Visits by channel', barList(countBy(m.sessions, 'channel').map(([c, n]) => ({ label: c, value: n }))));
+    card(g, 'Countries', 'Visitors, from browser time zone', barList(uniqBy(m.pageviews, (p) => country(p.tz), (p) => p.visitor_id).map(([c, n]) => ({ label: c, value: n }))));
+    card(g, 'Devices', 'Visitors', barList(uniqBy(m.pageviews, (p) => p.device, (p) => p.visitor_id).map(([c, n]) => ({ label: c, value: n }))));
+  }
+
+  function sources(body, m) {
+    const g = grid(body);
+    card(g, 'Channels', 'Visits by how people arrived', barList(countBy(m.sessions, 'channel').map(([c, n]) => ({ label: c, value: n }))));
+    card(g, 'Referring sites', 'Visits by the site that linked here', barList(countBy(m.sessions.filter((s) => s.first.referrer && hostOf(s.first.referrer) !== location.hostname.replace(/^www\./, '')), (s) => hostOf(s.first.referrer)).map(([c, n]) => ({ label: c, value: n })), { limit: 15 }));
+    card(g, 'Campaigns', 'Visits from links tagged with ?utm_source= or ?ref=', barList(countBy(m.sessions.filter((s) => s.first.utm_source || s.first.utm_campaign), (s) => [s.first.utm_source, s.first.utm_medium, s.first.utm_campaign].filter(Boolean).join(' / ')).map(([c, n]) => ({ label: c, value: n }))));
+    card(g, 'Referring pages', 'Exact page that linked here', barList(countBy(m.sessions.filter((s) => s.channel !== 'Direct' && s.first.referrer), (s) => s.first.referrer).map(([c, n]) => ({ label: c.replace(/^https?:\/\/(www\.)?/, ''), value: n })), { limit: 15 }));
+    const g2 = grid(body);
+    const vis = (key) => uniqBy(m.pageviews, key, (p) => p.visitor_id).map(([c, n]) => ({ label: c, value: n }));
+    card(g2, 'Countries', 'Visitors, from browser time zone', barList(vis((p) => country(p.tz)), { limit: 15 }));
+    card(g2, 'Time zones', 'Visitors', barList(vis((p) => p.tz || 'Unknown'), { limit: 15 }));
+    card(g2, 'Languages', 'Visitors, browser language', barList(vis((p) => p.lang || 'Unknown')));
+    card(g2, 'Devices', 'Visitors', barList(vis((p) => p.device)));
+    card(g2, 'Browsers', 'Visitors', barList(vis((p) => p.browser)));
+    card(g2, 'Operating systems', 'Visitors', barList(vis((p) => p.os)));
+    card(g2, 'Screen sizes', 'Visitors', barList(vis((p) => p.screen_w ? p.screen_w + ' × ' + p.screen_h : 'Unknown')));
+    const ret = m.sessions.filter((s) => s.returning).length;
+    card(g2, 'New vs returning', 'Visits', barList([{ label: 'New visitors', value: m.sessions.length - ret }, { label: 'Returning visitors', value: ret }]));
+  }
+
+  function journeys(body, m) {
+    const g = grid(body);
+    card(g, 'Entry pages', 'First page of each visit', barList(countBy(m.sessions, (s) => s.first.path).map(([p, n]) => ({ label: pageName(p), value: n }))));
+    card(g, 'Exit pages', 'Last page of each visit', barList(countBy(m.sessions, (s) => s.pages[s.pages.length - 1].path).map(([p, n]) => ({ label: pageName(p), value: n }))));
+
+    // Most common full journeys
+    const pathsOf = (s) => {
+      const out = [];
+      for (const p of s.pages) if (out[out.length - 1] !== p.path) out.push(p.path);
+      return out;
+    };
+    const journeyCounts = countBy(m.sessions, (s) => {
+      const p = pathsOf(s);
+      return (p.length > 6 ? p.slice(0, 6).concat('…') : p).map(pageName).join('  →  ');
+    });
+    card(grid(body, 'wide'), 'Most common journeys', 'The pages each visit went through, in order (repeat views of the same page are merged).',
+      barList(journeyCounts.map(([j, n]) => ({ label: j, value: n })), { limit: 20 }));
+
+    // Page explorer: where people came from and where they went next
+    const pages = countBy(m.pageviews, 'path').map(([p]) => p);
+    const ex = card(grid(body, 'wide'), 'Page flow', 'Pick a page to see what people did just before and just after it.',
+      `<div class="controls"><select id="flowPage">${pages.map((p) => `<option value="${esc(p)}">${esc(pageName(p))}</option>`).join('')}</select></div><div class="grid" id="flowOut" style="margin:0"></div>`);
+    const sel = ex.querySelector('#flowPage');
+    const drawFlow = () => {
+      const target = sel.value, before = [], after = [];
+      for (const s of m.sessions) {
+        s.pages.forEach((p, i) => {
+          if (p.path !== target) return;
+          const prev = s.pages[i - 1], next = s.pages[i + 1];
+          before.push(prev ? pageName(prev.path) : 'Arrived from ' + s.channel);
+          after.push(next ? pageName(next.path) : 'Left the site');
+        });
+      }
+      const out = ex.querySelector('#flowOut');
+      out.innerHTML = '';
+      card(out, 'Came from', null, barList(countBy(before, (x) => x).map(([c, n]) => ({ label: c, value: n }))), '').style.background = 'var(--card-2)';
+      card(out, 'Went to next', null, barList(countBy(after, (x) => x).map(([c, n]) => ({ label: c, value: n }))), '').style.background = 'var(--card-2)';
+    };
+    sel.addEventListener('change', drawFlow);
+    if (pages.length) drawFlow();
+
+    // Funnel
+    const named = countBy(m.clicks.filter((c) => c.name), 'name').map(([n]) => n);
+    const forms = countBy(m.events.filter((e) => e.type === 'form_submit'), 'name').map(([n]) => n);
+    const opts = [['', '—']].concat(pages.map((p) => ['page:' + p, 'Visited ' + pageName(p)]), named.map((n) => ['click:' + n, 'Clicked: ' + n]), forms.map((n) => ['form:' + n, 'Submitted form: ' + n]));
+    const optHtml = (v) => opts.map(([k, l]) => `<option value="${esc(k)}" ${k === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
+    const saved = (lsGet('dvi_an_funnel') || '').split('|');
+    const defaults = saved.some(Boolean) ? saved : ['page:/', pages.includes('/shiftdrop/') ? 'page:/shiftdrop/' : '', named.includes('download') ? 'click:download' : '', ''];
+    const fc = card(grid(body, 'wide'), 'Funnel', 'Pick up to four steps in order. Shows how many visits reached each step.',
+      `<div class="controls">${[0, 1, 2, 3].map((i) => `<select class="fstep">${optHtml(defaults[i] || '')}</select>`).join('<span class="muted">→</span>')}</div><div id="funnelOut"></div>`);
+    const drawFunnel = () => {
+      const steps = [...fc.querySelectorAll('.fstep')].map((s) => s.value).filter(Boolean);
+      lsSet('dvi_an_funnel', [...fc.querySelectorAll('.fstep')].map((s) => s.value).join('|'));
+      const matches = (e, step) => {
+        const [kind, val] = [step.slice(0, step.indexOf(':')), step.slice(step.indexOf(':') + 1)];
+        if (kind === 'page') return e.type === 'pageview' && e.path === val;
+        if (kind === 'click') return e.type === 'click' && e.name === val;
+        if (kind === 'form') return e.type === 'form_submit' && e.name === val;
+        return false;
+      };
+      const reached = steps.map(() => 0);
+      for (const s of m.sessions) {
+        let k = 0;
+        for (const e of s.events) { if (k < steps.length && matches(e, steps[k])) { reached[k]++; k++; } }
+      }
+      const out = fc.querySelector('#funnelOut');
+      if (!steps.length) { out.innerHTML = '<div class="empty">Pick a step.</div>'; return; }
+      out.innerHTML = barList(steps.map((st, i) => ({
+        label: (i + 1) + '. ' + opts.find((o) => o[0] === st)[1], value: reached[i],
+        valText: fmt(reached[i]) + (i ? '  ·  ' + (reached[0] ? pct(reached[i] / reached[0]) : '–') + ' of step 1' : ' visits')
+      })), { limit: 4 });
+    };
+    fc.querySelectorAll('.fstep').forEach((s) => s.addEventListener('change', drawFunnel));
+    drawFunnel();
+  }
+
+  function behavior(body, m) {
+    const n = (f) => m.clicks.filter(f).length;
+    const errors = m.events.filter((e) => e.type === 'js_error');
+    const custom = m.events.filter((e) => e.type === 'custom');
+    body.insertAdjacentHTML('beforeend', `<div class="kpis">
+      <div class="kpi"><div class="label">Downloads</div><div class="value">${fmt(n((c) => c.name === 'download'))}</div><div class="sub">download link clicks</div></div>
+      <div class="kpi"><div class="label">Outbound clicks</div><div class="value">${fmt(n((c) => c.name === 'outbound'))}</div><div class="sub">links to other sites</div></div>
+      <div class="kpi"><div class="label">Email link clicks</div><div class="value">${fmt(n((c) => c.name === 'email_link'))}</div><div class="sub">mailto links</div></div>
+      <div class="kpi"><div class="label">Form submits</div><div class="value">${fmt(m.events.filter((e) => e.type === 'form_submit').length)}</div><div class="sub">e.g. feedback</div></div>
+      <div class="kpi"><div class="label">Rage clicks</div><div class="value">${fmt(n((c) => c.props && c.props.rage))}</div><div class="sub">3+ fast clicks, one spot</div></div>
+      <div class="kpi"><div class="label">Dead clicks</div><div class="value">${fmt(n((c) => c.props && c.props.dead))}</div><div class="sub">clicks on non-clickable things</div></div>
+      <div class="kpi"><div class="label">JS errors</div><div class="value">${fmt(errors.length)}</div><div class="sub">script errors on pages</div></div>
+    </div>`);
+
+    const g = grid(body);
+    card(g, 'Most clicked elements', 'Buttons, links and other things people clicked', barList(countBy(m.clicks.filter((c) => !(c.props && c.props.dead)), (c) => c.target + '\u0000' + c.path).map(([k, v]) => { const [t, p] = k.split('\u0000'); return { label: t, sub: pageName(p), value: v }; }), { limit: 15 }));
+    card(g, 'Downloads', 'Which download links were clicked', barList(countBy(m.clicks.filter((c) => c.name === 'download'), 'href').map(([h, v]) => ({ label: h.replace(/^https?:\/\//, ''), value: v }))));
+    card(g, 'Outbound links', 'Where people left to', barList(countBy(m.clicks.filter((c) => c.name === 'outbound'), (c) => (c.href || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\?.*$/, '')).map(([h, v]) => ({ label: h, value: v })), { limit: 15 }));
+    card(g, 'Rage and dead clicks', 'Spots where people got frustrated or expected something to happen', barList(countBy(m.clicks.filter((c) => c.props && (c.props.rage || c.props.dead)), (c) => (c.props.rage ? 'Rage · ' : 'Dead · ') + c.target + '\u0000' + c.path).map(([k, v]) => { const [t, p] = k.split('\u0000'); return { label: t, sub: pageName(p), value: v }; })));
+
+    // Scroll depth and load time per page
+    const perPage = new Map();
+    for (const v of m.views.values()) {
+      const p = v.pv.path;
+      if (!perPage.has(p)) perPage.set(p, { views: 0, ms: 0, scrolls: [], loads: [] });
+      const x = perPage.get(p);
+      x.views++; x.ms += v.ms;
+      if (v.scroll != null) x.scrolls.push(v.scroll);
+      if (v.load) x.loads.push(v.load);
+    }
+    const reach = (arr, d) => arr.length ? arr.filter((s) => s >= d).length / arr.length : null;
+    const rows = [...perPage.entries()].sort((a, b) => b[1].views - a[1].views);
+    card(grid(body, 'wide'), 'Page engagement', 'Time is how long the page was visible; scroll shows the share of views that got at least that far down the page.', table([
+      { label: 'Page', get: (r) => pageName(r[0]) },
+      { label: 'Views', num: true, get: (r) => fmt(r[1].views) },
+      { label: 'Avg. time', num: true, get: (r) => dur(r[1].ms / r[1].views) },
+      { label: 'Saw 25%', num: true, get: (r) => pct(reach(r[1].scrolls, 25)) },
+      { label: 'Saw 50%', num: true, get: (r) => pct(reach(r[1].scrolls, 50)) },
+      { label: 'Saw 75%', num: true, get: (r) => pct(reach(r[1].scrolls, 75)) },
+      { label: 'Saw it all', num: true, get: (r) => pct(reach(r[1].scrolls, 98)) },
+      { label: 'Load time', num: true, get: (r) => r[1].loads.length ? (r[1].loads.reduce((a, b) => a + b, 0) / r[1].loads.length / 1000).toFixed(1) + 's' : '–' }
+    ], rows));
+
+    const g2 = grid(body);
+    card(g2, 'Custom events', 'Sent from page code with devindiAnalytics.track(name)', barList(countBy(custom, 'name').map(([c, v]) => ({ label: c, value: v }))));
+    card(g2, 'JS errors', 'Script errors visitors hit', table([
+      { label: 'When', get: (e) => when(e.created_at) },
+      { label: 'Page', get: (e) => pageName(e.path) },
+      { label: 'Error', get: (e) => e.target + (e.href ? ' (' + e.href.replace(/^https?:\/\/[^/]+/, '') + ')' : '') }
+    ], errors.slice(-20).reverse()));
+  }
+
+  function heatmaps(body, m) {
+    const pages = countBy(m.clicks, 'path').map(([p]) => p);
+    const allPages = [...new Set(pages.concat(countBy(m.pageviews, 'path').map(([p]) => p)))];
+    const c = card(grid(body, 'wide'), 'Click and scroll heatmap',
+      'Brighter spots got more clicks. Dashed lines show how far down the page a share of visitors scrolled.',
+      `<div class="controls">
+        <select id="hmPage">${allPages.map((p) => `<option value="${esc(p)}">${esc(pageName(p))}</option>`).join('')}</select>
+        <div class="seg" id="hmDev"><button data-d="desktop" class="on">Desktop</button><button data-d="tablet">Tablet</button><button data-d="mobile">Mobile</button></div>
+        <span class="muted" id="hmCount"></span>
+      </div>
+      <div class="heat-stage" id="hmStage"><div class="heat-inner" id="hmInner"><iframe id="hmFrame" title="Page preview" scrolling="no"></iframe><canvas id="hmCanvas"></canvas></div></div>`);
+    if (!allPages.length) { c.querySelector('.heat-stage').outerHTML = '<div class="empty">No page data in this period.</div>'; return; }
+    const listCard = card(grid(body, 'wide'), 'Clicks on this page', null, '<div id="hmList"></div>');
+    let dev = 'desktop';
+    const WIDTHS = { desktop: 1280, tablet: 820, mobile: 390 };
+    const frame = c.querySelector('#hmFrame'), canvas = c.querySelector('#hmCanvas'), inner = c.querySelector('#hmInner'), stage = c.querySelector('#hmStage');
+
+    function draw() {
+      const page = c.querySelector('#hmPage').value;
+      const width = WIDTHS[dev];
+      const clicks = m.clicks.filter((k) => k.path === page && bucket(k.viewport_w) === dev && k.x != null);
+      const scrolls = [...m.views.values()].filter((v) => v.pv.path === page && bucket(v.pv.viewport_w) === dev && v.scroll != null).map((v) => v.scroll).sort((a, b) => b - a);
+      c.querySelector('#hmCount').textContent = `${fmt(clicks.length)} clicks · ${fmt(scrolls.length)} views on ${dev}`;
+      listCard.querySelector('#hmList').innerHTML = barList(countBy(clicks, 'target').map(([t, n]) => ({ label: t, value: n })), { limit: 15 });
+
+      // Only ever load our own pages into the preview.
+      let url;
+      try { url = new URL(page, location.origin); } catch (e) { return; }
+      if (url.origin !== location.origin || !/^\/[\w\-./]*$/.test(page) || page.includes('..') || page.startsWith('/admin')) return;
+      url.search = 'noanalytics';
+      frame.style.width = width + 'px';
+      frame.style.height = '900px';
+      frame.onload = () => {
+        let h = 900;
+        try {
+          const d = frame.contentDocument;
+          h = Math.min(8000, Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0));
+        } catch (e) {}
+        frame.style.height = h + 'px';
+        canvas.width = width; canvas.height = h;
+        canvas.style.width = width + 'px'; canvas.style.height = h + 'px';
+        paint(canvas, clicks, scrolls, width, h);
+        const scale = Math.min(1, stage.clientWidth / width);
+        inner.style.transform = `scale(${scale})`;
+        stage.style.height = Math.ceil(h * scale) + 'px';
+        stage.style.width = Math.ceil(width * scale) + 'px';
+      };
+      frame.src = url.href;
+    }
+    c.querySelector('#hmPage').addEventListener('change', draw);
+    c.querySelector('#hmDev').addEventListener('click', (e) => {
+      const d = e.target.getAttribute('data-d'); if (!d) return;
+      dev = d;
+      [...e.currentTarget.children].forEach((b) => b.classList.toggle('on', b === e.target));
+      draw();
+    });
+    draw();
+  }
+
+  function paint(canvas, clicks, scrolls, w, h) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+    // 1. density: soft white blobs on an offscreen canvas
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const o = off.getContext('2d');
+    const R = 28;
+    for (const k of clicks) {
+      const x = k.x * w, y = k.y;
+      const g = o.createRadialGradient(x, y, 0, x, y, R);
+      g.addColorStop(0, 'rgba(0,0,0,0.35)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      o.fillStyle = g;
+      o.fillRect(x - R, y - R, R * 2, R * 2);
+    }
+    // 2. colour by density: dim -> gold -> hot red
+    const img = o.getImageData(0, 0, w, h);
+    const px = img.data;
+    for (let i = 0; i < px.length; i += 4) {
+      const a = px[i + 3] / 255;
+      if (!a) continue;
+      const t = Math.min(1, a * 1.4);
+      px[i] = 217 + (226 - 217) * t;
+      px[i + 1] = 164 + (70 - 164) * t;
+      px[i + 2] = 65 + (50 - 65) * t;
+      px[i + 3] = Math.round(70 + 170 * t);
+    }
+    ctx.putImageData(img, 0, 0);
+    // 3. scroll reach lines
+    if (scrolls.length >= 1) {
+      ctx.font = '600 13px Inter, sans-serif';
+      for (const share of [0.75, 0.5, 0.25]) {
+        const depth = percentile(scrolls, share); // scrolls sorted deepest first
+        if (depth == null) continue;
+        const y = Math.min(h - 2, depth / 100 * h);
+        ctx.setLineDash([8, 6]); ctx.strokeStyle = 'rgba(14,13,15,0.85)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        ctx.setLineDash([]);
+        const label = Math.round(share * 100) + '% of visitors scrolled this far';
+        const tw = ctx.measureText(label).width;
+        ctx.fillStyle = 'rgba(14,13,15,0.88)';
+        ctx.fillRect(w - tw - 22, y - 24, tw + 14, 22);
+        ctx.fillStyle = '#f4f3f0';
+        ctx.fillText(label, w - tw - 15, y - 8);
+      }
+    }
+  }
+
+  function sessionsTab(body, m) {
+    const recSessions = new Set(state.recIndex.map((r) => r.session_id));
+    const list = m.sessions.slice(0, state.sessionLimit);
+    const c = card(grid(body, 'wide'), 'Visits', 'Newest first. Click a visit to see every step, and watch the recording where there is one (▶).', table([
+      { label: 'Started', get: (s) => when(s.start) },
+      { label: 'Visitor', html: (s) => `<span class="mono">${esc(shortId(s.visitor))}</span> ${s.returning ? '<span class="pill">returning</span>' : '<span class="pill gold">new</span>'}` },
+      { label: 'Came from', get: (s) => s.channel + (s.first.referrer && s.channel !== 'Direct' ? ' · ' + hostOf(s.first.referrer) : '') },
+      { label: 'Entry page', get: (s) => pageName(s.first.path) },
+      { label: 'Pages', num: true, get: (s) => s.pages.length },
+      { label: 'Time', num: true, get: (s) => dur(s.ms) },
+      { label: 'Device', get: (s) => [s.first.device, s.first.browser, s.first.os].join(' · ') },
+      { label: 'Location', get: (s) => country(s.first.tz) },
+      { label: '', html: (s) => recSessions.has(s.id) ? '<span class="pill gold">▶ recording</span>' : '' }
+    ], list, { rowAttr: (s) => `class="clickable ${s.id === state.selectedSession ? 'sel' : ''}" data-s="${esc(s.id)}"` }));
+    if (m.sessions.length > state.sessionLimit) {
+      c.insertAdjacentHTML('beforeend', `<div style="margin-top:12px"><button class="btn" id="more">Show more (${fmt(m.sessions.length - state.sessionLimit)} older)</button></div>`);
+      c.querySelector('#more').addEventListener('click', () => { state.sessionLimit += 50; renderTab(); });
+    }
+    const detail = card(grid(body, 'wide'), 'Visit details', null, '<div id="detail" class="empty">Pick a visit above.</div>');
+    c.querySelectorAll('tr[data-s]').forEach((tr) => tr.addEventListener('click', () => {
+      state.selectedSession = tr.getAttribute('data-s');
+      c.querySelectorAll('tr[data-s]').forEach((x) => x.classList.toggle('sel', x === tr));
+      showSession(detail, m.sessions.find((s) => s.id === state.selectedSession), recSessions.has(state.selectedSession));
+      detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    if (state.selectedSession) {
+      const s = m.sessions.find((x) => x.id === state.selectedSession);
+      if (s) showSession(detail, s, recSessions.has(s.id));
+    }
+
+    const recRows = state.recIndex.length;
+    const keep = card(grid(body, 'wide'), 'Recording storage', `${fmt(recSessions.size)} recorded visits in this period (${fmt(recRows)} chunks). Recordings take the most space in Supabase; clear old ones now and then.`,
+      '<button class="btn danger" id="purge">Delete recordings older than 30 days</button> <span class="muted" id="purgeMsg"></span>');
+    keep.querySelector('#purge').addEventListener('click', async () => {
+      if (!confirm('Delete all session recordings older than 30 days? This cannot be undone.')) return;
+      const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+      try {
+        await rest('analytics_recordings?created_at=lt.' + encodeURIComponent(cutoff), { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+        keep.querySelector('#purgeMsg').textContent = 'Done.';
+      } catch (ex) { keep.querySelector('#purgeMsg').textContent = ex.message; }
+    });
+  }
+
+  function describeEvent(e) {
+    switch (e.type) {
+      case 'pageview': return ['Viewed page', pageName(e.path) + (e.title ? ' — ' + e.title : '')];
+      case 'engage': return ['Time on page', dur(e.duration_ms) + ' visible, scrolled ' + (e.scroll_pct == null ? '–' : e.scroll_pct + '%')];
+      case 'click': return [e.name ? 'Click · ' + e.name : (e.props && e.props.rage ? 'Rage click' : e.props && e.props.dead ? 'Dead click' : 'Click'), (e.target || '') + (e.href ? ' → ' + e.href : '')];
+      case 'form_submit': return ['Submitted form', e.name];
+      case 'js_error': return ['JS error', e.target];
+      case 'custom': return ['Event · ' + e.name, JSON.stringify(e.props || {})];
+      default: return [e.type, e.path];
+    }
+  }
+
+  async function showSession(detail, s, hasRec) {
+    const box = detail.querySelector('#detail') || detail;
+    const t0 = new Date(s.start).getTime();
+    const off = (iso) => { const sec = Math.round((new Date(iso) - t0) / 1000); return '+' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); };
+    box.className = '';
+    box.innerHTML = `
+      <p class="hint" style="margin-top:-4px">${esc(when(s.start))} · visitor <span class="mono">${esc(shortId(s.visitor))}</span> · ${esc(s.channel)}${s.first.referrer ? ' (' + esc(s.first.referrer) + ')' : ''} · ${esc([s.first.device, s.first.browser, s.first.os].join(', '))} · ${esc(s.first.screen_w + '×' + s.first.screen_h)} · ${esc(country(s.first.tz))} · ${esc(s.first.lang || '')}</p>
+      <ul class="timeline">${s.events.map((e) => { const [a, b] = describeEvent(e); return `<li><span class="t">${off(e.created_at)}</span><span>${esc(a)}</span><span class="d">${esc(b)}</span></li>`; }).join('')}</ul>
+      <div id="player">${hasRec ? '<div class="loading">Loading recording…</div>' : '<p class="empty">No recording for this visit.</p>'}</div>`;
+    if (!hasRec) return;
+    try {
+      const chunks = await fetchAll('analytics_recordings', 'id,page_id,seq,events', 'session_id=eq.' + encodeURIComponent(s.id));
+      const events = chunks.flatMap((c) => Array.isArray(c.events) ? c.events : []).sort((a, b) => a.timestamp - b.timestamp);
+      // A page recorded in a hidden or minimised tab can report a 0px window; give it a normal size.
+      for (const e of events) {
+        if (e.type === 4 && e.data) {
+          if (!(e.data.width > 0)) e.data.width = 1280;
+          if (!(e.data.height > 0) || e.data.height > 2000) e.data.height = 800;
+        }
+      }
+      if (state.selectedSession !== s.id) return;
+      await loadPlayer();
+      const holder = box.querySelector('#player');
+      holder.innerHTML = '';
+      if (events.length < 2) { holder.innerHTML = '<p class="empty">This recording is too short to play.</p>'; return; }
+      const width = Math.min(holder.clientWidth || 900, 1100);
+      new window.rrwebPlayer({ target: holder, props: { events, width, height: Math.round(width * 0.56), autoPlay: false, skipInactive: true, showController: true } });
+    } catch (ex) {
+      const holder = box.querySelector('#player');
+      if (holder) holder.innerHTML = `<div class="banner warn">Couldn't load the recording: ${esc(ex.message)}</div>`;
+    }
+  }
+
+  let playerPromise = null;
+  function loadPlayer() {
+    if (window.rrwebPlayer) return Promise.resolve();
+    if (playerPromise) return playerPromise;
+    playerPromise = new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = '../analytics/vendor/rrweb-player.css';
+      document.head.appendChild(css);
+      const s = document.createElement('script');
+      s.src = '../analytics/vendor/rrweb-player.js';
+      s.onload = resolve; s.onerror = () => reject(new Error('Player failed to load'));
+      document.head.appendChild(s);
+    });
+    return playerPromise;
+  }
+
+  function adminTab(body) {
+    const mine = lsGet('dvi_vid');
+    const rows = state.access.slice().reverse();
+    const logins = rows.filter((e) => e.type === 'admin_login');
+    const others = logins.filter((e) => e.visitor_id !== mine);
+    const failed = rows.filter((e) => e.type === 'admin_login_failed');
+    body.insertAdjacentHTML('beforeend', `<div class="kpis">
+      <div class="kpi"><div class="label">Sign-ins</div><div class="value">${fmt(logins.length)}</div><div class="sub">all time</div></div>
+      <div class="kpi"><div class="label">From other browsers</div><div class="value">${fmt(new Set(others.map((e) => e.visitor_id)).size)}</div><div class="sub">browsers that aren't this one</div></div>
+      <div class="kpi"><div class="label">Failed attempts</div><div class="value">${fmt(failed.length)}</div><div class="sub">wrong email or password</div></div>
+    </div>`);
+    const label = { admin_login: '<span class="pill good">Signed in</span>', admin_login_failed: '<span class="pill bad">Failed sign-in</span>', admin_view: '<span class="pill">Opened admin page</span>' };
+    card(grid(body, 'wide'), 'Admin activity', 'Every sign-in, failed attempt and admin page opened, newest first. Each browser gets its own ID; yours is marked "this browser". A sign-in from an unfamiliar browser, device or location that isn\'t you is worth a password change.', table([
+      { label: 'When', get: (e) => when(e.created_at) },
+      { label: 'What', html: (e) => label[e.type] || esc(e.type) },
+      { label: 'Page', get: (e) => pageName(e.path) },
+      { label: 'Device', get: (e) => [e.device, e.browser, e.os].join(' · ') },
+      { label: 'Location', get: (e) => country(e.tz) + (e.tz ? ' (' + e.tz + ')' : '') },
+      { label: 'Browser ID', html: (e) => `<span class="mono">${esc(shortId(e.visitor_id))}</span> ${e.visitor_id === mine ? '<span class="pill good">this browser</span>' : ''}` }
+    ], rows.slice(0, 300)));
+  }
+
+  window.addEventListener('resize', () => { clearTimeout(window.__dviR); window.__dviR = setTimeout(() => { if (state.loadedAt && ['overview', 'heatmaps'].includes(state.tab)) renderTab(); }, 250); });
+
+  start();
+})();
+</script>
+</body>
+</html>

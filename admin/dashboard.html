@@ -107,6 +107,15 @@
     <h2>Pages</h2>
     <div class="list" id="pageList">
 
+      <a class="page-row" href="analytics.html">
+        <div class="icon">📈</div>
+        <div class="meta">
+          <p class="name">Website Analytics</p>
+          <p class="desc">Visitors, sources, page journeys, clicks, heatmaps, session recordings and admin sign-ins for devindi.in.</p>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
       <a class="page-row" href="../worksheets/index.html">
         <div class="icon">✍️</div>
         <div class="meta">
@@ -147,6 +156,9 @@
   </section>
 </div>
 
+<script src="../analytics/config.js"></script>
+<script src="../analytics/track.js" data-mode="admin" defer></script>
+<script src="supabase-auth.js"></script>
 <script>
   // Gate: bounce straight back to sign-in unless this tab's session
   // already passed the login check. See admin/index.html for the caveat
@@ -160,6 +172,7 @@
   document.getElementById('logoutLink').addEventListener('click', (e) => {
     e.preventDefault();
     sessionStorage.removeItem('devindi_admin_ok');
+    window.devindiAuth.signOut();
     window.location.href = 'index.html';
   });
 </script>
