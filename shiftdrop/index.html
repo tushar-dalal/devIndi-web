@@ -3,170 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShiftDrop — drag, press Shift, drop to convert</title>
+<title>ShiftDrop: drag, press Shift, drop to convert</title>
 <meta name="description" content="ShiftDrop is a free Windows utility: start dragging a file, press Shift, and drop it on a wheel to convert or edit it. Images, PDFs, Word and text files.">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#fff6ef;--surface:#ffffff;--surface2:#fdeadf;
-    --text:#3a2117;--text-muted:#80604f;--text-faint:#b39383;
-    --border:#f3dccd;--accent:#ef4a2a;--accent-deep:#c9381c;--accent-soft:#fde3d3;
-    --seg:#fdd9c3;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:
-      radial-gradient(760px 460px at 96% -10%, rgba(239,74,42,0.13), transparent 60%),
-      radial-gradient(640px 420px at -10% 10%, rgba(246,176,66,0.12), transparent 60%),
-      var(--bg);
-    color:var(--text);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit;}
-  .wrap{max-width:880px;margin:0 auto;padding:0 22px 90px;}
-
-  header{padding:44px 0 8px;}
-  .back{
-    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text-muted);
-    text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;
-  }
-  .back:hover{color:var(--text);}
-
-  .hero{display:grid;grid-template-columns:1.15fr 0.85fr;gap:34px;align-items:center;}
-  .badge{width:58px;height:58px;border-radius:16px;margin-bottom:18px;display:block;
-         box-shadow:0 10px 24px -12px rgba(239,74,42,0.55);}
-  .kicker{
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--accent);margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px;
-  }
-  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
-  h1{font-family:'Outfit',sans-serif;font-weight:800;font-size:46px;margin:0 0 6px;letter-spacing:-0.02em;}
-  .tagline{font-family:'Outfit',sans-serif;font-weight:700;font-size:19px;color:var(--accent);margin:0 0 14px;}
-  .lede{font-size:15.5px;line-height:1.7;color:var(--text-muted);margin:0 0 24px;max-width:52ch;}
-
-  .download{display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
-  .btn-dl{
-    font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;color:#fff;background:var(--accent);
-    padding:14px 24px;border-radius:14px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;
-    box-shadow:0 14px 26px -14px rgba(201,56,28,0.9);transition:transform .15s ease, background .15s ease;
-  }
-  .btn-dl:hover{background:var(--accent-deep);transform:translateY(-1px);}
-  .btn-dl svg{width:18px;height:18px;}
-  .dl-meta{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-muted);line-height:1.6;}
-
-  .wheel-box{display:flex;justify-content:center;}
-  .wheel{width:100%;max-width:300px;height:auto;filter:drop-shadow(0 22px 30px rgba(201,56,28,0.18));}
-  .w-disc{fill:#fff1e7;stroke:#ffffff;stroke-width:3;}
-  .w-seg path{fill:var(--seg);stroke:var(--seg);stroke-width:5;stroke-linejoin:round;
-              animation:lit 9.6s infinite;animation-delay:calc(var(--i) * 1.2s);}
-  .w-seg text{font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;fill:var(--text);
-              text-anchor:middle;dominant-baseline:central;
-              animation:lit-text 9.6s infinite;animation-delay:calc(var(--i) * 1.2s);}
-  @keyframes lit{0%,11%{fill:var(--accent);stroke:var(--accent);}12.5%,100%{fill:var(--seg);stroke:var(--seg);}}
-  @keyframes lit-text{0%,11%{fill:#ffffff;}12.5%,100%{fill:var(--text);}}
-  .w-hub{fill:#fff8f3;stroke:#ffffff;stroke-width:3;}
-  .w-hub-t{font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;fill:var(--text);text-anchor:middle;}
-  .w-hub-s{font-family:'DM Sans',sans-serif;font-size:10.5px;fill:var(--text-muted);text-anchor:middle;}
-  @media (prefers-reduced-motion:reduce){
-    .w-seg path,.w-seg text{animation:none;}
-    .w-seg:first-of-type path{fill:var(--accent);stroke:var(--accent);}
-    .w-seg:first-of-type text{fill:#fff;}
-  }
-
-  main{margin-top:44px;}
-  section{margin-bottom:22px;}
-  .section-label{
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;
-    color:var(--accent);margin:0 0 12px;font-weight:600;
-  }
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;
-        box-shadow:0 10px 24px -20px rgba(58,33,23,0.25);}
-  p{font-size:14.5px;line-height:1.72;color:var(--text-muted);margin:0 0 12px;}
-  p:last-child{margin-bottom:0;}
-  strong{color:var(--text);font-weight:600;}
-  kbd{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);border:1px solid var(--border);
-      border-bottom-width:2px;border-radius:6px;padding:1px 7px;color:var(--text);}
-  code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--surface2);border-radius:5px;padding:1px 5px;
-       color:var(--text);word-break:break-all;}
-
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  .step{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
-  .step .n{font-family:'Outfit',sans-serif;font-weight:800;font-size:28px;color:var(--accent);line-height:1;margin-bottom:8px;}
-  .step h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin:0 0 6px;}
-  .step p{font-size:13.5px;margin:0;}
-
-  .table-wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;font-size:14px;}
-  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
-  th{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;
-     color:var(--text-faint);font-weight:600;}
-  td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
-  td{color:var(--text-muted);line-height:1.6;}
-  tr:last-child td{border-bottom:none;}
-  .chip{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;
-        background:var(--accent-soft);color:var(--accent-deep);border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0;}
-
-  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
-  .feature{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
-  .feature-icon{font-size:20px;margin-bottom:8px;}
-  .feature h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:15.5px;margin:0 0 6px;}
-  .feature p{font-size:13.5px;margin:0;}
-
-  .notes li{font-size:14px;line-height:1.7;color:var(--text-muted);margin-bottom:8px;}
-  .notes{margin:0;padding-left:20px;}
-
-  .cta-row{
-    margin-top:28px;padding-top:22px;border-top:1px solid var(--border);
-    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
-  }
-  .cta-row p{font-size:12.5px;color:var(--text-faint);margin:0;}
-  .link-group{display:flex;gap:10px;flex-wrap:wrap;}
-  .pill-link{
-    font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;color:var(--text);
-    border:1px solid var(--border);padding:10px 18px;border-radius:999px;text-decoration:none;background:transparent;
-  }
-  .pill-link:hover{background:var(--surface2);}
-  .pill-link.primary{background:var(--accent);color:#fff;border-color:transparent;}
-  .pill-link.primary:hover{background:var(--accent-deep);}
-
-  @media (max-width:720px){
-    .hero{grid-template-columns:1fr;}
-    .wheel-box{order:-1;}
-    .wheel{max-width:240px;}
-    .steps{grid-template-columns:1fr;}
-    h1{font-size:38px;}
-    .card{padding:18px 16px;}
-    th,td{padding:9px 6px;}
-    td:first-child{white-space:normal;width:34%;}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../analytics/config.js"></script>
 <script src="../analytics/track.js" defer></script>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <a class="back" href="../index.html">← devIndi</a>
-    <div class="hero">
-      <div>
-        <img class="badge" src="icon.png" alt="" width="58" height="58">
-        <p class="kicker"><span class="status-dot"></span>Windows utility · v1.0.0 · Free</p>
-        <h1>ShiftDrop</h1>
-        <p class="tagline">Drag. Shift. Drop.</p>
-        <p class="lede">Converting a file shouldn't mean opening an app, hunting for an export menu, or uploading it to a sketchy website. Start dragging any file in Explorer, press <kbd>Shift</kbd>, and a wheel opens under your cursor. Drop the file on a format and the converted copy lands right next to the original.</p>
-        <div class="download">
-          <a class="btn-dl" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-            Download for Windows
-          </a>
-          <div class="dl-meta">ShiftDrop-Setup.exe · 115 MB<br>Windows 10 &amp; 11 · 64-bit · no admin needed</div>
-        </div>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="sq"></span>devIndi</a>
+    <nav class="nav-links">
+      <a href="../index.html#apps" class="hide-sm">Apps</a>
+      <a href="../index.html#made-with-ai" class="hide-sm">How it's made</a>
+      <a href="../feedback.html?app=ShiftDrop">Feedback</a>
+      <a class="btn-sm" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop_nav">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="app-hero invert">
+    <div class="wrap">
+      <div class="top">
+        <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><b>ShiftDrop</b></p>
+        <span class="pill live"><span class="dot"></span>Out now · v1.0.0 · Free</span>
       </div>
-      <div class="wheel-box">
+      <div class="split">
+        <div>
+          <h1>ShiftDrop</h1>
+          <p class="tagline">Drag. Shift. Drop.</p>
+          <p class="lede">Converting a file shouldn't mean opening an app, hunting for an export menu, or uploading it to a sketchy website. Start dragging any file in Explorer, press <kbd>Shift</kbd>, and a wheel opens under your cursor. Drop the file on a format and the converted copy lands right next to the original.</p>
+          <div class="actions">
+            <a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Download for Windows
+            </a>
+          </div>
+          <p class="dl-meta">ShiftDrop-Setup.exe · 115 MB<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
+        </div>
+        <div class="wheel-box">
 <svg class="wheel" viewBox="0 0 320 320" role="img" aria-label="The ShiftDrop wheel: drop a JPG on PNG, WEBP, HEIC, TIFF, AVIF, BMP, PDF or DOCX">
 <circle cx="160" cy="160" r="156" class="w-disc"/>
 <g class="w-seg" style="--i:0"><path d="M109.5 23.0A146 146 0 0 1 210.5 23.0L179.4 107.5A56 56 0 0 0 140.6 107.5Z"/><text x="160.0" y="55.0">PNG</text></g>
@@ -178,33 +59,34 @@
 <g class="w-seg" style="--i:6"><path d="M23.0 210.5A146 146 0 0 1 23.0 109.5L107.5 140.6A56 56 0 0 0 107.5 179.4Z"/><text x="55.0" y="160.0">PDF</text></g>
 <g class="w-seg" style="--i:7"><path d="M27.4 98.9A146 146 0 0 1 98.9 27.4L136.6 109.1A56 56 0 0 0 109.1 136.6Z"/><text x="85.8" y="85.8">DOCX</text></g>
 <circle cx="160" cy="160" r="46" class="w-hub"/>
-<text x="160" y="157" class="w-hub-t">Convert</text>
-<text x="160" y="175" class="w-hub-s">Shift → Tools</text>
+<text x="160" y="160" class="w-hub-t">Convert</text>
+<text x="160" y="177" class="w-hub-s">SHIFT → TOOLS</text>
 </svg>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main>
-    <section>
-      <p class="section-label">How it works</p>
-      <div class="steps">
-        <div class="step"><div class="n">1</div><h3>Start dragging</h3><p>Pick up one or more files in Explorer or on the Desktop, like you're about to move them.</p></div>
-        <div class="step"><div class="n">2</div><h3>Press Shift</h3><p>Still holding the mouse, tap <kbd>Shift</kbd>. The wheel opens under your cursor. Tap it again to switch to Tools.</p></div>
-        <div class="step"><div class="n">3</div><h3>Drop on a slice</h3><p>The new file is saved beside the original. Drop in the centre to cancel; nothing is moved or overwritten.</p></div>
+  <div class="wrap">
+    <section class="block" style="border-top:0">
+      <p class="label"><b>01</b> / How it works</p>
+      <div class="cells three">
+        <div><span class="n">01</span><h3>Start dragging</h3><p>Pick up one or more files in Explorer or on the Desktop, like you're about to move them.</p></div>
+        <div><span class="n">02</span><h3>Press Shift</h3><p>Still holding the mouse, tap <kbd>Shift</kbd>. The wheel opens under your cursor. Tap it again to switch to Tools.</p></div>
+        <div><span class="n">03</span><h3>Drop on a slice</h3><p>The new file is saved beside the original. Drop in the centre to cancel; nothing is moved or overwritten.</p></div>
       </div>
     </section>
 
-    <section>
-      <p class="section-label">What it converts</p>
-      <div class="card table-wrap">
+    <section class="block">
+      <p class="label"><b>02</b> / What it converts</p>
+      <div class="table-wrap">
         <table>
           <thead><tr><th>Drag in</th><th>Get out</th></tr></thead>
           <tbody>
-            <tr><td>Images<br><span style="font-weight:400;color:var(--text-faint);font-size:12.5px;">JPG, PNG, WEBP, HEIC, AVIF, TIFF, BMP, GIF</span></td>
+            <tr><td>Images<small>JPG, PNG, WEBP, HEIC, AVIF, TIFF, BMP, GIF</small></td>
                 <td><span class="chip">PNG</span><span class="chip">JPG</span><span class="chip">WEBP</span><span class="chip">HEIC</span><span class="chip">TIFF</span><span class="chip">AVIF</span><span class="chip">BMP</span><span class="chip">PDF</span><span class="chip">DOCX</span></td></tr>
-            <tr><td>PDF</td><td><span class="chip">DOCX</span><span class="chip">JPG</span><span class="chip">PNG</span><span class="chip">TXT</span> <br>Every page becomes its own image; Word export keeps layout and tables.</td></tr>
-            <tr><td>Word (.docx)</td><td><span class="chip">PDF</span><span class="chip">TXT</span> <br>PDF export keeps the text, not the original formatting.</td></tr>
+            <tr><td>PDF</td><td><span class="chip">DOCX</span><span class="chip">JPG</span><span class="chip">PNG</span><span class="chip">TXT</span><br>Every page becomes its own image; Word export keeps layout and tables.</td></tr>
+            <tr><td>Word (.docx)</td><td><span class="chip">PDF</span><span class="chip">TXT</span><br>PDF export keeps the text, not the original formatting.</td></tr>
             <tr><td>Text, Markdown, CSV</td><td><span class="chip">PDF</span><span class="chip">DOCX</span></td></tr>
             <tr><td>Several files</td><td>Convert them all at once, or merge images and PDFs into a single PDF.</td></tr>
           </tbody>
@@ -212,43 +94,72 @@
       </div>
     </section>
 
-    <section>
-      <p class="section-label">Tools ring · press Shift twice</p>
-      <div class="feature-grid">
-        <div class="feature"><div class="feature-icon">✂️</div><h3>Crop</h3><p>Free-form or locked to 1:1, 16:9, 9:16, 4:3 and 3:4, with exact pixel sizes.</p></div>
-        <div class="feature"><div class="feature-icon">🎨</div><h3>Add background</h3><p>Drop a screenshot onto a gradient or solid colour with padding, rounded corners and a soft shadow.</p></div>
-        <div class="feature"><div class="feature-icon">✏️</div><h3>Annotate</h3><p>Pen, arrows, boxes, highlighter and text, in any colour.</p></div>
-        <div class="feature"><div class="feature-icon">🕶️</div><h3>Redact</h3><p>Black out or pixelate anything private before you share it.</p></div>
-        <div class="feature"><div class="feature-icon">🎚️</div><h3>Edit</h3><p>Rotate, flip, and adjust brightness, contrast, saturation and sharpness.</p></div>
-        <div class="feature"><div class="feature-icon">🗜️</div><h3>Compress</h3><p>Shrink images and PDFs in one drop. It tells you how much space you saved.</p></div>
-        <div class="feature"><div class="feature-icon">🏷️</div><h3>Metadata</h3><p>See the hidden EXIF and PDF details, and save a clean copy without them.</p></div>
+    <section class="block">
+      <p class="label"><b>03</b> / Tools ring<br><br>Press Shift twice</p>
+      <div class="cells">
+        <div><span class="n">01</span><h3>Crop</h3><p>Free-form or locked to 1:1, 16:9, 9:16, 4:3 and 3:4, with exact pixel sizes.</p></div>
+        <div><span class="n">02</span><h3>Add background</h3><p>Drop a screenshot onto a gradient or solid colour with padding, rounded corners and a soft shadow.</p></div>
+        <div><span class="n">03</span><h3>Annotate</h3><p>Pen, arrows, boxes, highlighter and text, in any colour.</p></div>
+        <div><span class="n">04</span><h3>Redact</h3><p>Black out or pixelate anything private before you share it.</p></div>
+        <div><span class="n">05</span><h3>Edit</h3><p>Rotate, flip, and adjust brightness, contrast, saturation and sharpness.</p></div>
+        <div><span class="n">06</span><h3>Compress</h3><p>Shrink images and PDFs in one drop. It tells you how much space you saved.</p></div>
+        <div><span class="n">07</span><h3>Metadata</h3><p>See the hidden EXIF and PDF details, and save a clean copy without them.</p></div>
+        <div><span class="n">08</span><h3>Built to save clicks</h3><p>Like every devIndi app, ShiftDrop was made with AI, then used daily and refined by hand.</p></div>
       </div>
     </section>
 
-    <section>
-      <p class="section-label">Installing</p>
-      <div class="card">
-        <ul class="notes">
-          <li>Run <strong>ShiftDrop-Setup.exe</strong>. It installs for your Windows account only, so no admin password is needed, and adds Start menu and Desktop shortcuts.</li>
-          <li>Windows may show <strong>“Windows protected your PC”</strong> the first time, because ShiftDrop is a new, independent app without a paid code-signing certificate. Click <strong>More info → Run anyway</strong>.</li>
-          <li>ShiftDrop runs quietly in the system tray, near the clock. Right-click its icon to pause it, choose whether it starts with Windows, or quit.</li>
-          <li>Everything happens on your PC. Files are never uploaded anywhere and ShiftDrop doesn't connect to the internet.</li>
-          <li>Uninstall anytime from <strong>Settings → Apps → ShiftDrop</strong>.</li>
-          <li>SHA-256 of the installer: <code>46246B882F4CC6D8E5DEEDE6815E990E6364690D586DD59AAF59980B7008F135</code></li>
-        </ul>
-      </div>
+    <section class="block">
+      <p class="label"><b>04</b> / Installing</p>
+      <ul class="notes">
+        <li><span>Run <strong>ShiftDrop-Setup.exe</strong>. It installs for your Windows account only, so no admin password is needed, and adds Start menu and Desktop shortcuts.</span></li>
+        <li><span>Windows may show <strong>“Windows protected your PC”</strong> the first time, because ShiftDrop is a new, independent app without a paid code-signing certificate. Click <strong>More info → Run anyway</strong>.</span></li>
+        <li><span>ShiftDrop runs quietly in the system tray, near the clock. Right-click its icon to pause it, choose whether it starts with Windows, or quit.</span></li>
+        <li><span>Everything happens on your PC. Files are never uploaded anywhere and ShiftDrop doesn't connect to the internet.</span></li>
+        <li><span>Uninstall anytime from <strong>Settings → Apps → ShiftDrop</strong>.</span></li>
+        <li><span>SHA-256 of the installer: <code>46246B882F4CC6D8E5DEEDE6815E990E6364690D586DD59AAF59980B7008F135</code></span></li>
+      </ul>
     </section>
 
-    <div class="cta-row">
-      <p>Free and open source (AGPL-3.0). <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-1.0.0-source.zip" style="color:var(--accent);">Source code</a></p>
-      <div class="link-group">
-        <a class="pill-link" href="../feedback.html?app=ShiftDrop">Feedback</a>
-        <a class="pill-link" href="terms.html">Terms &amp; Conditions</a>
-        <a class="pill-link primary" href="privacy.html">Privacy Policy →</a>
+    <div class="links-row">
+      <p>Free and open source (AGPL-3.0). <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-1.0.0-source.zip">Source code</a></p>
+      <div class="actions">
+        <a class="btn ghost" href="../feedback.html?app=ShiftDrop">Feedback</a>
+        <a class="btn ghost" href="terms.html">Terms</a>
+        <a class="btn" href="privacy.html">Privacy Policy <span class="arr">→</span></a>
       </div>
     </div>
-  </main>
-</div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="label" style="margin-bottom:14px">devIndi</p>
+        <p>Small utilities, made with AI, to make life simpler. Questions or ideas? Write to <a href="mailto:reach@devindi.in">reach@devindi.in</a>.</p>
+      </div>
+      <div>
+        <h4 class="label">Apps</h4>
+        <ul>
+          <li><a href="../shiftdrop/index.html">ShiftDrop</a></li>
+          <li><a href="../index.html#testing">In testing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="label">Studio</h4>
+        <ul>
+          <li><a href="../feedback.html">Feedback</a></li>
+          <li><a href="mailto:reach@devindi.in">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="giant" aria-hidden="true">devIndi</p>
+    <div class="legal-line">
+      <span class="mono">© 2026 devIndi · Built by Tushar Dalal</span>
+      <a class="mono" href="../admin/index.html">Admin</a>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>

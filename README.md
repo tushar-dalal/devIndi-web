@@ -1,12 +1,15 @@
 # devIndi
 
-The home for devIndi's apps — a static home page, one "about this app" page per
-app, and one privacy policy per app — each themed to match that app's own design
-system. Navigation follows one hierarchy: **home → app page → privacy policy**.
+The home for devIndi's apps: small utilities made with AI. A static home page
+(ShiftDrop featured first, the other apps listed as "in testing"), one "about this
+app" page per app, and a privacy policy + terms per app. Every page shares one
+black-and-white design system in `assets/site.css` (Geist, Geist Mono, Instrument
+Serif; no gradients). Navigation follows one hierarchy: **home → app page → privacy policy**.
 
 ```
 devIndi/
-├── index.html              home page — the app grid
+├── index.html              home page — ShiftDrop first, then the apps in testing
+├── assets/                 site.css (shared styles for every public page) + favicon.svg
 ├── feedback.html           shared feedback form (all apps, one inbox)
 ├── chatpata/
 │   ├── index.html          about Chatpata

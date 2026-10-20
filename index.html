@@ -3,256 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>devIndi — small, obsessively-designed apps</title>
-<meta name="description" content="devIndi is an independent studio building small, carefully-crafted mobile apps. Browse the build kits and their privacy policies.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>devIndi: small utilities, made with AI</title>
+<meta name="description" content="devIndi builds small utilities with AI to make everyday computing simpler. ShiftDrop for Windows is out now; more apps are in testing.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Baloo+2:wght@700&family=Quicksand:wght@700&family=Bricolage+Grotesque:wght@800&family=Fredoka:wght@700&family=Space+Grotesk:wght@700&family=Outfit:wght@800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0e0d0f;
-    --bg-soft:#151318;
-    --card:#1a171c;
-    --card-border:rgba(244,243,240,0.08);
-    --ink:#f4f3f0;
-    --ink-soft:rgba(244,243,240,0.62);
-    --ink-faint:rgba(244,243,240,0.38);
-    --gold:#d9a441;
-    --gold-soft:rgba(217,164,65,0.14);
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:
-      radial-gradient(1100px 620px at 12% -8%, rgba(217,164,65,0.10), transparent 60%),
-      radial-gradient(900px 520px at 100% 0%, rgba(255,255,255,0.04), transparent 55%),
-      var(--bg);
-    color:var(--ink);
-    font-family:'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit;}
-
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
-
-  header.site{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:28px 0;
-  }
-  .wordmark{
-    font-family:'Sora',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em;
-    display:flex;align-items:center;gap:8px;
-  }
-  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
-  header.site nav a{
-    font-size:13.5px;color:var(--ink-soft);text-decoration:none;margin-left:22px;
-  }
-  header.site nav a:hover{color:var(--ink);}
-
-  .hero{padding:64px 0 56px;}
-  .hero .eyebrow{
-    font-family:'Inter',sans-serif;font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--gold);font-weight:600;margin-bottom:18px;
-    display:flex;align-items:center;gap:10px;
-  }
-  .hero .eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);display:inline-block;}
-  .hero h1{
-    font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(34px,6vw,58px);
-    line-height:1.05;letter-spacing:-0.02em;margin:0 0 20px;
-    max-width:11ch;
-  }
-  .hero p.lede{
-    font-size:17px;line-height:1.65;color:var(--ink-soft);max-width:520px;margin:0;
-  }
-
-  .palette-row{display:flex;gap:8px;margin-top:32px;}
-  .palette-row span{
-    width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);
-    margin-left:-10px;box-shadow:0 2px 8px rgba(0,0,0,0.4);
-  }
-  .palette-row span:first-child{margin-left:0;}
-
-  section.kits{padding:8px 0 80px;}
-  section.kits h2{
-    font-family:'Sora',sans-serif;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--ink-faint);font-weight:600;margin:0 0 24px;
-  }
-
-  .grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;
-  }
-
-  .kit-card{
-    position:relative;
-    background:var(--card);
-    border:1px solid var(--card-border);
-    border-radius:18px;
-    padding:26px 24px 22px;
-    text-decoration:none;
-    color:var(--ink);
-    display:flex;flex-direction:column;
-    overflow:hidden;
-    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-  }
-  .kit-card::before{
-    content:'';position:absolute;inset:0 0 auto 0;height:4px;
-    background:var(--accent);
-  }
-  .kit-card::after{
-    content:'';position:absolute;width:180px;height:180px;border-radius:50%;
-    background:var(--accent);opacity:0.16;filter:blur(40px);
-    top:-70px;right:-60px;pointer-events:none;
-  }
-  .kit-card:hover{
-    transform:translateY(-3px);
-    border-color:var(--accent);
-    box-shadow:0 16px 32px -18px rgba(0,0,0,0.6);
-  }
-
-  .kit-icon{
-    width:42px;height:42px;border-radius:12px;background:var(--accent-soft);
-    display:flex;align-items:center;justify-content:center;font-size:20px;
-    margin-bottom:16px;
-  }
-  .kit-name{
-    font-size:23px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;
-  }
-  .kit-tag{
-    font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);
-    font-weight:600;margin-bottom:12px;font-family:'Inter',sans-serif;
-  }
-  .kit-desc{
-    font-size:14px;line-height:1.6;color:var(--ink-soft);margin:0 0 20px;flex:1;
-  }
-  .kit-link{
-    font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;
-    font-family:'Inter',sans-serif;
-  }
-  .kit-link .arrow{transition:transform .18s ease;}
-  .kit-card:hover .kit-link .arrow{transform:translateX(3px);}
-
-  /* Per-kit identity */
-  .kit-chatpata{--accent:#FF7A54;--accent-soft:rgba(255,122,84,0.16);}
-  .kit-chatpata .kit-name{font-family:'Baloo 2',sans-serif;}
-  .kit-lantern{--accent:#4C7B73;--accent-soft:rgba(76,123,115,0.16);}
-  .kit-lantern .kit-name{font-family:'Quicksand',sans-serif;}
-  .kit-connect{--accent:#e8a33d;--accent-soft:rgba(232,163,61,0.16);}
-  .kit-connect .kit-name{font-family:'Bricolage Grotesque',sans-serif;}
-  .kit-resonance{--accent:#9B84FF;--accent-soft:rgba(155,132,255,0.18);}
-  .kit-resonance .kit-name{font-family:'Fredoka',sans-serif;}
-  .kit-waypoint{--accent:#4f3de0;--accent-soft:rgba(79,61,224,0.16);}
-  .kit-waypoint .kit-name{font-family:'Space Grotesk',sans-serif;}
-  .kit-shiftdrop{--accent:#ef4a2a;--accent-soft:rgba(239,74,42,0.16);}
-  .kit-shiftdrop .kit-name{font-family:'Outfit',sans-serif;}
-  .kit-icon img{width:26px;height:26px;display:block;}
-
-  footer{
-    border-top:1px solid var(--card-border);
-    padding:28px 0 48px;
-    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
-  }
-  footer p{margin:0;font-size:13px;color:var(--ink-faint);}
-  footer a{font-size:13px;color:var(--ink-soft);text-decoration:none;}
-  footer a:hover{color:var(--gold);}
-
-  @media (max-width:520px){
-    header.site nav a{margin-left:14px;}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
 <script src="analytics/config.js"></script>
 <script src="analytics/track.js" defer></script>
 </head>
 <body>
 
-<div class="wrap">
-  <header class="site">
-    <div class="wordmark"><span class="dot"></span>devIndi</div>
-    <nav>
-      <a href="#kits">Build Kits</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="sq"></span>devIndi</a>
+    <nav class="nav-links">
+      <a href="#apps" class="hide-sm">Apps</a>
+      <a href="#made-with-ai" class="hide-sm">How it's made</a>
       <a href="feedback.html">Feedback</a>
-      <a href="mailto:reach@devindi.in">Contact</a>
+      <a class="btn-sm" href="shiftdrop/index.html">Get ShiftDrop</a>
     </nav>
-  </header>
+  </div>
+</header>
 
-  <section class="hero">
-    <div class="eyebrow">Independent app studio</div>
-    <h1>Small apps, made with too much care.</h1>
-    <p class="lede">devIndi is where a handful of tightly-scoped, genuinely-designed mobile apps live — each with its own name, its own palette, its own reason to exist. This page is the front door and the privacy-policy shelf.</p>
-    <div class="palette-row" aria-hidden="true">
-      <span style="background:#FF7A54"></span>
-      <span style="background:#4C7B73"></span>
-      <span style="background:#e8a33d"></span>
-      <span style="background:#9B84FF"></span>
-      <span style="background:#4f3de0"></span>
-      <span style="background:#ef4a2a"></span>
+<main>
+  <section class="hero wrap">
+    <div class="top">
+      <p class="label">Independent software studio</p>
+      <p class="label">Est. 2026 / India</p>
+    </div>
+    <h1>Utilities made with AI, to make life <em>simpler.</em></h1>
+    <div class="below">
+      <p>devIndi builds <strong>small, single-purpose apps</strong> with AI as a co-builder. Each one takes a small, annoying chore off your plate and stays out of your way.</p>
+      <div class="stats">
+        <div class="stat"><div class="n">01</div><p class="label t">Released</p></div>
+        <div class="stat"><div class="n">05</div><p class="label t">In testing</p></div>
+        <div class="stat"><div class="n"><em>AI</em></div><p class="label t">Co-builder</p></div>
+      </div>
     </div>
   </section>
 
-  <section class="kits" id="kits">
-    <h2>Build Kits</h2>
-    <div class="grid">
-
-      <a class="kit-card kit-chatpata" href="chatpata/index.html">
-        <div class="kit-icon">🌶️</div>
-        <div class="kit-tag">Party game</div>
-        <h3 class="kit-name">Chatpata</h3>
-        <p class="kit-desc">A bluffing party game with real desi masala — invent a lie, vote on the truth, and try not to get Busted.</p>
-        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
-      </a>
-
-      <a class="kit-card kit-lantern" href="lantern/index.html">
-        <div class="kit-icon">🏮</div>
-        <div class="kit-tag">Daily structure</div>
-        <h3 class="kit-name">Lantern</h3>
-        <p class="kit-desc">A gentle, ADHD-friendly companion for time-blind days — capture what matters, do today's few things.</p>
-        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
-      </a>
-
-      <a class="kit-card kit-connect" href="connect/index.html">
-        <div class="kit-icon">🕯️</div>
-        <div class="kit-tag">Social deduction</div>
-        <h3 class="kit-name">Connect</h3>
-        <p class="kit-desc">A tense little party game played by amber light — find the hidden connection before anyone else does.</p>
-        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
-      </a>
-
-      <a class="kit-card kit-resonance" href="resonance/index.html">
-        <div class="kit-icon">🌈</div>
-        <div class="kit-tag">Party game</div>
-        <h3 class="kit-name">Resonance</h3>
-        <p class="kit-desc">A candy-colored spectrum-guessing game — the fun is reading minds, not getting the "right" answer.</p>
-        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
-      </a>
-
-      <a class="kit-card kit-waypoint" href="waypoint/index.html">
-        <div class="kit-icon">🧭</div>
-        <div class="kit-tag">Task manager</div>
-        <h3 class="kit-name">Waypoint</h3>
-        <p class="kit-desc">A calm, focused task manager for people who'd rather do the work than manage the app.</p>
-        <span class="kit-link">Privacy Policy <span class="arrow">→</span></span>
-      </a>
-
-      <a class="kit-card kit-shiftdrop" href="shiftdrop/index.html">
-        <div class="kit-icon"><img src="shiftdrop/icon.png" alt=""></div>
-        <div class="kit-tag">Windows utility</div>
-        <h3 class="kit-name">ShiftDrop</h3>
-        <p class="kit-desc">Drag any file, press Shift, drop it on the wheel. Convert images, PDFs and Word files, or crop, redact and annotate, without opening an app.</p>
-        <span class="kit-link">Download for Windows <span class="arrow">→</span></span>
-      </a>
-
+  <!-- Featured: ShiftDrop -->
+  <section class="feature-panel invert" id="apps">
+    <div class="wrap">
+      <div class="row">
+        <p class="label"><b>01</b> / Released</p>
+        <span class="pill live"><span class="dot"></span>Out now · v1.0.0 · Free</span>
+      </div>
+      <div class="grid">
+        <div>
+          <svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="currentColor"/><circle class="cut" cx="50" cy="50" r="30" fill="none" stroke-width="8" stroke-dasharray="15.5 8.06" transform="rotate(-15 50 50)"/><circle class="hole" cx="50" cy="50" r="11"/></svg>
+          <h2>ShiftDrop</h2>
+          <p class="tagline">Drag. Shift. Drop.</p>
+          <p class="desc">Start dragging any file in Explorer, press <kbd>Shift</kbd>, and a wheel opens under your cursor. Drop the file on a format and the converted copy lands right next to the original. <strong>Images, PDFs and Word files.</strong> Crop, redact and annotate too. Everything stays on your PC.</p>
+          <div class="actions">
+            <a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop_home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Download for Windows
+            </a>
+            <a class="btn ghost" href="shiftdrop/index.html">How it works <span class="arr">→</span></a>
+          </div>
+          <p class="dl-meta">Windows 10 &amp; 11 · 64-bit · 115 MB · No admin needed</p>
+        </div>
+        <div class="wheel-box">
+<svg class="wheel" viewBox="0 0 320 320" role="img" aria-label="The ShiftDrop wheel: drop a JPG on PNG, WEBP, HEIC, TIFF, AVIF, BMP, PDF or DOCX">
+<circle cx="160" cy="160" r="156" class="w-disc"/>
+<g class="w-seg" style="--i:0"><path d="M109.5 23.0A146 146 0 0 1 210.5 23.0L179.4 107.5A56 56 0 0 0 140.6 107.5Z"/><text x="160.0" y="55.0">PNG</text></g>
+<g class="w-seg" style="--i:1"><path d="M221.1 27.4A146 146 0 0 1 292.6 98.9L210.9 136.6A56 56 0 0 0 183.4 109.1Z"/><text x="234.2" y="85.8">WEBP</text></g>
+<g class="w-seg" style="--i:2"><path d="M297.0 109.5A146 146 0 0 1 297.0 210.5L212.5 179.4A56 56 0 0 0 212.5 140.6Z"/><text x="265.0" y="160.0">HEIC</text></g>
+<g class="w-seg" style="--i:3"><path d="M292.6 221.1A146 146 0 0 1 221.1 292.6L183.4 210.9A56 56 0 0 0 210.9 183.4Z"/><text x="234.2" y="234.2">TIFF</text></g>
+<g class="w-seg" style="--i:4"><path d="M210.5 297.0A146 146 0 0 1 109.5 297.0L140.6 212.5A56 56 0 0 0 179.4 212.5Z"/><text x="160.0" y="265.0">AVIF</text></g>
+<g class="w-seg" style="--i:5"><path d="M98.9 292.6A146 146 0 0 1 27.4 221.1L109.1 183.4A56 56 0 0 0 136.6 210.9Z"/><text x="85.8" y="234.2">BMP</text></g>
+<g class="w-seg" style="--i:6"><path d="M23.0 210.5A146 146 0 0 1 23.0 109.5L107.5 140.6A56 56 0 0 0 107.5 179.4Z"/><text x="55.0" y="160.0">PDF</text></g>
+<g class="w-seg" style="--i:7"><path d="M27.4 98.9A146 146 0 0 1 98.9 27.4L136.6 109.1A56 56 0 0 0 109.1 136.6Z"/><text x="85.8" y="85.8">DOCX</text></g>
+<circle cx="160" cy="160" r="46" class="w-hub"/>
+<text x="160" y="160" class="w-hub-t">Convert</text>
+<text x="160" y="177" class="w-hub-s">SHIFT → TOOLS</text>
+</svg>
+        </div>
+      </div>
+      <div class="steps3">
+        <div><p class="label">01</p><h3>Start dragging</h3><p>Pick up one or more files in Explorer or on the Desktop.</p></div>
+        <div><p class="label">02</p><h3>Press Shift</h3><p>The wheel opens under your cursor. Tap again for crop, redact, compress and more.</p></div>
+        <div><p class="label">03</p><h3>Drop on a slice</h3><p>The new file is saved beside the original. Nothing is moved or overwritten.</p></div>
+      </div>
     </div>
   </section>
 
-  <footer>
-    <p>© 2026 devIndi. Built by Tushar Dalal.</p>
-    <div style="display:flex;gap:16px;align-items:center;">
-      <a href="mailto:reach@devindi.in">reach@devindi.in</a>
-      <a href="admin/index.html">Admin</a>
+  <!-- In testing -->
+  <section class="section wrap" id="testing">
+    <div class="section-head">
+      <h2>In <em class="s">testing</em></h2>
+      <p>Experimental apps that aren't released yet. They're being built and tested now, so details may change before they ship.</p>
     </div>
-  </footer>
-</div>
+    <ul class="app-list">
+      <li><a class="app-row" href="lantern/index.html">
+        <span class="idx">02</span>
+        <span><span class="name">Lantern</span><span class="cat">Daily structure</span></span>
+        <span class="blurb">A gentle, ADHD-friendly companion for time-blind days. Capture what matters, then do today's few things.</span>
+        <span class="pill testing"><span class="dot"></span>In testing</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row" href="waypoint/index.html">
+        <span class="idx">03</span>
+        <span><span class="name">Waypoint</span><span class="cat">Task manager</span></span>
+        <span class="blurb">A calm, focused task manager for people who'd rather do the work than manage the app.</span>
+        <span class="pill testing"><span class="dot"></span>In testing</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row" href="chatpata/index.html">
+        <span class="idx">04</span>
+        <span><span class="name">Chatpata</span><span class="cat">Party game</span></span>
+        <span class="blurb">A bluffing trivia game built on Indian trivia. Invent a lie, vote on the truth, try not to get busted.</span>
+        <span class="pill testing"><span class="dot"></span>In testing</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row" href="connect/index.html">
+        <span class="idx">05</span>
+        <span><span class="name">Connect</span><span class="cat">Word game</span></span>
+        <span class="blurb">A tense party word game. Find the hidden word through hints before the Danner reveals it.</span>
+        <span class="pill testing"><span class="dot"></span>In testing</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row" href="resonance/index.html">
+        <span class="idx">06</span>
+        <span><span class="name">Resonance</span><span class="cat">Party game</span></span>
+        <span class="blurb">A spectrum-guessing game. One clue, one dial. The fun is reading minds, not being right.</span>
+        <span class="pill testing"><span class="dot"></span>In testing</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+    </ul>
+  </section>
+
+  <!-- Made with AI -->
+  <section class="section invert" id="made-with-ai">
+    <div class="wrap">
+      <div class="statement">
+        <p class="label"><b>How it's made</b></p>
+        <p class="big">Every devIndi app is <em>made with AI.</em> <span class="dim">Not AI for the sake of it, and not a chatbot bolted on. Just useful utilities, built faster and polished further, so the boring parts of your day take fewer clicks.</span></p>
+      </div>
+      <div class="tenets">
+        <div><p class="label">01</p><h3>Built with AI</h3><p>Designed, written and tested alongside AI tools. That's how one person can ship software that would usually need a team.</p></div>
+        <div><p class="label">02</p><h3>Checked by a human</h3><p>Every app is used, broken and refined by hand until it feels right. Nothing ships just because the code compiles.</p></div>
+        <div><p class="label">03</p><h3>Made to be simple</h3><p>One job per app, done well. No feature sprawl, no dark patterns, and plain-language privacy policies.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="label" style="margin-bottom:14px">devIndi</p>
+        <p>Small utilities, made with AI, to make life simpler. Questions or ideas? Write to <a href="mailto:reach@devindi.in">reach@devindi.in</a>.</p>
+      </div>
+      <div>
+        <h4 class="label">Apps</h4>
+        <ul>
+          <li><a href="shiftdrop/index.html">ShiftDrop</a></li>
+          <li><a href="#testing">In testing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="label">Studio</h4>
+        <ul>
+          <li><a href="feedback.html">Feedback</a></li>
+          <li><a href="mailto:reach@devindi.in">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="giant" aria-hidden="true">devIndi</p>
+    <div class="legal-line">
+      <span class="mono">© 2026 devIndi · Built by Tushar Dalal</span>
+      <a class="mono" href="admin/index.html">Admin</a>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
