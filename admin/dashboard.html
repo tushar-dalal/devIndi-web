@@ -3,158 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — devIndi</title>
+<title>Admin · devIndi</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0e0d0f;
-    --card:#1a171c;
-    --card-border:rgba(244,243,240,0.08);
-    --ink:#f4f3f0;
-    --ink-soft:rgba(244,243,240,0.62);
-    --ink-faint:rgba(244,243,240,0.38);
-    --gold:#d9a441;
-    --gold-soft:rgba(217,164,65,0.14);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:
-      radial-gradient(1100px 620px at 12% -8%, rgba(217,164,65,0.10), transparent 60%),
-      radial-gradient(900px 520px at 100% 0%, rgba(255,255,255,0.04), transparent 55%),
-      var(--bg);
-    color:var(--ink);
-    font-family:'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    visibility:hidden;
-  }
-  a{color:inherit;}
-  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
-
-  header.site{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:28px 0;
-  }
-  .wordmark{
-    font-family:'Sora',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em;
-    display:flex;align-items:center;gap:8px;
-  }
-  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
-  .wordmark .tag{
-    font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.08em;
-    text-transform:uppercase;color:var(--gold);background:var(--gold-soft);
-    border-radius:999px;padding:3px 9px;margin-left:4px;
-  }
-  header.site a.logout{
-    font-size:13px;color:var(--ink-faint);text-decoration:none;
-  }
-  header.site a.logout:hover{color:var(--ink-soft);}
-
-  .pagehead{padding:12px 0 36px;}
-  .pagehead h1{
-    font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(26px,4vw,36px);
-    letter-spacing:-0.02em;margin:0 0 10px;
-  }
-  .pagehead p{font-size:15px;line-height:1.6;color:var(--ink-soft);margin:0;max-width:60ch;}
-
-  section.pages{padding-bottom:80px;}
-  section.pages h2{
-    font-family:'Sora',sans-serif;font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--ink-faint);font-weight:600;margin:0 0 18px;
-  }
-  .list{display:flex;flex-direction:column;gap:12px;}
-  .page-row{
-    display:flex;align-items:center;gap:16px;
-    background:var(--card);border:1px solid var(--card-border);border-radius:14px;
-    padding:18px 20px;text-decoration:none;color:var(--ink);
-    transition:border-color .15s ease, transform .15s ease;
-  }
-  .page-row:hover{border-color:var(--gold);transform:translateY(-1px);}
-  .page-row .icon{
-    width:38px;height:38px;border-radius:10px;background:var(--gold-soft);
-    display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;
-  }
-  .page-row .meta{flex:1;min-width:0;}
-  .page-row .name{font-family:'Sora',sans-serif;font-weight:700;font-size:15.5px;margin:0 0 2px;}
-  .page-row .desc{font-size:13px;color:var(--ink-faint);margin:0;}
-  .page-row .arrow{color:var(--ink-faint);flex:none;}
-  .page-row:hover .arrow{color:var(--gold);}
-
-  .empty-hint{
-    font-size:13px;color:var(--ink-faint);padding:16px 20px;border:1px dashed var(--card-border);
-    border-radius:14px;
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>body{visibility:hidden;}</style>
 </head>
 <body>
 
-<div class="wrap">
-  <header class="site">
-    <div class="wordmark"><span class="dot"></span>devIndi<span class="tag">Admin</span></div>
-    <a class="logout" href="#" id="logoutLink">Sign out</a>
-  </header>
-
-  <div class="pagehead">
-    <h1>Internal pages</h1>
-    <p>Unlisted pages that live on devindi.in but aren't linked from the public site. Add a row here each time a new one goes up.</p>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="dashboard.html"><span class="sq"></span>devIndi<span class="tag">Admin</span></a>
+    <nav class="nav-links">
+      <a href="../index.html" class="hide-sm">Public site</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
   </div>
+</header>
 
-  <section class="pages">
-    <h2>Pages</h2>
-    <div class="list" id="pageList">
-
-      <a class="page-row" href="analytics.html">
-        <div class="icon">📈</div>
-        <div class="meta">
-          <p class="name">Website Analytics</p>
-          <p class="desc">Visitors, sources, page journeys, clicks, heatmaps, session recordings and admin sign-ins for devindi.in.</p>
-        </div>
-        <span class="arrow">→</span>
-      </a>
-
-      <a class="page-row" href="../worksheets/index.html">
-        <div class="icon">✍️</div>
-        <div class="meta">
-          <p class="name">Class Manager</p>
-          <p class="desc">Each student's latest and next class, paper prompts for Claude, and the class counter with monthly earnings.</p>
-        </div>
-        <span class="arrow">→</span>
-      </a>
-
-      <a class="page-row" href="../papergen/index.html">
-        <div class="icon">📝</div>
-        <div class="meta">
-          <p class="name">Paper Generator</p>
-          <p class="desc">Generate section-authentic SAT practice papers and answer keys from the question bank.</p>
-        </div>
-        <span class="arrow">→</span>
-      </a>
-
-      <a class="page-row" href="../spendtracker/index.html">
-        <div class="icon">💸</div>
-        <div class="meta">
-          <p class="name">AI Spend Tracker</p>
-          <p class="desc">Prototype: AI subscription + API spend in INR, with a Keep/Downgrade/Cancel verdict per plan.</p>
-        </div>
-        <span class="arrow">→</span>
-      </a>
-
-      <a class="page-row" href="../3a7dy934nudf0q/index.html">
-        <div class="icon">🚀</div>
-        <div class="meta">
-          <p class="name">Ship Pipeline</p>
-          <p class="desc">Expo → Google Cloud → Google Play release pipeline flowchart, with engineering and product notes.</p>
-        </div>
-        <span class="arrow">→</span>
-      </a>
-
-    </div>
+<main class="wrap">
+  <section class="legal-hero">
+    <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><b>Admin</b></p>
+    <h1>Internal <em>pages</em></h1>
+    <p class="lede">Unlisted pages that live on devindi.in but aren't linked from the public site. Add a row here each time a new one goes up.</p>
   </section>
-</div>
+
+  <section style="padding-bottom:clamp(56px, 8vw, 96px)">
+    <div class="section-head" style="padding-bottom:16px"><p class="label" style="justify-self:start"><b>05</b> / Pages</p></div>
+    <ul class="app-list" id="pageList">
+      <li><a class="app-row plain" href="analytics.html">
+        <span class="idx">01</span>
+        <span><span class="name">Website Analytics</span><span class="cat">Analytics</span></span>
+        <span class="blurb">Visitors, sources, page journeys, clicks, heatmaps, session recordings and admin sign-ins for devindi.in.</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row plain" href="../worksheets/index.html">
+        <span class="idx">02</span>
+        <span><span class="name">Class Manager</span><span class="cat">Tutoring</span></span>
+        <span class="blurb">Each student's latest and next class, paper prompts for Claude, and the class counter with monthly earnings.</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row plain" href="../papergen/index.html">
+        <span class="idx">03</span>
+        <span><span class="name">Paper Generator</span><span class="cat">Tutoring</span></span>
+        <span class="blurb">Generate section-authentic SAT practice papers and answer keys from the question bank.</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row plain" href="../spendtracker/index.html">
+        <span class="idx">04</span>
+        <span><span class="name">AI Spend Tracker</span><span class="cat">Prototype</span></span>
+        <span class="blurb">Prototype: AI subscription + API spend in INR, with a Keep/Downgrade/Cancel verdict per plan.</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+      <li><a class="app-row plain" href="../3a7dy934nudf0q/index.html">
+        <span class="idx">05</span>
+        <span><span class="name">Ship Pipeline</span><span class="cat">Docs</span></span>
+        <span class="blurb">Expo → Google Cloud → Google Play release pipeline flowchart, with engineering and product notes.</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a></li>
+    </ul>
+  </section>
+</main>
 
 <script src="../analytics/config.js"></script>
 <script src="../analytics/track.js" data-mode="admin" defer></script>
