@@ -1,17 +1,10 @@
 -- devIndi website analytics: one-time Supabase setup.
 -- Run this whole file once in Supabase -> SQL Editor -> New query -> Run.
 --
--- BEFORE RUNNING: replace admin@example.com below with the email of the
--- Supabase Auth user you'll sign in with (Authentication -> Users -> Add user).
--- Only that user can read the analytics; visitors can only add rows.
-
-create or replace function public.is_analytics_admin()
-returns boolean
-language sql
-stable
-as $$
-  select lower(coalesce(auth.jwt() ->> 'email', '')) = lower('admin@example.com');
-$$;
+-- Visitors can add rows. Reading is open to the public key too, so the admin
+-- Analytics page needs no extra sign-in. Trade-off: the key is in the public
+-- repo, so anyone who looks can read the analytics data and recordings.
+-- Already ran an older version of this file? Run open-reads.sql instead.
 
 -- One row per thing a visitor does: pageview, click, engage (time + scroll),
 -- form_submit, js_error, admin_login, admin_login_failed, admin_view, custom.
@@ -67,7 +60,8 @@ create table if not exists public.analytics_recordings (
 create index if not exists analytics_recordings_session_idx on public.analytics_recordings (session_id);
 create index if not exists analytics_recordings_created_idx on public.analytics_recordings (created_at);
 
--- Row level security: anyone may add rows (stamped "now"), only the admin may read or delete.
+-- Row level security: anyone may add rows (stamped "now") and read them; only
+-- recordings older than 30 days can be deleted (the admin page's clean-up button).
 alter table public.analytics_events enable row level security;
 alter table public.analytics_recordings enable row level security;
 
@@ -76,27 +70,23 @@ create policy "visitors add events" on public.analytics_events
   for insert to anon, authenticated
   with check (created_at between now() - interval '1 minute' and now() + interval '1 minute');
 
-drop policy if exists "admin reads events" on public.analytics_events;
-create policy "admin reads events" on public.analytics_events
-  for select to authenticated using (public.is_analytics_admin());
-
-drop policy if exists "admin deletes events" on public.analytics_events;
-create policy "admin deletes events" on public.analytics_events
-  for delete to authenticated using (public.is_analytics_admin());
+drop policy if exists "anyone reads events" on public.analytics_events;
+create policy "anyone reads events" on public.analytics_events
+  for select to anon, authenticated using (true);
 
 drop policy if exists "visitors add recordings" on public.analytics_recordings;
 create policy "visitors add recordings" on public.analytics_recordings
   for insert to anon, authenticated
   with check (created_at between now() - interval '1 minute' and now() + interval '1 minute');
 
-drop policy if exists "admin reads recordings" on public.analytics_recordings;
-create policy "admin reads recordings" on public.analytics_recordings
-  for select to authenticated using (public.is_analytics_admin());
+drop policy if exists "anyone reads recordings" on public.analytics_recordings;
+create policy "anyone reads recordings" on public.analytics_recordings
+  for select to anon, authenticated using (true);
 
-drop policy if exists "admin deletes recordings" on public.analytics_recordings;
-create policy "admin deletes recordings" on public.analytics_recordings
-  for delete to authenticated using (public.is_analytics_admin());
+drop policy if exists "clean up old recordings" on public.analytics_recordings;
+create policy "clean up old recordings" on public.analytics_recordings
+  for delete to anon, authenticated using (created_at < now() - interval '30 days');
 
 revoke all on public.analytics_events, public.analytics_recordings from anon, authenticated;
-grant insert on public.analytics_events, public.analytics_recordings to anon, authenticated;
-grant select, delete on public.analytics_events, public.analytics_recordings to authenticated;
+grant insert, select on public.analytics_events, public.analytics_recordings to anon, authenticated;
+grant delete on public.analytics_recordings to anon, authenticated;

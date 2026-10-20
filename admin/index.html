@@ -120,7 +120,6 @@
 
 <script src="../analytics/config.js"></script>
 <script src="../analytics/track.js" defer></script>
-<script src="supabase-auth.js"></script>
 <script>
   // NOTE for future-Tushar: this is a static site with no server, so this
   // "login" is a UI speed bump, not real access control — the credential
@@ -153,14 +152,10 @@
       sessionStorage.setItem('devindi_admin_ok', '1');
       submitBtn.textContent = 'Signing in…';
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-      // Log the admin login, and sign in to Supabase so the Analytics page can
-      // read the data. If Supabase fails, Analytics asks again on its own page.
+      // Log the admin login before leaving the page.
       await Promise.race([
-        Promise.all([
-          window.devindiAnalytics ? window.devindiAnalytics.adminLogin() : null,
-          window.devindiAuth.configured() ? window.devindiAuth.signIn(email, password).catch(() => null) : null
-        ]),
-        wait(4000)
+        window.devindiAnalytics ? window.devindiAnalytics.adminLogin() : null,
+        wait(3000)
       ]);
       window.location.href = 'dashboard.html';
     } else {

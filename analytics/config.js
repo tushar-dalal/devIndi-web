@@ -1,7 +1,7 @@
 // devIndi website analytics settings.
 // Fill in the two Supabase values from: Supabase -> Project Settings -> API
-// (Project URL, and the anon / publishable key). Both are safe to publish:
-// the database rules in supabase-setup.sql only let visitors add rows.
+// (Project URL, and the anon / publishable key). This key can add and read
+// analytics rows (see supabase-setup.sql), and the admin Analytics page uses it.
 // Until they're filled in, tracking stays off and the admin page shows setup steps.
 window.DEVINDI_ANALYTICS = {
   supabaseUrl: 'https://pbrcuqgqtuivxmuyrujo.supabase.co',

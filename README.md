@@ -101,10 +101,10 @@ page, scroll depth, form submits, JS errors, admin sign-ins and session recordin
 
 One-time setup:
 
-1. Supabase → **Authentication → Users → Add user** with the same email/password as the admin login.
-2. Put that email into `analytics/supabase-setup.sql` (replace `admin@example.com`) and run the file in the **SQL Editor**.
-3. Copy the Project URL and anon/publishable key from **Project Settings → API** into `analytics/config.js`.
+1. Run `analytics/supabase-setup.sql` in the Supabase **SQL Editor**.
+2. Copy the Project URL and anon/publishable key from **Project Settings → API** into `analytics/config.js`.
 
-Visitors can only insert rows; only that admin user can read or delete them.
+The Analytics page reads with that public key, so there's no second sign-in. Trade-off:
+the key is in this public repo, so anyone could read the analytics data and recordings.
 Add the two `<script>` tags to any new public page. Track a custom action with
 `devindiAnalytics.track('name', { any: 'props' })`, or add `data-track="name"` to an element.
