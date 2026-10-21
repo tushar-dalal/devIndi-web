@@ -159,7 +159,7 @@
       cred = null;
       $('unlockErr').textContent = err.status === 401 ? 'Wrong admin email or password.'
         : (location.protocol === 'file:' ? 'Open this page from devindi.in, not from a file.' : err.message +
-           ' If the store functions aren\'t set up yet, see store/README.md.');
+           ' If the store functions aren\'t set up yet, see admin/store/README.md.');
       $('unlockErr').classList.add('show');
     } finally {
       $('unlockBtn').disabled = false;

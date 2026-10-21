@@ -1,0 +1,5 @@
+# GitHub Pages (Jekyll) settings.
+# Admin-only setup files: kept in the repo, but never published on devindi.in.
+exclude:
+  - admin/store
+  - README.md

@@ -1,5 +1,5 @@
 // Tests for the two store functions, with Supabase and Lemon Squeezy simulated.
-// Run from the devIndi folder:  node --test store/functions/functions.test.ts
+// Run from the devIndi folder:  node --test admin/store/functions/functions.test.ts
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import * as hook from "./lemon-webhook/index.ts";

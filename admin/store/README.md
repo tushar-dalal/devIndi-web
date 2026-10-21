@@ -78,4 +78,4 @@ Do this once in **test mode** now, and again in live mode when you go live.
   "disable it by hand", and Lemon Squeezy retries failed notifications.
 - The admin password check runs on the server, but the hash in `admin/index.html` is public,
   so keep the admin password long and unique.
-- Tests (simulated Lemon Squeezy and Supabase): `node --test store/functions/functions.test.ts`
+- Tests (simulated Lemon Squeezy and Supabase): `node --test admin/store/functions/functions.test.ts`
