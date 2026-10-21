@@ -35,6 +35,9 @@ devIndi/
 │   ├── index.html          download links point at the GitHub Release `shiftdrop-v1.0.0`
 │   ├── privacy.html        (the installer is >100 MB, too big to commit; it lives on the release)
 │   └── terms.html
+├── shotly/                 Shotly (Windows screenshot app), coming soon: teaser page only
+│   ├── index.html          animated CSS mock-ups (capture, redact, search); no downloads yet
+│   └── icon.svg            also teased on the home page in the "Coming up" section
 ├── spendtracker/           unlisted admin tool: AI Spend Tracker prototype
 │   ├── index.html          (reached via admin/dashboard.html; data lives in IndexedDB)
 │   └── tools/pull.mjs      pulls the Anthropic Console cost report locally (its API blocks browsers)
