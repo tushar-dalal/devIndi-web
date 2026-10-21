@@ -563,6 +563,8 @@ button.btn:disabled{opacity:.45;cursor:not-allowed;}
 .app-hero .split .notice{grid-template-columns:1fr;gap:12px;}
 .app-hero .split .notice .pill{justify-self:start;}
 
+.btn.soon{opacity:.6;cursor:default;}
+.btn.soon:hover{opacity:.6;}
 /* Shotly price card */
 .price-card{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:start;
   border:1px solid var(--ink);padding:clamp(24px,4vw,44px);}
