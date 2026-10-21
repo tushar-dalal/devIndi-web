@@ -563,6 +563,19 @@ button.btn:disabled{opacity:.45;cursor:not-allowed;}
 .app-hero .split .notice{grid-template-columns:1fr;gap:12px;}
 .app-hero .split .notice .pill{justify-self:start;}
 
+.btn.soon{opacity:.6;cursor:default;}
+.btn.soon:hover{opacity:.6;}
+/* Shotly price card */
+.price-card{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:start;
+  border:1px solid var(--ink);padding:clamp(24px,4vw,44px);}
+.price-card .price{margin:14px 0 0;font-weight:500;font-size:clamp(48px,7vw,88px);line-height:1;letter-spacing:-.05em;}
+.price-card .price em{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42em;letter-spacing:-.01em;color:var(--mute);}
+.price-card .price-local{margin:10px 0 0;font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--ink);}
+.price-card .price-note{margin:10px 0 0;color:var(--faint);font-size:14px;}
+.price-card .actions{margin-top:24px;}
+.price-card .notes a{color:var(--ink);}
+@media (max-width:820px){ .price-card{grid-template-columns:1fr;} }
+
 /* Two-column showcase: words beside a demo */
 .showcase{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center;}
 .showcase .prose p{font-size:17px;}
