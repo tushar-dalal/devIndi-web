@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders · devIndi Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  body{visibility:hidden;}
+  .unlock{max-width:440px;border:1px solid var(--ink);padding:28px;margin-bottom:clamp(56px,8vw,96px);}
+  .unlock .field{grid-template-columns:1fr;gap:4px;padding:16px 0 0;border-bottom:0;}
+  .unlock .field > label{padding-top:0;}
+  .unlock .btn{margin-top:22px;}
+  .unlock .err{display:none;margin-top:14px;padding:10px 12px;border:1px dashed var(--ink);font-size:14px;}
+  .unlock .err.show{display:block;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:28px 0 20px;}
+  .toolbar input[type=search]{flex:1;min-width:200px;font-size:15px;border:1px solid var(--line);border-radius:999px;padding:10px 16px;}
+  .toolbar select{width:auto;border:1px solid var(--line);border-radius:999px;padding:10px 34px 10px 16px;font-size:14px;background-position:right 12px center;}
+  .toolbar .btn{padding:10px 16px;font-size:14px;}
+  .note{color:var(--mute);font-size:14px;margin:0 0 8px;min-height:20px;}
+  .stats4{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .stats4 > div{padding:20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .stats4 .n{font-size:clamp(26px,3.4vw,40px);font-weight:500;letter-spacing:-.04em;line-height:1.1;margin-top:8px;}
+  @media (max-width:720px){ .stats4{grid-template-columns:repeat(2,1fr);} }
+  table.orders td:first-child{width:auto;font-weight:400;}
+  table.orders td{vertical-align:top;}
+  table.orders .who b{display:block;color:var(--ink);font-weight:500;}
+  table.orders .mono-s{font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .st{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 9px;white-space:nowrap;}
+  .st.paid,.st.ok,.st.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .st.refunded,.st.disabled,.st.error{border-style:dashed;border-color:var(--ink);}
+  .st.test{color:var(--faint);}
+  .events{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink);}
+  .events li{display:grid;grid-template-columns:150px 110px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--mute);}
+  .events li b{color:var(--ink);font-weight:500;}
+  @media (max-width:720px){ .events li{grid-template-columns:1fr;gap:4px;} }
+  .empty{color:var(--mute);padding:28px 0;}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="dashboard.html"><span class="sq"></span>devIndi<span class="tag">Admin</span></a>
+    <nav class="nav-links">
+      <a href="dashboard.html" class="hide-sm">Admin home</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="legal-hero">
+    <p class="label crumbs"><a href="dashboard.html">Admin</a><span>/</span><b>Orders</b></p>
+    <h1>Orders &amp; <em>refunds</em></h1>
+    <p class="lede">A private copy of every Lemon Squeezy purchase. When an order is fully refunded, its license key is disabled automatically and the step is logged below. Refund from the Lemon Squeezy dashboard; this page updates on its own.</p>
+  </section>
+
+  <form class="unlock" id="unlock">
+    <p class="label"><b>Confirm it's you</b></p>
+    <p class="note" style="margin-top:10px">Customer details are only sent after the server checks your admin email and password.</p>
+    <div class="field"><label for="email">Email</label><input type="email" id="email" required autocomplete="username"></div>
+    <div class="field"><label for="password">Password</label><input type="password" id="password" required autocomplete="current-password"></div>
+    <button class="btn" type="submit" id="unlockBtn">Show orders</button>
+    <div class="err" id="unlockErr"></div>
+  </form>
+
+  <div id="board" hidden style="padding-bottom:clamp(56px,8vw,96px)">
+    <div class="stats4" id="stats"></div>
+
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Search name, email or order number">
+      <select id="mode">
+        <option value="all">Live and test</option>
+        <option value="live">Live only</option>
+        <option value="test">Test only</option>
+      </select>
+      <button class="btn ghost" id="refreshBtn" type="button">Refresh</button>
+      <button class="btn ghost" id="syncBtn" type="button" title="Copy every order and key from Lemon Squeezy, in case a notification was missed">Sync from Lemon Squeezy</button>
+      <button class="btn ghost" id="csvBtn" type="button">Export CSV</button>
+    </div>
+    <p class="note" id="note"></p>
+
+    <div class="table-wrap">
+      <table class="orders">
+        <thead><tr><th>Date</th><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th><th>License key</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <section style="margin-top:clamp(48px,7vw,80px)">
+      <p class="label" style="margin-bottom:14px"><b>Activity</b> / notifications and automatic actions</p>
+      <ul class="events" id="events"></ul>
+    </section>
+  </div>
+</main>
+
+<script src="../analytics/config.js"></script>
+<script src="../analytics/track.js" data-mode="admin" defer></script>
+<script>
+  if (sessionStorage.getItem('devindi_admin_ok') !== '1') {
+    window.location.replace('index.html');
+  } else {
+    document.body.style.visibility = 'visible';
+  }
+  document.getElementById('logoutLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('devindi_admin_ok');
+    window.location.href = 'index.html';
+  });
+
+  const cfg = window.DEVINDI_ANALYTICS || {};
+  const FN = (cfg.supabaseUrl || '') + '/functions/v1/admin-orders';
+  let cred = null;           // kept in memory only, for this page
+  let data = { orders: [], keys: [], events: [] };
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function money(minor, currency) {
+    if (minor == null || !currency) return '—';
+    try {
+      const f = new Intl.NumberFormat(undefined, { style: 'currency', currency });
+      const digits = f.resolvedOptions().maximumFractionDigits;
+      return f.format(minor / Math.pow(10, digits));
+    } catch { return (minor / 100).toFixed(2) + ' ' + currency; }
+  }
+  const when = (t) => t ? new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+  async function call(action) {
+    const res = await fetch(FN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: cfg.anonKey || '' },
+      body: JSON.stringify({ email: cred.email, password: cred.password, action })
+    });
+    let body = {};
+    try { body = await res.json(); } catch {}
+    if (!res.ok) { const e = new Error(body.error || ('Request failed (' + res.status + ')')); e.status = res.status; throw e; }
+    return body;
+  }
+
+  $('unlock').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('unlockErr').classList.remove('show');
+    $('unlockBtn').disabled = true;
+    $('unlockBtn').textContent = 'Checking…';
+    cred = { email: $('email').value.trim().toLowerCase(), password: $('password').value };
+    try {
+      data = await call('list');
+      $('unlock').hidden = true;
+      $('board').hidden = false;
+      render();
+    } catch (err) {
+      cred = null;
+      $('unlockErr').textContent = err.status === 401 ? 'Wrong admin email or password.'
+        : (location.protocol === 'file:' ? 'Open this page from devindi.in, not from a file.' : err.message +
+           ' If the store functions aren\'t set up yet, see store/README.md.');
+      $('unlockErr').classList.add('show');
+    } finally {
+      $('unlockBtn').disabled = false;
+      $('unlockBtn').textContent = 'Show orders';
+    }
+  });
+
+  async function reload(action) {
+    const btn = action === 'sync' ? $('syncBtn') : $('refreshBtn');
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = action === 'sync' ? 'Syncing…' : 'Loading…';
+    try {
+      data = await call(action);
+      render();
+      $('note').textContent = data.note || ('Updated ' + new Date().toLocaleTimeString());
+    } catch (err) {
+      $('note').textContent = err.message;
+    } finally { btn.disabled = false; btn.textContent = label; }
+  }
+  $('refreshBtn').addEventListener('click', () => reload('list'));
+  $('syncBtn').addEventListener('click', () => reload('sync'));
+  $('q').addEventListener('input', render);
+  $('mode').addEventListener('change', render);
+
+  function visibleOrders() {
+    const q = $('q').value.trim().toLowerCase();
+    const mode = $('mode').value;
+    return data.orders.filter((o) =>
+      (mode === 'all' || (mode === 'test') === !!o.test_mode) &&
+      (!q || [o.customer_name, o.customer_email, o.order_number, o.identifier].some((v) => String(v ?? '').toLowerCase().includes(q))));
+  }
+
+  function keysFor(orderId) { return data.keys.filter((k) => k.ls_order_id === orderId); }
+
+  function render() {
+    const orders = visibleOrders();
+    // Totals in US dollars (Lemon Squeezy gives every order a USD value).
+    let gross = 0, refundedUsd = 0, refunds = 0, sales = 0;
+    for (const o of orders) {
+      if (['paid', 'refunded', 'partial_refund'].includes(o.status)) { sales++; gross += o.total_usd || 0; }
+      if (o.status === 'refunded') { refunds++; refundedUsd += o.total_usd || 0; }
+      if (o.status === 'partial_refund' && o.total) { refunds++; refundedUsd += Math.round((o.total_usd || 0) * (o.refunded_amount || 0) / o.total); }
+    }
+    $('stats').innerHTML = [
+      ['Sales', String(sales)],
+      ['Gross (USD)', money(gross, 'USD')],
+      ['Refunds', String(refunds)],
+      ['Net of refunds', money(gross - refundedUsd, 'USD')],
+    ].map(([l, n]) => `<div><p class="label">${l}</p><div class="n">${n}</div></div>`).join('');
+
+    $('rows').innerHTML = orders.length ? orders.map((o) => {
+      const keys = keysFor(o.ls_order_id);
+      const keyHtml = keys.length ? keys.map((k) => {
+        const st = k.disabled ? 'disabled' : (k.status || '');
+        return `<div><span class="mono-s">${esc(k.key_short || k.ls_key_id)}</span><br><span class="st ${esc(st)}">${esc(st)}</span>`
+          + ` <span class="mono-s">${k.instances_count ?? 0}/${k.activation_limit ?? '∞'} PCs</span></div>`;
+      }).join('') : '<span class="mono-s">—</span>';
+      const status = o.status === 'partial_refund' ? 'partly refunded' : o.status;
+      return `<tr>
+        <td>${esc(when(o.created_at))}</td>
+        <td>#${esc(o.order_number ?? o.ls_order_id)}${o.test_mode ? ' <span class="st test">test</span>' : ''}<br><span class="mono-s">${esc(o.product_name || '')}</span></td>
+        <td class="who"><b>${esc(o.customer_name || '—')}</b><a href="mailto:${esc(o.customer_email || '')}">${esc(o.customer_email || '')}</a></td>
+        <td>${money(o.total, o.currency)}${o.refunded_amount ? `<br><span class="mono-s">refunded ${money(o.refunded_amount, o.currency)}</span>` : ''}</td>
+        <td><span class="st ${esc(o.status)}">${esc(status)}</span>${o.refunded_at ? `<br><span class="mono-s">${esc(when(o.refunded_at))}</span>` : ''}${o.receipt_url ? `<br><a class="mono-s" href="${esc(o.receipt_url)}" target="_blank" rel="noopener">receipt</a>` : ''}</td>
+        <td>${keyHtml}</td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="6" class="empty">${data.orders.length ? 'No orders match.' : 'No orders yet. They appear here as soon as someone buys (test purchases included).'}</td></tr>`;
+
+    $('events').innerHTML = data.events.length ? data.events.map((e) =>
+      `<li><span>${esc(when(e.received_at))}</span><span><span class="st ${esc(e.outcome)}">${esc(e.outcome)}</span>${e.test_mode ? ' <span class="st test">test</span>' : ''}</span>`
+      + `<span><b>${esc(e.event_name.replace(/_/g, ' '))}</b> · ${esc(e.detail || '')}</span></li>`).join('')
+      : '<li><span class="empty">Nothing yet.</span></li>';
+  }
+
+  $('csvBtn').addEventListener('click', () => {
+    const cols = ['created_at', 'order_number', 'test_mode', 'status', 'customer_name', 'customer_email', 'product_name',
+                  'currency', 'total', 'tax', 'total_usd', 'refunded_amount', 'refunded_at', 'license_keys'];
+    const cell = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const lines = [cols.join(',')].concat(visibleOrders().map((o) => cols.map((c) => c === 'license_keys'
+      ? cell(keysFor(o.ls_order_id).map((k) => `${k.key_short} (${k.disabled ? 'disabled' : k.status})`).join('; '))
+      : cell(o[c])).join(',')));
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+    a.download = 'devindi-orders-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+  });
+</script>
+
+</body>
+</html>

@@ -38,6 +38,10 @@ devIndi/
 ├── shotly/                 Shotly (Windows screenshot app), coming soon: teaser page only
 │   ├── index.html          animated CSS mock-ups (capture, redact, search); no downloads yet
 │   └── icon.svg            also teased on the home page in the "Coming up" section
+├── store/                  Lemon Squeezy order records + automatic key disabling on refund
+│   ├── README.md           one-time Supabase + Lemon Squeezy setup
+│   ├── supabase-store-setup.sql   private tables (not readable with the public key)
+│   └── functions/          two Supabase Edge Functions: lemon-webhook, admin-orders (+ tests)
 ├── spendtracker/           unlisted admin tool: AI Spend Tracker prototype
 │   ├── index.html          (reached via admin/dashboard.html; data lives in IndexedDB)
 │   └── tools/pull.mjs      pulls the Anthropic Console cost report locally (its API blocks browsers)
