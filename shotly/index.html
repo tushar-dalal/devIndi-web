@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="../assets/site.css">
 <script src="../analytics/config.js"></script>
 <script src="../analytics/track.js" defer></script>
+<script src="../assets/price.js" defer></script>
 <script>
 /* Buy buttons: load Lemon Squeezy's checkout only when someone clicks Buy, then open it as an
    overlay. If the script can't load, go to the hosted checkout page instead. */
@@ -63,10 +64,10 @@ document.addEventListener('click', function (e) {
           <p class="tagline">Press. Drag. Done.</p>
           <p class="lede">Shotly takes over your <kbd>Print Screen</kbd> key and turns every screenshot into something you can <strong>find, fix and share in seconds.</strong> Capture anything, hide anything private, copy the text out of any picture, and search every screenshot you've ever taken by the words inside it.</p>
           <div class="actions">
-            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/buy/REPLACE-ME?embed=1" data-track="shotly_buy_hero">Buy Shotly · <span data-price>$19</span></a>
+            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/checkout/buy/926d55de-14b0-4e9b-9013-ee0fe0f54ad0?embed=1" data-track="shotly_buy_hero">Buy Shotly · ₹1,499</a>
             <a class="btn ghost" href="#buy">What you get <span class="arr">→</span></a>
           </div>
-          <p class="dl-meta">One-time purchase · up to 3 PCs · 14-day refunds<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
+          <p class="dl-meta"><span data-inr="1499" data-inr-suffix=" in your currency · " hidden></span>One-time purchase · up to 3 PCs · 14-day refunds<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
         </div>
         <div>
           <div class="shot-demo" role="img" aria-label="Shotly in action: the screen dims, a box is dragged out with its size and a pixel magnifier shown, then a preview slides in saying Copied and saved.">
@@ -196,12 +197,13 @@ document.addEventListener('click', function (e) {
       <div class="price-card">
         <div>
           <p class="label">Shotly for Windows · v1.0.0</p>
-          <p class="price"><span data-price>$19</span> <em>one-time</em></p>
-          <p class="price-note">Local taxes are added at checkout where they apply.</p>
+          <p class="price">₹1,499 <em>one-time</em></p>
+          <p class="price-local" data-inr="1499" data-inr-suffix=" in your currency" hidden></p>
+          <p class="price-note">Priced in Indian rupees. If your card is in another currency, your bank converts it and shows the amount in your own currency. Local taxes are added at checkout where they apply.</p>
           <div class="actions">
-            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/buy/REPLACE-ME?embed=1" data-track="shotly_buy">Buy Shotly <span class="arr">→</span></a>
+            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/checkout/buy/926d55de-14b0-4e9b-9013-ee0fe0f54ad0?embed=1" data-track="shotly_buy">Buy Shotly <span class="arr">→</span></a>
           </div>
-          <p class="dl-meta">Secure checkout by Lemon Squeezy · cards, PayPal and more</p>
+          <p class="dl-meta">Secure checkout by Lemon Squeezy · cards and PayPal</p>
         </div>
         <ul class="notes">
           <li><span><strong>Use it on up to 3 of your PCs.</strong> Move it to a new PC anytime.</span></li>

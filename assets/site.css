@@ -568,6 +568,7 @@ button.btn:disabled{opacity:.45;cursor:not-allowed;}
   border:1px solid var(--ink);padding:clamp(24px,4vw,44px);}
 .price-card .price{margin:14px 0 0;font-weight:500;font-size:clamp(48px,7vw,88px);line-height:1;letter-spacing:-.05em;}
 .price-card .price em{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42em;letter-spacing:-.01em;color:var(--mute);}
+.price-card .price-local{margin:10px 0 0;font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--ink);}
 .price-card .price-note{margin:10px 0 0;color:var(--faint);font-size:14px;}
 .price-card .actions{margin-top:24px;}
 .price-card .notes a{color:var(--ink);}
