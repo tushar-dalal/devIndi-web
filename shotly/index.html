@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shotly: the screenshot app Windows should have had (coming soon)</title>
-<meta name="description" content="Coming soon from devIndi: Shotly replaces Print Screen on Windows. Capture anything, hide private info in one click, copy text from any picture, and find every screenshot you've ever taken by the words inside it.">
+<title>Shotly: the screenshot app Windows should have had</title>
+<meta name="description" content="Shotly replaces Print Screen on Windows. Capture anything, hide private info in one click, copy text from any picture, and find every screenshot you've ever taken by the words inside it.">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,28 @@
 <link rel="stylesheet" href="../assets/site.css">
 <script src="../analytics/config.js"></script>
 <script src="../analytics/track.js" defer></script>
+<script>
+/* Buy buttons: load Lemon Squeezy's checkout only when someone clicks Buy, then open it as an
+   overlay. If the script can't load, go to the hosted checkout page instead. */
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a.ls-buy');
+  if (!a) return;
+  e.preventDefault();
+  var url = a.href, done = false;
+  function page() { if (!done) { done = true; location.href = url.replace(/[?&]embed=1/, ''); } }
+  function overlay() {
+    if (done) return;
+    try { if (window.createLemonSqueezy) window.createLemonSqueezy(); window.LemonSqueezy.Url.Open(url); done = true; }
+    catch (err) { page(); }
+  }
+  if (window.LemonSqueezy) return overlay();
+  var s = document.createElement('script');
+  s.src = 'https://assets.lemonsqueezy.com/lemon.js';
+  s.onload = overlay; s.onerror = page;
+  document.head.appendChild(s);
+  setTimeout(function () { if (!window.LemonSqueezy) page(); }, 5000);
+});
+</script>
 </head>
 <body>
 
@@ -22,7 +44,7 @@
       <a href="../index.html#apps" class="hide-sm">Apps</a>
       <a href="../index.html#made-with-ai" class="hide-sm">How it's made</a>
       <a href="../feedback.html?app=Shotly">Feedback</a>
-      <a class="btn-sm" href="../shiftdrop/index.html">Get ShiftDrop</a>
+      <a class="btn-sm" href="#buy">Buy Shotly</a>
     </nav>
   </div>
 </header>
@@ -31,8 +53,8 @@
   <section class="app-hero invert">
     <div class="wrap">
       <div class="top">
-        <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><a href="../index.html#coming-up">Coming up</a><span>/</span><b>Shotly</b></p>
-        <span class="pill testing"><span class="dot"></span>Coming soon · Windows</span>
+        <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><b>Shotly</b></p>
+        <span class="pill live"><span class="dot"></span>Out now · v1.0.0 · Windows</span>
       </div>
       <div class="split">
         <div>
@@ -40,11 +62,11 @@
           <h1 style="margin-top:22px">Shotly</h1>
           <p class="tagline">Press. Drag. Done.</p>
           <p class="lede">Shotly takes over your <kbd>Print Screen</kbd> key and turns every screenshot into something you can <strong>find, fix and share in seconds.</strong> Capture anything, hide anything private, copy the text out of any picture, and search every screenshot you've ever taken by the words inside it.</p>
-          <div class="notice">
-            <span class="pill solid">Screenshots</span>
-            <p><strong>Not released yet.</strong> Shotly is in final testing on Windows 10 and 11. There's nothing to download yet. Check back here for the launch.</p>
-            <a href="../feedback.html?app=Shotly" data-track="shotly_feedback_hero">Tell us what you'd want →</a>
+          <div class="actions">
+            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/buy/REPLACE-ME?embed=1" data-track="shotly_buy_hero">Buy Shotly · <span data-price>$19</span></a>
+            <a class="btn ghost" href="#buy">What you get <span class="arr">→</span></a>
           </div>
+          <p class="dl-meta">One-time purchase · up to 3 PCs · 14-day refunds<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
         </div>
         <div>
           <div class="shot-demo" role="img" aria-label="Shotly in action: the screen dims, a box is dragged out with its size and a pixel magnifier shown, then a preview slides in saying Copied and saved.">
@@ -169,22 +191,45 @@
       </div>
     </section>
 
+    <section class="block" id="buy">
+      <p class="label"><b>07</b> / Get Shotly</p>
+      <div class="price-card">
+        <div>
+          <p class="label">Shotly for Windows · v1.0.0</p>
+          <p class="price"><span data-price>$19</span> <em>one-time</em></p>
+          <p class="price-note">Local taxes are added at checkout where they apply.</p>
+          <div class="actions">
+            <a class="btn ls-buy" href="https://devindi.lemonsqueezy.com/buy/REPLACE-ME?embed=1" data-track="shotly_buy">Buy Shotly <span class="arr">→</span></a>
+          </div>
+          <p class="dl-meta">Secure checkout by Lemon Squeezy · cards, PayPal and more</p>
+        </div>
+        <ul class="notes">
+          <li><span><strong>Use it on up to 3 of your PCs.</strong> Move it to a new PC anytime.</span></li>
+          <li><span><strong>Every 1.x update included.</strong> No subscription.</span></li>
+          <li><span><strong>Download link and license key by email</strong>, right after you pay.</span></li>
+          <li><span><strong>14-day refund</strong>, no questions asked. <a href="terms.html#refunds">Details</a></span></li>
+        </ul>
+      </div>
+    </section>
+
     <section class="block">
-      <p class="label"><b>07</b> / Private by design</p>
+      <p class="label"><b>08</b> / Private by design</p>
       <ul class="notes">
         <li><span><strong>Everything happens on your PC.</strong> No account, no cloud, no uploads. Your screenshots never leave your computer.</span></li>
         <li><span>Text is read by the <strong>OCR built into Windows</strong>, so even search works fully offline.</span></li>
         <li><span>Shotly <strong>never moves or changes</strong> your existing screenshots. It only reads them to make them searchable.</span></li>
         <li><span>Deleting a capture sends it to the <strong>Recycle Bin</strong>, so a slip of the finger is never permanent.</span></li>
+        <li><span>The only time Shotly goes online is to <strong>check your license key</strong> with our payment provider. <a href="privacy.html">Privacy policy</a></span></li>
         <li><span>Like every devIndi app, Shotly is <strong>made with AI</strong>, then used daily and refined by hand.</span></li>
       </ul>
     </section>
 
     <div class="links-row">
-      <p>Launch details, privacy policy and terms will be published here with the release.</p>
+      <p>Questions before you buy? Write to <a href="mailto:reach@devindi.in">reach@devindi.in</a>.</p>
       <div class="actions">
         <a class="btn ghost" href="../feedback.html?app=Shotly" data-track="shotly_feedback">Feedback</a>
-        <a class="btn" href="../index.html">Back to devIndi <span class="arr">→</span></a>
+        <a class="btn ghost" href="terms.html">Terms &amp; refunds</a>
+        <a class="btn" href="privacy.html">Privacy Policy <span class="arr">→</span></a>
       </div>
     </div>
   </div>
@@ -201,7 +246,7 @@
         <h4 class="label">Apps</h4>
         <ul>
           <li><a href="../shiftdrop/index.html">ShiftDrop</a></li>
-          <li><a href="../shotly/index.html">Shotly · soon</a></li>
+          <li><a href="../shotly/index.html">Shotly</a></li>
           <li><a href="../index.html#testing">In testing</a></li>
         </ul>
       </div>
