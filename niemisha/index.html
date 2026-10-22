@@ -3,49 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Niemisha · artist & curator</title>
-<meta name="description" content="Niemisha is an artist and a curator of art and objects.">
-<!-- Remove this line when the site moves to its own domain and should show up in search. -->
+<title>Niemisha Sharma · Artist &amp; Curator</title>
+<meta name="description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:title" content="Niemisha Sharma · Artist &amp; Curator">
+<meta property="og:description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:type" content="website">
+<!-- Remove this line at launch, when the site should show up in search. -->
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Figtree:wght@400;500;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="home">
 <div id="head"></div>
-<main>
+<main id="main">
   <section class="hero">
     <div class="wrap">
       <div>
-        <p class="kicker">Artist &amp; curator of art and objects</p>
-        <h1>Making things, and finding them <span class="circled"><em>a home.</em><svg viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path d="M30 64 C 28 22, 150 8, 248 26 S 296 92, 196 108 S 18 104, 22 58 S 120 14, 170 16" fill="none" stroke="#c96a4b" stroke-width="3" stroke-linecap="round"/></svg></span></h1>
-        <p class="lede">I paint, shape clay and gather objects, then put them in rooms where people can slow down and look. This is where that work lives.</p>
-        <div class="actions"><a class="btn" href="work.html">See the work →</a><a class="btn ghost" href="about.html">About me</a></div>
+        <p class="label">Niemisha Sharma · Artist &amp; Curator</p>
+        <h1 class="hero-title">Artistic practice, <em>curatorial inquiry,</em> and visual research.</h1>
+        <p class="lede">Paintings, prints, photographs and installations, alongside exhibitions made with other artists.</p>
+        <div class="actions"><a class="btn" href="practice.html">Explore practice →</a><a class="btn line" href="curating.html">Explore curatorial work</a></div>
+        <p class="meta" id="years" style="margin-top:22px"></p>
       </div>
-      <div class="scatter" id="scatter"><span class="note hand">new from the studio ↓</span></div>
+      <div id="heroImg"></div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap">
-      <div class="section-head"><div><p class="kicker">Made</p><h2>Lately in the <em>studio</em></h2></div><a class="arrow-link" href="work.html#made">All my work →</a></div>
-      <div class="grid" id="latest"></div>
+      <div class="head-row"><div><p class="label"><span class="n">02</span>Selected practice</p><h2>Artistic <em>practice</em></h2></div><a class="more" href="practice.html">All work →</a></div>
+      <div class="works" id="homeWorks"></div>
     </div>
   </section>
 
-  <section class="section tint">
+  <section class="section panel">
     <div class="wrap">
-      <div class="section-head"><div><p class="kicker">Curated</p><h2>Rooms I've <em>put together</em></h2></div><a class="arrow-link" href="work.html#curated">All projects →</a></div>
-      <div class="curated" id="curated"></div>
+      <div class="head-row"><div><p class="label"><span class="n">03</span>Curatorial work</p><h2>Exhibitions &amp; <em>projects</em></h2></div><a class="more" href="curating.html">All curatorial projects →</a></div>
+      <div class="features" id="homeCurating"></div>
     </div>
   </section>
 
   <section class="section">
+    <div class="wrap inquiry" id="inquiry"></div>
+  </section>
+
+  <section class="section">
     <div class="wrap">
-      <div class="section-head"><div><p class="kicker">Journal</p><h2>Notes &amp; <em>wanderings</em></h2></div><a class="arrow-link" href="journal.html">Read the journal →</a></div>
-      <ul class="posts" id="posts"></ul>
+      <div class="head-row"><div><p class="label"><span class="n">05</span>Writing &amp; publications</p><h2>Writing &amp; <em>research</em></h2></div><a class="more" href="writing.html">All writing →</a></div>
+      <ul class="index" id="homeWriting"></ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap about-grid">
+      <div id="aboutImg"></div>
+      <div>
+        <p class="label"><span class="n">06</span>About</p>
+        <p class="lede" id="aboutShort" style="font-size:clamp(19px,1.8vw,23px)"></p>
+        <div class="actions" style="margin-top:28px"><a class="btn line" href="about.html">Full biography</a><a class="btn line" href="about.html#cv">CV</a></div>
+      </div>
     </div>
   </section>
 </main>

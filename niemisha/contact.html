@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact · Niemisha Sharma</title>
+<meta name="description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:title" content="Contact · Niemisha Sharma">
+<meta property="og:description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:type" content="website">
+<!-- Remove this line at launch, when the site should show up in search. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="contact">
+<div id="head"></div>
+<main id="main" class="wrap">
+  <section class="page-head">
+    <p class="label">Contact</p>
+    <h1>Get in <em>touch</em></h1>
+  </section>
+  <div class="contact-grid" style="padding-bottom:20px">
+    <div>
+      <p class="lede" style="margin-top:0">For exhibitions, research, writing or collaboration, email is the most direct route.</p>
+      <p style="margin:28px 0"><a class="email" id="mail" href="#"></a></p>
+      <p class="meta measure">This form doesn't store or send anything itself. It opens your own email app with your message filled in, so your details go only to Niemisha.</p>
+    </div>
+    <form class="form" id="contactForm" novalidate>
+      <div class="row">
+        <label>Name<input name="name" autocomplete="name" required aria-describedby="err-name"><span class="err" id="err-name" aria-live="polite"></span></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required aria-describedby="err-email"><span class="err" id="err-email" aria-live="polite"></span></label>
+      </div>
+      <label>Enquiry type
+        <select name="type" required aria-describedby="err-type">
+          <option value="">Choose one</option>
+          <option>Exhibition</option><option>Research</option><option>Writing</option><option>Collaboration</option><option>Other</option>
+        </select><span class="err" id="err-type" aria-live="polite"></span></label>
+      <label>Message<textarea name="message" required aria-describedby="err-message"></textarea><span class="err" id="err-message" aria-live="polite"></span></label>
+      <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div><button class="btn" type="submit">Write to Niemisha →</button></div>
+      <p class="status" id="status" role="status"></p>
+    </form>
+  </div>
+</main>
+<div id="foot"></div>
+<script src="js/data.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

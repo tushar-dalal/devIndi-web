@@ -3,59 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About · Niemisha</title>
-<meta name="description" content="Niemisha is an artist and a curator of art and objects.">
-<!-- Remove this line when the site moves to its own domain and should show up in search. -->
+<title>About · Niemisha Sharma</title>
+<meta name="description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:title" content="About · Niemisha Sharma">
+<meta property="og:description" content="Niemisha Sharma is an artist and curator: artistic practice, curatorial inquiry, and visual research.">
+<meta property="og:type" content="website">
+<!-- Remove this line at launch, when the site should show up in search. -->
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Figtree:wght@400;500;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="about">
 <div id="head"></div>
-<main>
+<main id="main">
   <section class="wrap page-head">
-    <div class="about">
-      <div class="portrait"><div class="frame" id="portrait"></div><span class="hand">hi, it's me!</span></div>
+    <div class="about-grid">
+      <div id="portrait"></div>
       <div>
-        <p class="kicker">About</p>
-        <h1 style="font-size:clamp(40px,6.5vw,84px)">I'm <em>Niemisha.</em></h1>
-        <div class="prose" style="margin-top:24px">
-          <p>I'm an artist and a curator of art and objects. In the studio I work with gouache, clay and paper, mostly on small, quiet pieces about light, rooms and the things we keep.</p>
-          <p>Outside it, I bring other makers together: group shows, pop-ups and collections of objects that deserve a closer look.</p>
-          <p>This text is a placeholder. Niemisha's own words will go here.</p>
-        </div>
+        <p class="label">About</p>
+        <h1>Niemisha <em>Sharma</em></h1>
+        <p class="lede" id="bio" style="margin-top:22px"></p>
       </div>
     </div>
   </section>
 
-  <section class="section tint">
+  <section class="section panel">
+    <div class="wrap two">
+      <div><p class="label">Artistic practice</p><p class="lede measure" id="practiceText"></p><p><a class="more" href="practice.html">See the work →</a></p></div>
+      <div><p class="label">Curatorial interests</p><p class="lede measure" id="curatorialText"></p><p><a class="more" href="curating.html">See curatorial projects →</a></p></div>
+    </div>
+  </section>
+
+  <section class="section" id="cv">
     <div class="wrap">
-      <div class="section-head"><div><p class="kicker">What I do</p><h2>Three ways to <em>work together</em></h2></div></div>
-      <div class="trio">
-        <div><span class="blob" style="display:block;background:var(--blush)"></span><h3>Making</h3><p>Original paintings and objects, and the occasional commission when it feels like a fit.</p></div>
-        <div><span class="blob" style="display:block;background:var(--sage)"></span><h3>Curating</h3><p>Exhibitions and object collections for galleries, studios, shops and homes.</p></div>
-        <div><span class="blob" style="display:block;background:var(--butter)"></span><h3>Collaborating</h3><p>Pop-ups, talks and projects with makers, brands and spaces who care about craft.</p></div>
+      <div class="head-row"><h2>Curriculum <em>vitae</em></h2><span id="cvBtn"></span></div>
+      <div class="two">
+        <div><p class="label">Education</p><div id="education"></div><p class="label" style="margin-top:40px">Professional experience</p><div id="experience"></div></div>
+        <div><p class="label">Selected exhibitions, publications &amp; collaborations</p><div id="selected"></div></div>
       </div>
-    </div>
-  </section>
-
-  <section class="section" id="contact">
-    <div class="wrap contact">
-      <div>
-        <p class="kicker">Contact</p>
-        <h2>Let's make something <em>lovely.</em></h2>
-        <p class="lede" style="margin:20px 0 28px">Write to me about a commission, a show, a space, or an object you think I'd love.</p>
-        <a class="big-mail" id="mail" href="#"></a>
-      </div>
-      <form class="form" id="contactForm">
-        <label>Your name<input name="name" autocomplete="name" required></label>
-        <label>What's on your mind?<textarea name="message" rows="6" required></textarea></label>
-        <div><button class="btn" type="submit">Write to Niemisha →</button></div>
-        <p style="font-size:14px;color:var(--ink-soft);margin:0">This opens your email app with your message ready to send.</p>
-      </form>
     </div>
   </section>
 </main>

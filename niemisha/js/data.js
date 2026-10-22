@@ -1,100 +1,165 @@
-// All of the site's content lives here. Edit this file to add works, curated projects and journal posts.
-// Everything below is PLACEHOLDER text and generated artwork, to be swapped for Niemisha's real work.
+// All of the site's content lives here, following the content model in the Website Kickstart Brief (§12).
 //
-// Artwork: until real photos exist, each piece shows a generated painting built from `seed` and `palette`.
-// To use a real image, add  image: "images/your-file.jpg"  to the item (put the file in niemisha/images/).
+// IMPORTANT: every record below is a PLACEHOLDER (marked `placeholder: true`). The brief is clear that the site
+// must not invent artwork titles or use generated imagery, so these only show the layout. Replace each one with
+// Niemisha's real, verified work, and delete `placeholder: true` once a record is final. The "To select" tags
+// and the draft banner disappear on their own when nothing is marked as a placeholder.
+//
+// Images: put files in niemisha/images/ and set  src: "images/project-title_artwork-title_2025_view-01.webp".
+// A missing `src` shows a quiet "image to be supplied" box, never a stand-in picture.
 
 window.SITE = {
-  name: "Niemisha",
-  role: "artist & curator",
-  email: "hello@example.com", // TODO: replace with Niemisha's real email
-  instagram: "",              // e.g. "https://instagram.com/…" — leave empty to hide
-  location: "India",
+  name: "Niemisha Sharma",
+  descriptor: "Artist & Curator",
+  tagline: "Artistic practice, curatorial inquiry, and visual research.",
+  years: "",                       // e.g. "2019–present" once confirmed (brief §06); empty hides it
+  email: "hello@example.com",      // TODO: professional email
+  cv: "",                          // e.g. "cv/Niemisha_Sharma_CV.pdf"; empty shows "CV coming soon"
+  cvUpdated: "",                   // e.g. "October 2026"
+  socials: [                       // professional profiles only; empty list hides them
+    // { label: "Instagram", url: "https://instagram.com/…" },
+  ],
+  heroImage: { src: "", alt: "", caption: "Hero image: a real artwork or installation view, to be selected" },
+  invite: "For exhibitions, research, writing or collaboration, I'd be glad to hear from you.",
 };
 
-// kind: "made" = her own artwork, "curated" = an exhibition or object collection she put together
-window.WORKS = [
+// Artistic Practice — 3–5 projects or series at launch (brief §11).
+// category: one of "Painting", "Printmaking", "Photography", "Installation", "Other". Filters only show categories in use.
+window.PRACTICE = [
   {
-    id: "afternoon-in-ochre", kind: "made", title: "Afternoon in Ochre", year: 2026,
-    medium: "Gouache on handmade paper", size: "40 × 50 cm", seed: 11, palette: ["#ecbcaa", "#c96a4b", "#eccb7a", "#2e2622"],
-    blurb: "Light falling across a kitchen floor, held for a moment.",
-    body: [
-      "This piece started as a sketch of the light on my grandmother's kitchen floor, the hour after lunch when everything goes quiet.",
-      "I kept removing things until only the warmth was left: a shape for the window, a shape for the shadow, and the colour of the afternoon itself.",
+    id: "painting-series", placeholder: true,
+    title: "Painting series", years: "Year", category: "Painting",
+    medium: "Medium · dimensions", series: "",
+    summary: "One or two plain sentences on what the series is and where it started.",
+    statement: [
+      "A short introduction goes here, written in Niemisha's own voice. It should say what the work is and what prompted it, in concrete terms.",
+      "A longer statement is optional and only needed when it adds context the images can't carry.",
     ],
+    images: [
+      { kind: "Artwork", caption: "Title, year. Medium, dimensions." },
+      { kind: "Artwork", caption: "Title, year. Medium, dimensions." },
+      { kind: "Detail", caption: "Detail of title, year." },
+    ],
+    credits: ["Photography: name"],
   },
   {
-    id: "small-weather", kind: "made", title: "Small Weather", year: 2026,
-    medium: "Oil pastel and graphite", size: "30 × 30 cm", seed: 27, palette: ["#dfe3d3", "#9fae8c", "#7d5a6e", "#f7f0e6"],
-    blurb: "A series about the moods that pass through a room.",
-    body: [
-      "Small Weather is a series of nine squares, each made in a single sitting.",
-      "They're about the moods that pass through a room in a day: a little cloud of worry, a patch of sun, the stillness after a phone call.",
+    id: "printmaking-series", placeholder: true,
+    title: "Printmaking series", years: "Year", category: "Printmaking",
+    medium: "Process · edition · dimensions",
+    summary: "One or two plain sentences on the process and what it made possible.",
+    statement: ["Project introduction to be written."],
+    images: [
+      { kind: "Artwork", caption: "Title, year. Process, edition, dimensions." },
+      { kind: "Process", caption: "Process image, if it clarifies the work." },
     ],
+    credits: [],
   },
   {
-    id: "soft-architecture", kind: "made", title: "Soft Architecture", year: 2025,
-    medium: "Clay, linen, pigment", size: "Variable", seed: 42, palette: ["#efe4d4", "#c96a4b", "#9fae8c", "#2e2622"],
-    blurb: "Rooms you could hold in two hands.",
-    body: [
-      "Small clay rooms, each wrapped in dyed linen. I wanted to make buildings that felt like they could breathe.",
-      "They were shown together on one long low table, so you had to bend down to look inside.",
+    id: "cyanotype-pinhole", placeholder: true,
+    title: "Cyanotype and pinhole photography", years: "Year", category: "Photography",
+    medium: "Cyanotype / pinhole photograph · dimensions",
+    summary: "Include only if this remains representative of the current practice.",
+    statement: ["Project introduction to be written."],
+    images: [
+      { kind: "Artwork", caption: "Title, year. Cyanotype on paper, dimensions." },
+      { kind: "Artwork", caption: "Title, year. Pinhole photograph, dimensions." },
     ],
+    credits: [],
   },
   {
-    id: "the-blue-hour", kind: "made", title: "The Blue Hour", year: 2025,
-    medium: "Watercolour", size: "21 × 29 cm", seed: 63, palette: ["#d9dde6", "#7d5a6e", "#ecbcaa", "#2e2622"],
-    blurb: "Dusk, painted from memory, every evening for a month.",
-    body: [
-      "Thirty small paintings, one every evening for a month, always from memory and never from a photograph.",
-      "Some days I remembered the sky. Some days I only remembered how it felt.",
+    id: "light-installation", placeholder: true,
+    title: "Installation on light", years: "Year", category: "Installation",
+    medium: "Installation · materials · dimensions variable",
+    summary: "Include only once the documentation and its current framing are approved.",
+    statement: ["Project introduction to be written."],
+    images: [
+      { kind: "Installation view", caption: "Installation view, venue, year. Photo: name." },
+      { kind: "Detail", caption: "Detail." },
     ],
-  },
-  {
-    id: "found-and-kept", kind: "curated", title: "Found & Kept", year: 2026,
-    medium: "Group exhibition · 14 artists", size: "Studio space, three weeks", seed: 88, palette: ["#f2e3c4", "#eccb7a", "#c96a4b", "#7d5a6e"],
-    blurb: "An exhibition about the objects we can't throw away.",
-    body: [
-      "Found & Kept brought together fourteen artists and one question: what's the object you've carried through every move?",
-      "Each artist showed a new work next to the object that inspired it. The objects turned out to be the quiet stars of the show.",
-    ],
-  },
-  {
-    id: "table-for-ten", kind: "curated", title: "Table for Ten", year: 2025,
-    medium: "Object collection · ceramics & textiles", size: "Pop-up, one weekend", seed: 104, palette: ["#e7ead9", "#9fae8c", "#c96a4b", "#2e2622"],
-    blurb: "Ten makers, one long table, everything on it for sale.",
-    body: [
-      "A single long dinner table, set with plates, cups, cloths and cutlery made by ten independent makers.",
-      "Visitors could sit down, use everything, and take home what they loved.",
-    ],
+    credits: ["Photography: name"],
   },
 ];
 
-window.POSTS = [
+// Curatorial Practice — 2–4 projects with clear roles (brief §08). role must be accurate:
+// "Curator", "Co-curator", "Curatorial assistant", "Contributor", …
+window.CURATING = [
   {
-    slug: "on-keeping-things", title: "On keeping things", date: "2026-10-04",
-    excerpt: "Why I've started to think of curating as a kind of caretaking.",
-    body: [
-      "For a long time I thought of curating as choosing. Picking the best, leaving out the rest.",
-      "Lately it feels more like caretaking. You're finding the right room, the right light and the right neighbours for something, so it can be seen properly.",
-      "This post is a placeholder: Niemisha's real writing will go here.",
+    id: "exhibition-one", placeholder: true,
+    title: "Exhibition title", role: "Curator", year: "Year",
+    dates: "Opening – closing dates", venue: "Venue name", city: "City",
+    artists: ["Artist name", "Artist name", "Artist name"],
+    collaborators: [],
+    summary: "One or two sentences on what the exhibition brought together, and why.",
+    text: [
+      "The approved curatorial statement goes here, with attribution. A calm reading column keeps it separate from the facts on the left.",
     ],
+    images: [
+      { kind: "Installation view", caption: "Installation view. Photo: name." },
+      { kind: "Key work", caption: "Artist, title, year. Courtesy of the artist." },
+      { kind: "Public programme", caption: "Public programme, date." },
+    ],
+    credits: ["Photography: name", "Design: name", "Institution: name"],
+    links: [],
   },
   {
-    slug: "a-month-of-dusk", title: "A month of dusk", date: "2026-08-19",
-    excerpt: "Notes from painting the same sky thirty times.",
-    body: [
-      "The rule was simple: one painting every evening, from memory, no photographs.",
-      "By the second week I'd stopped trying to get it right and started trying to get it true.",
-      "This post is a placeholder: Niemisha's real writing will go here.",
-    ],
-  },
-  {
-    slug: "studio-notes-spring", title: "Studio notes, spring", date: "2026-04-02",
-    excerpt: "Clay under my nails, a new table, and too many jars of pigment.",
-    body: [
-      "The studio moved this spring. Smaller room, bigger window, which is a trade I'd make every time.",
-      "This post is a placeholder: Niemisha's real writing will go here.",
-    ],
+    id: "exhibition-two", placeholder: true,
+    title: "Exhibition title", role: "Co-curator", year: "Year",
+    dates: "Dates", venue: "Venue name", city: "City",
+    artists: ["Artist name", "Artist name"],
+    collaborators: ["Co-curator name"],
+    summary: "One or two sentences. State the shared role plainly.",
+    text: ["Curatorial text to be supplied."],
+    images: [{ kind: "Installation view", caption: "Installation view. Photo: name." }],
+    credits: [],
+    links: [],
   },
 ];
+
+// Writing & Research — 3–6 entries (brief §09).
+// type: "Essay", "Catalogue text", "Research note", "Talk", "Publication", "Interview".
+// status: "published", "note" (working note), "excerpt" or "draft". External texts: set `url` instead of `body`.
+window.WRITING = [
+  {
+    slug: "essay", placeholder: true,
+    title: "Essay title", type: "Essay", status: "published", date: "2026-01-01",
+    context: "Publication name, issue", url: "",
+    summary: "A sentence on the question the essay takes up.",
+    body: ["Essay text, or set `url` to link to where it is published."],
+    related: [{ kind: "practice", id: "painting-series" }],
+  },
+  {
+    slug: "research-note", placeholder: true,
+    title: "Research note title", type: "Research note", status: "note", date: "2026-01-01",
+    context: "Working note", url: "",
+    summary: "A short note from current research, as an invitation into the thinking behind the work.",
+    question: "A current research question, phrased in a single sentence, goes here.",
+    body: ["Short research note to be written."],
+    related: [{ kind: "practice", id: "light-installation" }],
+  },
+  {
+    slug: "catalogue-text", placeholder: true,
+    title: "Catalogue text title", type: "Catalogue text", status: "published", date: "2025-01-01",
+    context: "Exhibition catalogue, publisher", url: "",
+    summary: "Written for an exhibition; name the exhibition and publisher.",
+    body: ["Catalogue text, or a link to it."],
+    related: [{ kind: "curating", id: "exhibition-one" }],
+  },
+];
+
+// About (brief §10). Third person for the formal biography.
+window.ABOUT = {
+  placeholder: true,
+  short: "Niemisha Sharma is an artist and curator. A short biography of 60–100 words goes here: what she makes, what she curates, and the questions running through both. It should be written in plain, specific language and match the CV.",
+  portrait: { src: "", alt: "", caption: "Portrait or studio image (optional)" },
+  practice: "A paragraph on the artistic practice: media, methods and current concerns.",
+  curatorial: "A paragraph on curatorial interests: the kinds of exhibitions, artists and questions she works with.",
+  education: [
+    { years: "Year", text: "Degree, institution, city" },
+  ],
+  experience: [
+    { years: "Year", text: "Role, organisation" },
+  ],
+  selected: [
+    { years: "Year", text: "Exhibition, publication or collaboration" },
+  ],
+};
