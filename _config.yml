@@ -3,3 +3,4 @@
 exclude:
   - admin/store
   - README.md
+  - niemisha/README.md
