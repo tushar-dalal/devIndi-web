@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShiftDrop: drag, press Shift, drop to convert</title>
-<meta name="description" content="ShiftDrop is a free Windows utility: start dragging a file, press Shift, and drop it on a wheel to convert or edit it. Images, PDFs, Word and text files.">
+<meta name="description" content="ShiftDrop is a free utility for Windows, macOS and Linux: start dragging a file, press Shift, and drop it on a wheel to convert or edit it. Images, PDFs, Word and text files.">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
       <a href="../index.html#apps" class="hide-sm">Apps</a>
       <a href="../index.html#made-with-ai" class="hide-sm">How it's made</a>
       <a href="../feedback.html?app=ShiftDrop">Feedback</a>
-      <a class="btn-sm" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop_nav">Download</a>
+      <a class="btn-sm" href="#download" data-track="download_shiftdrop_nav">Download</a>
     </nav>
   </div>
 </header>
@@ -32,20 +32,21 @@
     <div class="wrap">
       <div class="top">
         <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><b>ShiftDrop</b></p>
-        <span class="pill live"><span class="dot"></span>Out now · v1.0.0 · Free</span>
+        <span class="pill live"><span class="dot"></span>Out now · v1.1.0 · Free</span>
       </div>
       <div class="split">
         <div>
           <h1>ShiftDrop</h1>
           <p class="tagline">Drag. Shift. Drop.</p>
-          <p class="lede">Converting a file shouldn't mean opening an app, hunting for an export menu, or uploading it to a sketchy website. Start dragging any file in Explorer, press <kbd>Shift</kbd>, and a wheel opens under your cursor. Drop the file on a format and the converted copy lands right next to the original.</p>
+          <p class="lede">Converting a file shouldn't mean opening an app, hunting for an export menu, or uploading it to a sketchy website. Start dragging any file in Explorer, Finder or your Linux file manager, press <kbd>Shift</kbd>, and a wheel opens under your cursor. Drop the file on a format and the converted copy lands right next to the original.</p>
           <div class="actions">
-            <a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop">
+            <a class="btn" id="dl-primary" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-              Download for Windows
+              <span id="dl-label">Download for Windows</span>
             </a>
+            <a class="btn ghost" href="#download">Mac &amp; Linux</a>
           </div>
-          <p class="dl-meta">ShiftDrop-Setup.exe · 115 MB<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
+          <p class="dl-meta" id="dl-meta">ShiftDrop-Setup.exe · 115 MB<br>Windows 10 &amp; 11 · 64-bit · no admin needed</p>
         </div>
         <div class="wheel-box">
 <svg class="wheel" viewBox="0 0 320 320" role="img" aria-label="The ShiftDrop wheel: drop a JPG on PNG, WEBP, HEIC, TIFF, AVIF, BMP, PDF or DOCX">
@@ -71,7 +72,7 @@
     <section class="block" style="border-top:0">
       <p class="label"><b>01</b> / How it works</p>
       <div class="cells three">
-        <div><span class="n">01</span><h3>Start dragging</h3><p>Pick up one or more files in Explorer or on the Desktop, like you're about to move them.</p></div>
+        <div><span class="n">01</span><h3>Start dragging</h3><p>Pick up one or more files in Explorer, Finder or your file manager, like you're about to move them.</p></div>
         <div><span class="n">02</span><h3>Press Shift</h3><p>Still holding the mouse, tap <kbd>Shift</kbd>. The wheel opens under your cursor. Tap it again to switch to Tools.</p></div>
         <div><span class="n">03</span><h3>Drop on a slice</h3><p>The new file is saved beside the original. Drop in the centre to cancel; nothing is moved or overwritten.</p></div>
       </div>
@@ -108,20 +109,46 @@
       </div>
     </section>
 
+    <section class="block" id="download">
+      <p class="label"><b>04</b> / Download</p>
+      <div class="table-wrap">
+        <table class="os-dl">
+          <thead><tr><th>System</th><th>File</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Windows<small>10 &amp; 11 · 64-bit</small></td>
+                <td>ShiftDrop-Setup.exe<small>115 MB · installer, no admin needed</small></td>
+                <td><a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-Setup.exe" data-track="download_shiftdrop_win">Download</a></td></tr>
+            <tr><td>macOS · Apple Silicon<small>M1 and newer · macOS 12+</small></td>
+                <td>ShiftDrop-1.1.0-mac-arm64.dmg<small>127 MB · <span class="chip">Beta</span></small></td>
+                <td><a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-1.1.0-mac-arm64.dmg" data-track="download_shiftdrop_mac_arm">Download</a></td></tr>
+            <tr><td>macOS · Intel<small>macOS 12+</small></td>
+                <td>ShiftDrop-1.1.0-mac-x86_64.dmg<small>122 MB · <span class="chip">Beta</span></small></td>
+                <td><a class="btn ghost" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-1.1.0-mac-x86_64.dmg" data-track="download_shiftdrop_mac_intel">Download</a></td></tr>
+            <tr><td>Linux · x86_64<small>Ubuntu 22.04+, Debian 12+, Fedora 36+</small></td>
+                <td>ShiftDrop-1.1.0-x86_64.AppImage<small>176 MB · <span class="chip">Beta</span> · also as <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-1.1.0-linux-x86_64.tar.gz" data-track="download_shiftdrop_linux_tar">.tar.gz</a></small></td>
+                <td><a class="btn" href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-1.1.0-x86_64.AppImage" data-track="download_shiftdrop_linux">Download</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="block">
-      <p class="label"><b>04</b> / Installing</p>
-      <ul class="notes">
-        <li><span>Run <strong>ShiftDrop-Setup.exe</strong>. It installs for your Windows account only, so no admin password is needed, and adds Start menu and Desktop shortcuts.</span></li>
-        <li><span>Windows may show <strong>“Windows protected your PC”</strong> the first time, because ShiftDrop is a new, independent app without a paid code-signing certificate. Click <strong>More info → Run anyway</strong>.</span></li>
-        <li><span>ShiftDrop runs quietly in the system tray, near the clock. Right-click its icon to pause it, choose whether it starts with Windows, or quit.</span></li>
-        <li><span>Everything happens on your PC. Files are never uploaded anywhere and ShiftDrop doesn't connect to the internet.</span></li>
-        <li><span>Uninstall anytime from <strong>Settings → Apps → ShiftDrop</strong>.</span></li>
-        <li><span>SHA-256 of the installer: <code>46246B882F4CC6D8E5DEEDE6815E990E6364690D586DD59AAF59980B7008F135</code></span></li>
-      </ul>
+      <p class="label"><b>05</b> / Installing</p>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><td>Windows</td><td>Run <strong>ShiftDrop-Setup.exe</strong>. If Windows shows <strong>“Windows protected your PC”</strong> (ShiftDrop is a new, independent app without a paid code-signing certificate), click <strong>More info → Run anyway</strong>. ShiftDrop lives in the system tray near the clock. Uninstall from <strong>Settings → Apps</strong>.</td></tr>
+            <tr><td>macOS</td><td>Open the .dmg and drag <strong>ShiftDrop</strong> into <strong>Applications</strong>. The first time you open it, macOS says it can't verify the developer: open <strong>System Settings → Privacy &amp; Security</strong>, scroll down and click <strong>Open Anyway</strong>. ShiftDrop lives in the menu bar. To remove it, turn off <em>Open at login</em> in its menu, then drag it to the Bin.</td></tr>
+            <tr><td>Linux</td><td>Make the AppImage executable (<code>chmod +x ShiftDrop-*.AppImage</code>, or <em>Properties → Allow executing</em>) and double-click it. Its tray menu can add it to your applications menu and start it at login. On <strong>X11</strong> the Shift gesture works as usual. <strong>Wayland</strong> doesn't let apps watch the mouse, so drag files onto the small <strong>ShiftDrop dock</strong> at the right edge of the screen instead.</td></tr>
+            <tr><td>Privacy</td><td>Everything happens on your computer. Files are never uploaded anywhere, and ShiftDrop doesn't connect to the internet.</td></tr>
+            <tr><td>Checksums</td><td>SHA-256 for every file is in <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/SHA256SUMS.txt">SHA256SUMS.txt</a>.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <div class="links-row">
-      <p>Free and open source (AGPL-3.0). <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.0.0/ShiftDrop-1.0.0-source.zip">Source code</a></p>
+      <p>Free and open source (AGPL-3.0). <a href="https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/ShiftDrop-1.1.0-source.zip">Source code</a></p>
       <div class="actions">
         <a class="btn ghost" href="../feedback.html?app=ShiftDrop">Feedback</a>
         <a class="btn ghost" href="terms.html">Terms</a>
@@ -161,5 +188,23 @@
   </div>
 </footer>
 
+<script>
+  // Point the main Download button at the visitor's system. Every file is also listed under Download.
+  (function () {
+    var ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+    var R = 'https://github.com/tushar-dalal/devIndi-web/releases/download/shiftdrop-v1.1.0/', btn = document.getElementById('dl-primary'), label = document.getElementById('dl-label'),
+        meta = document.getElementById('dl-meta');
+    if (!btn) return;
+    if (/Mac/i.test(plat) && !/iPhone|iPad/i.test(ua)) {
+      btn.href = R + 'ShiftDrop-1.1.0-mac-arm64.dmg'; btn.setAttribute('data-track', 'download_shiftdrop_mac_arm');
+      label.textContent = 'Download for Mac';
+      meta.innerHTML = 'ShiftDrop-1.1.0-mac-arm64.dmg · 127 MB<br>Apple Silicon · macOS 12+ · <a href="#download">Intel Mac?</a>';
+    } else if (/Linux/i.test(plat) && !/Android/i.test(ua)) {
+      btn.href = R + 'ShiftDrop-1.1.0-x86_64.AppImage'; btn.setAttribute('data-track', 'download_shiftdrop_linux');
+      label.textContent = 'Download for Linux';
+      meta.innerHTML = 'ShiftDrop-1.1.0-x86_64.AppImage · 176 MB<br>x86_64 · Ubuntu 22.04+, Debian 12+, Fedora 36+';
+    }
+  })();
+</script>
 </body>
 </html>

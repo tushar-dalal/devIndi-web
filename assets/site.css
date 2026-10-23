@@ -594,6 +594,19 @@ button.btn:disabled{opacity:.45;cursor:not-allowed;}
   .punch > div,.punch > div:nth-child(even){padding:24px 0;border-left:0;}
 }
 
+/* Per-OS download table (ShiftDrop) */
+.os-dl td{vertical-align:middle;}
+.os-dl td:last-child{text-align:right;width:1%;white-space:nowrap;padding-right:0;}
+.os-dl .btn{padding:10px 18px;font-size:14px;}
+.os-dl small a{color:var(--ink);}
+@media (max-width:640px){
+  .os-dl thead{display:none;}
+  .os-dl tr{display:grid;grid-template-columns:1fr auto;column-gap:12px;row-gap:6px;padding:16px 0;border-bottom:1px solid var(--line);}
+  .os-dl td{border:0;padding:0;width:auto;}
+  .os-dl td:nth-child(2){grid-column:1;grid-row:2;font-size:14px;}
+  .os-dl td:last-child{grid-column:2;grid-row:1 / span 2;align-self:center;}
+}
+
 .keys td:first-child{width:auto;white-space:nowrap;}
 .keys kbd{margin:2px 0;display:inline-block;}
 
