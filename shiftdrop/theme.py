@@ -1,8 +1,8 @@
 """Shared colours, stylesheet and PIL <-> Qt image helpers."""
 from PIL import Image
-from PySide6.QtGui import QColor, QImage, QPixmap
+from PySide6.QtGui import QColor, QFont, QImage, QPixmap
 
-from .plat import UI_FONT
+from .plat import IS_MAC, UI_FONT
 
 ACCENT = QColor("#ef4a2a")
 ACCENT_DARK = QColor("#c9381c")
@@ -10,12 +10,21 @@ CREAM = QColor(255, 236, 220, 235)
 CREAM_EDGE = QColor(255, 255, 255, 170)
 TEXT = QColor("#5a3220")
 FONT = UI_FONT
+# macOS sizes fonts at 72 points per inch, Windows and Linux at 96: scale so text looks the same.
+FONT_SCALE = 4 / 3 if IS_MAC else 1.0
+
+
+def font(points: float, bold: bool = False, family: str = "") -> QFont:
+    f = QFont(family or FONT)
+    f.setPointSizeF(points * FONT_SCALE)
+    f.setBold(bold)
+    return f
 
 STYLESHEET = """
 QWidget#Editor { background: #fff4ec; }
-QWidget { font-family: '%s'; font-size: 10pt; color: #4a2a1c; }
-QLabel#Title { font-size: 11pt; font-weight: 600; }
-QLabel#Section { color: #8a5a44; font-size: 9pt; }
+QWidget { font-family: '%s'; font-size: 13px; color: #4a2a1c; }
+QLabel#Title { font-size: 15px; font-weight: 600; }
+QLabel#Section { color: #8a5a44; font-size: 12px; }
 QPushButton {
     background: #fde3d3; border: 1px solid #f5c6ad; border-radius: 7px; padding: 5px 12px;
 }

@@ -9,7 +9,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QGuiApplication, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
-from .theme import ACCENT, FONT
+from .theme import ACCENT, font
 
 
 class DockWindow(QWidget):
@@ -50,8 +50,7 @@ class DockWindow(QWidget):
         p.save()
         p.translate(self.W / 2 + 7, self.H - 14)
         p.rotate(-90)
-        f = QFont(FONT, 8)
-        f.setBold(True)
+        f = font(8, bold=True)
         p.setFont(f)
         p.drawText(QRectF(0, -14, 80, 16), Qt.AlignLeft | Qt.AlignVCenter, "DROP HERE")
         p.restore()

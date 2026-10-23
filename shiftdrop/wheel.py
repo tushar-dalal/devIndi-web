@@ -9,14 +9,14 @@ from PySide6.QtWidgets import QWidget
 
 from . import converters as conv
 from . import plat
-from .theme import ACCENT, FONT, TEXT
+from .theme import ACCENT, FONT, TEXT, font
 
 # Segoe MDL2 Assets glyphs on Windows; widely available Unicode symbols elsewhere
 TOOL_ICONS = {
     "compress": "", "metadata": "", "edit": "", "annotate": "",
     "addbg": "", "crop": "", "redact": "", "clean": "", "merge": "",
 } if plat.IS_WIN else {
-    "compress": "⇲", "metadata": "ⓘ", "edit": "✎", "annotate": "✍", "addbg": "▣",
+    "compress": "⇲", "metadata": "ℹ", "edit": "✎", "annotate": "✍", "addbg": "▣",
     "crop": "✂", "redact": "◼", "clean": "⌫", "merge": "⧉",
 }
 
@@ -157,16 +157,14 @@ class WheelWindow(QWidget):
             color = QColor("white") if hovered else TEXT
             p.setPen(color)
             if kind == "tool":
-                p.setFont(QFont(plat.ICON_FONT, 15) if plat.ICON_FONT else QFont(FONT, 15))
+                p.setFont(font(15, family=plat.ICON_FONT))
                 p.drawText(QRectF(tx - 30, ty - 24, 60, 22), Qt.AlignHCenter | Qt.AlignBottom,
                            TOOL_ICONS.get(value, ""))
-                f = QFont(FONT, 8)
-                f.setBold(True)
+                f = font(8, bold=True)
                 p.setFont(f)
                 p.drawText(QRectF(tx - 40, ty + 1, 80, 18), Qt.AlignHCenter | Qt.AlignTop, label.upper())
             else:
-                f = QFont(FONT, 10)
-                f.setBold(True)
+                f = font(10, bold=True)
                 p.setFont(f)
                 p.drawText(QRectF(tx - 40, ty - 12, 80, 24), Qt.AlignCenter, label)
 
@@ -175,8 +173,7 @@ class WheelWindow(QWidget):
         p.setBrush(QColor(255, 240, 230, 245))
         p.drawEllipse(QPointF(0, 0), self.R_IN - 8, self.R_IN - 8)
         p.setPen(TEXT)
-        f = QFont(FONT, 10)
-        f.setBold(True)
+        f = font(10, bold=True)
         p.setFont(f)
         if not self.paths:
             title, sub = "Drop", "move to load"
@@ -189,7 +186,7 @@ class WheelWindow(QWidget):
             sub = ("Shift → " + ("Tools" if self.page == 0 else "Convert")) if other else \
                 f"{len(self.paths)} file{'s' if len(self.paths) > 1 else ''}"
         p.drawText(QRectF(-50, -20, 100, 22), Qt.AlignCenter, title)
-        p.setFont(QFont(FONT, 8))
+        p.setFont(font(8))
         p.setPen(QColor(138, 90, 68))
         p.drawText(QRectF(-50, 2, 100, 18), Qt.AlignCenter, sub)
 

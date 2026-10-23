@@ -13,10 +13,13 @@ datas, binaries, hiddenimports = [], [], []
 d, b, h = collect_all("pillow_heif")
 datas += d; binaries += b; hiddenimports += h
 datas += collect_data_files("pymupdf") + collect_data_files("docx")
-hiddenimports += collect_submodules("pymupdf") + collect_submodules("pdf2docx")
+hiddenimports += [m for m in collect_submodules("pymupdf") if not m.startswith("pymupdf.layout")]
+hiddenimports += collect_submodules("pdf2docx")
 
 excludes = ["tkinter", "matplotlib", "IPython", "PySide6.QtQml", "PySide6.QtQuick", "PySide6.QtWebEngineCore",
-            "PySide6.Qt3DCore", "PySide6.QtMultimedia", "PySide6.QtPdf"]
+            "PySide6.Qt3DCore", "PySide6.QtMultimedia", "PySide6.QtPdf",
+            # PyMuPDF's optional AI page-layout add-on (~80 MB with onnxruntime); ShiftDrop never uses it
+            "pymupdf.layout", "onnxruntime"]
 if IS_WIN:
     excludes += ["PySide6.QtNetwork", "PySide6.QtOpenGL", "PySide6.QtSvg"]
 
@@ -37,6 +40,8 @@ def keep(entry):
     if any(base.startswith(p) or base.startswith("lib" + p) for p in DROP):
         return False
     if any(p.endswith(".framework") and p[:-10] in DROP for p in parts):  # macOS Qt frameworks
+        return False
+    if "pymupdf/layout/" in name or "onnxruntime" in name:
         return False
     if "/translations/" in name or name.endswith(".qm"):
         return False

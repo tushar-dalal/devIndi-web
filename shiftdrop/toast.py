@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor, QFont, QGuiApplication, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
 from . import plat
-from .theme import ACCENT, FONT, TEXT
+from .theme import ACCENT, TEXT, font
 
 
 class Toast(QWidget):
@@ -82,12 +82,11 @@ class Toast(QWidget):
         p.setPen(QPen(QColor(150, 110, 90), 1.6))
         p.drawLine(18, 20, 26, 28)
         p.drawLine(26, 20, 18, 28)
-        f = QFont(FONT, 10)
-        f.setBold(True)
+        f = font(10, bold=True)
         p.setFont(f)
         p.setPen(QColor("#b3261e") if self.error else TEXT)
         p.drawText(QRectF(36, 12, self.W - 50, 22), Qt.AlignVCenter | Qt.AlignLeft, self.title)
-        p.setFont(QFont(FONT, 9))
+        p.setFont(font(9))
         p.setPen(QColor(140, 100, 82))
         p.drawText(QRectF(18, 38, self.W - 36, 18), Qt.AlignVCenter | Qt.AlignLeft, self.sub)
         # progress bar
