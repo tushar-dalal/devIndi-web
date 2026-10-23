@@ -1,0 +1,118 @@
+name: Build ShiftDrop (macOS + Linux)
+
+on:
+  push:
+    branches: [shiftdrop-src]
+  workflow_dispatch:
+
+env:
+  VERSION: "1.1.0"
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04  # oldest glibc we support: runs on Ubuntu 22.04+, Debian 12+, Fedora 36+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: System libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-keysyms1 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-randr0 libxcb-render-util0 libxcb-image0 libegl1 libgl1 \
+            libfontconfig1 libdbus-1-3 xvfb xdotool imagemagick fonts-dejavu-core
+      - run: pip install -r requirements.txt pyinstaller
+      - run: python -m PyInstaller --noconfirm ShiftDrop.spec
+      - name: Self-test (every conversion, inside the packaged app)
+        run: |
+          python ci/make_fixtures.py fx
+          dist/ShiftDrop/ShiftDrop --selftest fx || { cat ~/.local/state/ShiftDrop/shiftdrop.log; exit 1; }
+          grep -c "selftest OK" ~/.local/state/ShiftDrop/shiftdrop.log
+      - name: Smoke test (tray, wheel, dock start)
+        run: |
+          xvfb-run -a dist/ShiftDrop/ShiftDrop --smoketest
+          grep "smoketest ok" ~/.local/state/ShiftDrop/shiftdrop.log
+      - name: End-to-end Shift gesture (real drag under X11)
+        run: xvfb-run -a -s "-screen 0 1280x800x24" python ci/e2e_x11.py dist/ShiftDrop/ShiftDrop e2e e2e-wheel.png
+      - name: Screenshots of the wheel
+        run: |
+          xvfb-run -a -s "-screen 0 1280x800x24" bash -c \
+            'dist/ShiftDrop/ShiftDrop --demo fx/shot.jpg & sleep 4; import -window root linux-convert.png; wait'
+          xvfb-run -a -s "-screen 0 1280x800x24" bash -c \
+            'dist/ShiftDrop/ShiftDrop --demo fx/shot.jpg tools & sleep 4; import -window root linux-tools.png; wait'
+      - name: Package AppImage and tar.gz
+        run: bash ci/build_appimage.sh "$VERSION"
+      - name: Launch on fresh distros
+        run: |
+          set -e
+          APP="ShiftDrop-${VERSION}-x86_64.AppImage"
+          docker run --rm -v "$PWD:/w" ubuntu:24.04 bash -c "apt-get update -qq && \
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq xvfb libgl1 libegl1 libfontconfig1 \
+            libxkbcommon0 libx11-6 libx11-xcb1 libxcb1 libdbus-1-3 libglib2.0-0t64 > /dev/null && \
+            bash /w/ci/distro_test.sh $APP"
+          docker run --rm -v "$PWD:/w" fedora:41 bash -c "dnf install -y -q xorg-x11-server-Xvfb mesa-libGL \
+            mesa-libEGL fontconfig libxkbcommon libX11 libX11-xcb libxcb dbus-libs glib2 findutils > /dev/null && \
+            bash /w/ci/distro_test.sh $APP"
+          docker run --rm -v "$PWD:/w" debian:12 bash -c "apt-get update -qq && \
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq xvfb libgl1 libegl1 libfontconfig1 \
+            libxkbcommon0 libx11-6 libx11-xcb1 libxcb1 libdbus-1-3 libglib2.0-0 > /dev/null && \
+            bash /w/ci/distro_test.sh $APP"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux
+          path: |
+            ShiftDrop-*.AppImage
+            ShiftDrop-*.tar.gz
+            *.png
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt pyinstaller
+      - run: python -m PyInstaller --noconfirm ShiftDrop.spec
+      - name: Self-test (every conversion, inside the packaged app)
+        run: |
+          python ci/make_fixtures.py fx
+          LOG="$HOME/Library/Application Support/ShiftDrop/shiftdrop.log"
+          dist/ShiftDrop.app/Contents/MacOS/ShiftDrop --selftest fx || { cat "$LOG"; exit 1; }
+          grep -c "selftest OK" "$LOG"
+      - name: Smoke test (menu bar, wheel, dock start)
+        run: |
+          dist/ShiftDrop.app/Contents/MacOS/ShiftDrop --smoketest
+          grep "smoketest ok" "$HOME/Library/Application Support/ShiftDrop/shiftdrop.log"
+      - name: Screenshot of the wheel
+        continue-on-error: true
+        run: |
+          (dist/ShiftDrop.app/Contents/MacOS/ShiftDrop --demo fx/shot.jpg &) ; sleep 5
+          screencapture -x "mac-${{ matrix.arch }}-convert.png"
+      - name: Signature check
+        run: codesign -dv --verbose=2 dist/ShiftDrop.app 2>&1 | head -8; lipo -archs dist/ShiftDrop.app/Contents/MacOS/ShiftDrop
+      - name: Package DMG
+        run: |
+          mkdir dmg
+          cp -R dist/ShiftDrop.app dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create -volname "ShiftDrop" -srcfolder dmg -ov -format UDZO \
+            "ShiftDrop-${VERSION}-mac-${{ matrix.arch }}.dmg"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-${{ matrix.arch }}
+          path: |
+            ShiftDrop-*.dmg
+            *.png

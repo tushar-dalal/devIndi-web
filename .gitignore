@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.log
+build/
+dist/
+release/
+AppDir/
+appimagetool
+squashfs-root/
+fx/
+e2e/
