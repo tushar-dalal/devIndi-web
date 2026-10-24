@@ -101,6 +101,15 @@ To point submissions at a different address, change the URL in the `fetch(...)`
 call inside `feedback.html`'s `<script>` block
 (`https://formsubmit.co/ajax/reach@devindi.in`).
 
+Each submission is also saved to a `feedback` table in the analytics Supabase
+project, and shows up in **Admin → Website Analytics → Feedback** (mark done,
+delete, reply by email). The public key can only *add* feedback; reading goes
+through `read_feedback()`, which only answers to a key derived from the admin
+password at sign-in (Supabase stores just its hash). One-time setup: sign in to
+the admin, open the Feedback tab, and run the SQL it shows (it's
+`analytics/feedback-setup.sql` with your hash filled in). If the admin password
+changes, the tab shows a one-line SQL update to re-lock it.
+
 ## Website analytics (`analytics/`, `admin/analytics.html`)
 
 Every public page (and the admin sign-in screen) loads `analytics/config.js` +

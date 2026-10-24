@@ -151,6 +151,15 @@
   .gate .error{font-size:13px;margin-top:10px;min-height:1em;}
   ol.steps{padding-left:20px;line-height:1.75;color:var(--ink-soft);font-size:14px;}
   ol.steps code{font-family:var(--mono);background:var(--card-2);padding:1px 6px;border-radius:4px;font-size:12.5px;color:var(--ink);}
+  .fb{padding:22px 0;border-bottom:1px solid var(--grid);}
+  .fb:first-child{padding-top:4px;}
+  .fb:last-child{border-bottom:0;}
+  .fb-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .fb-msg{margin:12px 0 16px;font-size:15.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;max-width:80ch;}
+  .fb.done .fb-msg{color:var(--ink-soft);}
+  .fb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .fb-actions a.btn{text-decoration:none;display:inline-flex;align-items:center;}
+  .sqlbox{width:100%;min-height:260px;font:12px/1.6 var(--mono);color:var(--ink);background:var(--card-2);border:1px solid var(--card-border);padding:14px;resize:vertical;}
   .loading{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);padding:64px 0;text-align:center;}
 </style>
 </head>
@@ -189,6 +198,7 @@
   document.getElementById('logoutLink').addEventListener('click', (e) => {
     e.preventDefault();
     sessionStorage.removeItem('devindi_admin_ok');
+    sessionStorage.removeItem('devindi_feedback_key');
     location.href = 'index.html';
   });
 
@@ -299,7 +309,8 @@
     hideMine: lsGet('dvi_an_hide') !== '0',
     tab: lsGet('dvi_an_tab') || 'overview',
     raw: [], access: [], recIndex: [], loadedAt: null,
-    sessionLimit: 50, selectedSession: null
+    sessionLimit: 50, selectedSession: null,
+    fb: null, fbPromise: null, fbShow: lsGet('dvi_fb_show') || 'new', fbApp: 'all', renderSeq: 0
   };
   if (!RANGES[state.range]) state.range = '7d';
   function rangeStart() {
@@ -335,6 +346,8 @@
   async function load() {
     const body = document.getElementById('tabBody');
     body.innerHTML = '<div class="loading">Loading data…</div>';
+    state.fb = null; state.fbPromise = null;
+    loadFeedback();
     try {
       const since = rangeStart().toISOString();
       const [raw, access, recIndex] = await Promise.all([
@@ -404,7 +417,7 @@
 
   // ---------- shell ----------
   const TABS = [
-    ['overview', 'Overview'], ['sources', 'Sources & audience'], ['journeys', 'Journeys'],
+    ['overview', 'Overview'], ['feedback', 'Feedback'], ['sources', 'Sources & audience'], ['journeys', 'Journeys'],
     ['behavior', 'Clicks & events'], ['heatmaps', 'Heatmaps'], ['sessions', 'Sessions & recordings'], ['admin', 'Admin sign-ins']
   ];
   function renderShell() {
@@ -440,12 +453,184 @@
   function renderTab() {
     const m = model();
     const body = document.getElementById('tabBody');
-    const fn = { overview, sources, journeys, behavior, heatmaps, sessionsTab, admin: adminTab }[state.tab === 'sessions' ? 'sessionsTab' : state.tab] || overview;
+    state.renderSeq++;
+    const fn = { overview, feedback: feedbackTab, sources, journeys, behavior, heatmaps, sessionsTab, admin: adminTab }[state.tab === 'sessions' ? 'sessionsTab' : state.tab] || overview;
     body.innerHTML = '';
-    if (!state.raw.length && state.tab !== 'admin') {
+    if (!state.raw.length && state.tab !== 'admin' && state.tab !== 'feedback') {
       body.insertAdjacentHTML('beforeend', `<div class="banner info">No visits recorded in this period yet. Visits show up here within a few seconds of happening.</div>`);
     }
     fn(body, m);
+  }
+
+  // ---------- feedback inbox ----------
+  // Messages from feedback.html, saved in Supabase (analytics/feedback-setup.sql).
+  // The public key can only add them; reading goes through read_feedback(), which
+  // needs the reader key the admin sign-in puts in sessionStorage.
+  const fbKey = () => sessionStorage.getItem('devindi_feedback_key');
+  async function sha256Hex(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function rpc(fn, args) {
+    const res = await fetch(API + 'rpc/' + fn, {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, keyHeaders),
+      body: JSON.stringify(args)
+    });
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch (e) {}
+    if (!res.ok) {
+      const err = new Error((data && data.message) || ('Supabase ' + res.status));
+      err.status = res.status; err.code = data && data.code;
+      throw err;
+    }
+    return data;
+  }
+  function loadFeedback() {
+    if (!fbKey()) { state.fb = { error: 'nokey' }; return Promise.resolve(); }
+    state.fbPromise = rpc('read_feedback', { p_key: fbKey() })
+      .then((rows) => { state.fb = { rows: rows || [] }; })
+      .catch((ex) => {
+        const missing = ex.status === 404 || ex.code === 'PGRST202' || ex.code === '42P01';
+        const wrong = ex.code === '42501' || /wrong reader key/.test(ex.message);
+        state.fb = { error: missing ? 'setup' : wrong ? 'mismatch' : 'other', message: ex.message };
+      })
+      .then(updateFeedbackLabel);
+    return state.fbPromise;
+  }
+  function updateFeedbackLabel() {
+    const b = document.querySelector('[data-t="feedback"]');
+    if (!b) return;
+    const n = state.fb && state.fb.rows ? state.fb.rows.filter((r) => !r.done).length : 0;
+    b.textContent = n ? `Feedback (${n})` : 'Feedback';
+  }
+
+  async function feedbackTab(body) {
+    const seq = state.renderSeq;
+    const stale = () => seq !== state.renderSeq;
+    if (!state.fb) {
+      body.innerHTML = '<div class="loading">Loading feedback…</div>';
+      await (state.fbPromise || loadFeedback());
+      if (stale()) return;
+      body.innerHTML = '';
+    }
+    const fb = state.fb;
+
+    if (fb.error === 'nokey') {
+      body.insertAdjacentHTML('beforeend', `<div class="banner info">Feedback is locked to your admin sign-in. Sign out and sign back in once to unlock it on this tab.
+        <a href="#" id="fbResign" style="margin-left:auto">Sign out →</a></div>`);
+      body.querySelector('#fbResign').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('logoutLink').click(); });
+      return;
+    }
+    if (fb.error === 'setup' || fb.error === 'mismatch') {
+      const hash = await sha256Hex(fbKey());
+      if (stale()) return;
+      let sql, title, intro;
+      if (fb.error === 'setup') {
+        title = 'Set up the feedback inbox';
+        intro = 'One step. Feedback still reaches reach@devindi.in by email; this also keeps a copy here.';
+        try {
+          const res = await fetch('../analytics/feedback-setup.sql', { cache: 'no-store' });
+          sql = (await res.text()).replace('PASTE_READER_HASH_HERE', hash);
+          if (stale()) return;
+        } catch (e) { sql = '-- Couldn\'t load analytics/feedback-setup.sql. Open it from the repo and replace PASTE_READER_HASH_HERE with:\n-- ' + hash; }
+      } else {
+        title = 'Unlock feedback for this password';
+        intro = 'The feedback inbox is locked to a different admin password (did it change?). Run this to re-lock it to the one you just signed in with.';
+        sql = `update public.feedback_reader set key_hash = '${hash}' where id = 1;`;
+      }
+      const c = card(grid(body, 'wide'), title, intro, `
+        <ol class="steps">
+          <li>Copy the SQL below. It already contains your reader hash.</li>
+          <li>Open Supabase → <b>SQL Editor</b> → New query, paste, and click <b>Run</b>.</li>
+          <li>Come back here and press <b>Refresh</b>.</li>
+        </ol>
+        <div class="controls"><button class="btn primary" id="fbCopy">Copy SQL</button><span class="muted" id="fbCopied"></span></div>
+        <textarea class="sqlbox" readonly spellcheck="false">${esc(sql)}</textarea>`);
+      c.querySelector('#fbCopy').addEventListener('click', async () => {
+        const ta = c.querySelector('textarea');
+        try { await navigator.clipboard.writeText(ta.value); } catch (e) { ta.select(); document.execCommand('copy'); }
+        c.querySelector('#fbCopied').textContent = 'Copied.';
+      });
+      return;
+    }
+    if (fb.error) {
+      body.insertAdjacentHTML('beforeend', `<div class="banner warn">Couldn't load feedback: ${esc(fb.message)}</div>`);
+      return;
+    }
+
+    const rows = fb.rows;
+    const weekAgo = Date.now() - 7 * 864e5;
+    body.insertAdjacentHTML('beforeend', `<div class="kpis">
+      <div class="kpi"><div class="label">New</div><div class="value">${fmt(rows.filter((r) => !r.done).length)}</div><div class="sub">not marked done</div></div>
+      <div class="kpi"><div class="label">Last 7 days</div><div class="value">${fmt(rows.filter((r) => new Date(r.created_at) >= weekAgo).length)}</div><div class="sub">messages received</div></div>
+      <div class="kpi"><div class="label">All time</div><div class="value">${fmt(rows.length)}</div><div class="sub">since the inbox was set up</div></div>
+      <div class="kpi"><div class="label">Can reply</div><div class="value">${fmt(rows.filter((r) => r.email).length)}</div><div class="sub">left an email</div></div>
+    </div>`);
+
+    const apps = countBy(rows, 'app');
+    const c = card(grid(body, 'wide'), 'Messages', 'All time, newest first. The date range above doesn\'t apply here; every message is also emailed to reach@devindi.in.', `
+      <div class="controls">
+        <div class="seg" id="fbShow">${[['new', 'New'], ['done', 'Done'], ['all', 'All']].map(([k, v]) => `<button data-f="${k}" class="${state.fbShow === k ? 'on' : ''}">${v}</button>`).join('')}</div>
+        <select id="fbApp"><option value="all">All apps</option>${apps.map(([a, n]) => `<option value="${esc(a)}" ${state.fbApp === a ? 'selected' : ''}>${esc(a)} (${n})</option>`).join('')}</select>
+      </div>
+      <div id="fbList"></div>`);
+
+    function draw() {
+      const list = rows.filter((r) =>
+        (state.fbShow === 'all' || (state.fbShow === 'done' ? r.done : !r.done)) &&
+        (state.fbApp === 'all' || r.app === state.fbApp));
+      const out = c.querySelector('#fbList');
+      if (!list.length) {
+        out.innerHTML = `<div class="empty">${rows.length ? 'Nothing here with these filters.' : 'No feedback yet. Messages sent from devindi.in/feedback.html show up here.'}</div>`;
+        return;
+      }
+      out.innerHTML = list.map((r) => {
+        const subject = encodeURIComponent('Re: your ' + r.app + ' feedback');
+        const quote = encodeURIComponent('\n\n---\nYou wrote on ' + when(r.created_at) + ':\n' + r.message);
+        return `<article class="fb${r.done ? ' done' : ''}" data-id="${r.id}">
+          <div class="fb-meta"><span class="pill${r.done ? '' : ' good'}">${r.done ? 'Done' : 'New'}</span><span class="pill gold">${esc(r.app)}</span><span class="muted">${esc(when(r.created_at))}${r.device ? ' · ' + esc(r.device) : ''}</span></div>
+          <p class="fb-msg">${esc(r.message)}</p>
+          <div class="fb-actions">
+            ${r.email ? `<a class="btn primary" href="mailto:${esc(r.email)}?subject=${subject}&body=${quote}">Reply to ${esc(r.email)}</a>` : '<span class="muted">No email left, so no reply possible.</span>'}
+            <button class="btn" data-act="done">${r.done ? 'Mark as new' : 'Mark done'}</button>
+            <button class="btn danger" data-act="delete">Delete</button>
+          </div>
+        </article>`;
+      }).join('');
+    }
+    draw();
+
+    c.querySelector('#fbShow').addEventListener('click', (e) => {
+      const f = e.target.getAttribute('data-f'); if (!f) return;
+      state.fbShow = f; lsSet('dvi_fb_show', f);
+      [...e.currentTarget.children].forEach((b) => b.classList.toggle('on', b === e.target));
+      draw();
+    });
+    c.querySelector('#fbApp').addEventListener('change', (e) => { state.fbApp = e.target.value; draw(); });
+    c.querySelector('#fbList').addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-act]'); if (!btn) return;
+      const id = Number(btn.closest('[data-id]').getAttribute('data-id'));
+      const row = rows.find((r) => r.id === id); if (!row) return;
+      const act = btn.getAttribute('data-act');
+      if (act === 'delete' && !confirm('Delete this message for good? The emailed copy in reach@devindi.in stays.')) return;
+      btn.disabled = true;
+      try {
+        if (act === 'delete') {
+          await rpc('update_feedback', { p_key: fbKey(), p_id: id, p_delete: true });
+          rows.splice(rows.indexOf(row), 1);
+        } else {
+          await rpc('update_feedback', { p_key: fbKey(), p_id: id, p_done: !row.done });
+          row.done = !row.done;
+        }
+        updateFeedbackLabel();
+        draw();
+      } catch (ex) {
+        btn.disabled = false;
+        alert('Couldn\'t save that: ' + ex.message);
+      }
+    });
   }
 
   // ---------- building blocks ----------

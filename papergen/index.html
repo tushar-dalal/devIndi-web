@@ -251,6 +251,7 @@
   }
   document.getElementById('signOutLink').addEventListener('click', () => {
     sessionStorage.removeItem('devindi_admin_ok');
+    sessionStorage.removeItem('devindi_feedback_key');
     window.location.href = '../admin/index.html';
   });
 </script>

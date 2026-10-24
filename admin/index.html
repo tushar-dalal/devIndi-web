@@ -75,6 +75,9 @@
 
     if (hash === EXPECTED_HASH) {
       sessionStorage.setItem('devindi_admin_ok', '1');
+      // Key for reading the feedback inbox (see analytics/feedback-setup.sql).
+      // It comes from the password, so it isn't in this file; Supabase only keeps its hash.
+      sessionStorage.setItem('devindi_feedback_key', await sha256Hex('devindi-feedback-reader:' + email + ':' + password));
       submitBtn.textContent = 'Signing in…';
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
       // Log the admin login before leaving the page.

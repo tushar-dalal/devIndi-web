@@ -89,6 +89,7 @@
   document.getElementById('logoutLink').addEventListener('click', (e) => {
     e.preventDefault();
     sessionStorage.removeItem('devindi_admin_ok');
+    sessionStorage.removeItem('devindi_feedback_key');
     window.location.href = 'index.html';
   });
 </script>

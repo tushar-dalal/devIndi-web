@@ -132,7 +132,9 @@
       status.className = 'status';
       status.textContent = '';
 
-      fetch('https://formsubmit.co/ajax/reach@devindi.in', {
+      // Two copies: an email via FormSubmit, and a row in the Supabase feedback
+      // inbox (Admin → Website Analytics → Feedback). Either one getting through counts.
+      var sendEmail = fetch('https://formsubmit.co/ajax/reach@devindi.in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
@@ -142,12 +144,33 @@
           _subject: 'devIndi feedback — ' + app,
           _template: 'box'
         })
-      })
-        .then(function (res) {
-          if (!res.ok) throw new Error('Request failed: ' + res.status);
-          return res.json();
-        })
-        .then(function () {
+      }).then(function (res) {
+        if (!res.ok) throw new Error('Email relay failed: ' + res.status);
+      });
+
+      var sendInbox = Promise.reject(new Error('Inbox not configured'));
+      var cfg = window.DEVINDI_ANALYTICS || {};
+      if (cfg.supabaseUrl && cfg.anonKey && !/YOUR-/.test(cfg.supabaseUrl + cfg.anonKey)) {
+        var headers = { 'Content-Type': 'application/json', 'apikey': cfg.anonKey, 'Prefer': 'return=minimal' };
+        if (/^eyJ/.test(cfg.anonKey)) headers.Authorization = 'Bearer ' + cfg.anonKey;
+        var w = window.innerWidth;
+        sendInbox = fetch(cfg.supabaseUrl.replace(/\/+$/, '') + '/rest/v1/feedback', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            app: app.slice(0, 60),
+            message: message.slice(0, 5000),
+            email: email ? email.slice(0, 254) : null,
+            device: w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop'
+          })
+        }).then(function (res) {
+          if (!res.ok) throw new Error('Inbox failed: ' + res.status);
+        });
+      }
+
+      Promise.allSettled([sendEmail, sendInbox])
+        .then(function (results) {
+          if (!results.some(function (r) { return r.status === 'fulfilled'; })) throw new Error('Both failed');
           btn.textContent = 'Sent ✓';
           note.textContent = 'Thanks for taking the time.';
           status.className = 'status success';
