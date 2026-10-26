@@ -1,3 +1,6 @@
 .DS_Store
 Thumbs.db
 worksheets/skills/*.zip
+
+# Private drafts (emails, attachments): never committed or published
+outbox/
