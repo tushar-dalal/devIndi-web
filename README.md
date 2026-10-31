@@ -1,7 +1,7 @@
 # devIndi
 
 The home for devIndi's apps: small utilities made with AI. A static home page
-(ShiftDrop featured first, the other apps listed as "in testing"), one "about this
+(ShiftDrop and SlipTide featured first, the other apps listed as "in testing"), one "about this
 app" page per app, and a privacy policy + terms per app. Every page shares one
 black-and-white design system in `assets/site.css` (Geist, Geist Mono, Instrument
 Serif; no gradients). Navigation follows one hierarchy: **home → app page → privacy policy**.
@@ -34,6 +34,10 @@ devIndi/
 ├── shiftdrop/              ShiftDrop (Windows app) — about/download page, privacy, terms, icon.png
 │   ├── index.html          download links point at the GitHub Release `shiftdrop-v1.0.0`
 │   ├── privacy.html        (the installer is >100 MB, too big to commit; it lives on the release)
+│   └── terms.html
+├── sliptide/               SlipTide (Windows torrent client) — about/download page, privacy, terms, icon.png
+│   ├── index.html          download links point at the GitHub Release `sliptide-v1.0.0`
+│   ├── privacy.html        (installer + portable exe are >100 MB; they live on the release)
 │   └── terms.html
 ├── shotly/                 Shotly (Windows screenshot app), coming soon: teaser page only
 │   ├── index.html          animated CSS mock-ups (capture, redact, search); no downloads yet

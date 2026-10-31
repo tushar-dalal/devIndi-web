@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SlipTide: Privacy Policy</title>
+<meta name="description" content="Privacy Policy for SlipTide, the ad-free torrent client for Windows.">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../analytics/config.js"></script>
+<script src="../analytics/track.js" defer></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="sq"></span>devIndi</a>
+    <nav class="nav-links">
+      <a href="../index.html#apps" class="hide-sm">Apps</a>
+      <a href="../index.html#made-with-ai" class="hide-sm">How it's made</a>
+      <a href="../feedback.html?app=SlipTide">Feedback</a>
+      <a class="btn-sm" href="index.html#download">Get SlipTide</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="legal-hero">
+    <p class="label crumbs"><a href="../index.html">devIndi</a><span>/</span><a href="index.html">SlipTide</a><span>/</span><b>Privacy</b></p>
+    <h1>Privacy <em>policy</em></h1>
+
+    <div class="meta">
+      <p class="label">SlipTide · Last updated October 31, 2026</p>
+      <div class="tab-row">
+        <a class="tab" href="terms.html">Terms</a>
+        <a class="tab active" href="privacy.html">Privacy</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="legal">
+<div class="card intro">
+      <p>SlipTide is a torrent client: it runs on your own computer and connects directly to other people's computers to share files. The short version: <strong>we don't collect anything.</strong> There is no account, no analytics and no ads, and nothing is ever sent to devIndi.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">01</span> What other peers can see</h2>
+      <p>This is how BitTorrent works, in every torrent app, and it's worth knowing:</p>
+      <ul>
+        <li><strong>Your IP address</strong> is visible to the other computers you share a torrent with, and to the trackers that help you find them.</li>
+        <li>They can see <strong>which torrent</strong> you're downloading or seeding, how much of it you have, and the name and version of the app you use.</li>
+        <li>Turning on <strong>encryption</strong> in Settings hides the contents of peer traffic from your network, but not your IP address from the peers themselves.</li>
+      </ul>
+      <p>Only download and share files you have the right to.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">02</span> Who SlipTide connects to</h2>
+      <ul>
+        <li><strong>Peers and trackers</strong> for the torrents you add, including public trackers that Tracker boost adds to public torrents (you can turn it off in Settings).</li>
+        <li><strong>The DHT network</strong> and other computers on your local network, to find peers without a tracker.</li>
+        <li><strong>Your router</strong>, through UPnP / NAT-PMP, to open a port so peers can reach you (you can turn it off).</li>
+        <li><strong>Web addresses you give it</strong>: a link to a .torrent file, an IP blocklist, or the web seeds listed inside a torrent.</li>
+      </ul>
+      <p>SlipTide never contacts devIndi, and it doesn't check for updates.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">03</span> What stays on your computer</h2>
+      <ul>
+        <li><strong>Your downloads</strong>, in the folder you choose (<code>Downloads\SlipTide</code> by default).</li>
+        <li><strong>Settings, your torrent list and lifetime totals</strong>, in <code>%APPDATA%\SlipTide</code>, or in the <code>SlipTide-data</code> folder beside the portable version.</li>
+        <li><strong>A local error log</strong> (<code>error.log</code> in the same folder), only if something goes wrong. It never leaves your computer unless you choose to send it to us.</li>
+      </ul>
+      <p>The built-in player streams through a private address on your own computer (<code>127.0.0.1</code>) that other devices can't reach. SlipTide checks your clipboard for a magnet link only when you switch to it, and nothing it reads is stored or sent.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">04</span> Downloading SlipTide</h2>
+      <p>The installer is hosted on GitHub, so GitHub's own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">privacy statement</a> covers the download itself. This website uses Google Fonts, which receives standard request information (such as your IP address) when the page loads.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">05</span> Feedback</h2>
+      <p>If you send feedback through the devIndi feedback form or by email, we receive only what you choose to write, and use it only to reply and improve SlipTide.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">06</span> This website</h2>
+      <p>This website (not the app) measures how visitors use devindi.in: pages viewed, the site that linked you here, clicks, how far you scroll, time on each page, and your device type, browser, language and time zone. Some visits are saved as an anonymous replay of scrolling, mouse movement and clicks; anything typed into a form is hidden before it is saved. A random ID is kept in your browser to tell visits apart. We don't store your IP address, don't use advertising trackers, and never sell or share this data; it stays in our own database (hosted by Supabase). If your browser sends Do Not Track or Global Privacy Control, none of this runs.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">07</span> Changes to this policy</h2>
+      <p>If a future version ever changes how data is handled, for example by adding an update check, we'll update this page and the date above before releasing it.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="label" style="margin-bottom:14px">devIndi</p>
+        <p>Small utilities, made with AI, to make life simpler. Questions or ideas? Write to <a href="mailto:reach@devindi.in">reach@devindi.in</a>.</p>
+      </div>
+      <div>
+        <h4 class="label">Apps</h4>
+        <ul>
+          <li><a href="../shiftdrop/index.html">ShiftDrop</a></li>
+          <li><a href="../sliptide/index.html">SlipTide</a></li>
+          <li><a href="../shotly/index.html">Shotly</a></li>
+          <li><a href="../index.html#testing">In testing</a></li>
+          <li><a href="../index.html#websites">Websites</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="label">Studio</h4>
+        <ul>
+          <li><a href="../feedback.html">Feedback</a></li>
+          <li><a href="mailto:reach@devindi.in">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="giant" aria-hidden="true">devIndi</p>
+    <div class="legal-line">
+      <span class="mono">© 2026 devIndi · Built by Tushar Dalal</span>
+      <span class="mono"><a href="../disclaimer.html">Disclaimer</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="../admin/index.html">Admin</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
