@@ -6,6 +6,10 @@ app" page per app, and a privacy policy + terms per app. Every page shares one
 black-and-white design system in `assets/site.css` (Geist, Geist Mono, Instrument
 Serif; no gradients). Navigation follows one hierarchy: **home → app page → privacy policy**.
 
+Every page links the stylesheet as `assets/site.css?v=YYYYMMDD`. **When you change
+`site.css`, bump that date on every page** (one find-and-replace), otherwise visitors
+may get the new HTML with a cached old stylesheet for up to 10 minutes.
+
 ```
 devIndi/
 ├── index.html              home page — ShiftDrop first, then the apps in testing
