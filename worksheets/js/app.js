@@ -1054,6 +1054,58 @@
     } catch (e) { toast("Couldn't remove: " + e.message); }
   }
 
+  // Monthly invoice message per parent, in Tushar's WhatsApp format. Extra-hours
+  // entries count as classes (he posts them as "Class N" too). Hours are billed hours.
+  const num = (h) => String(Number(h.toFixed(2)));
+  function parentsFor(students) {
+    const map = new Map();
+    for (const s of students) {
+      const p = s.profile && s.profile.parent && s.profile.parent.name;
+      if (!p) continue;
+      if (!map.has(p)) map.set(p, []);
+      map.get(p).push(s);
+    }
+    for (const list of map.values()) list.sort((a, b) => ((a.profile.parent.invoiceOrder || 99) - (b.profile.parent.invoiceOrder || 99)) || a.name.localeCompare(b.name));
+    return map;
+  }
+  function invoiceText(parent, kids, rows) {
+    let totalH = 0, totalAmt = 0;
+    const blocks = [];
+    for (const s of kids) {
+      const mine = rows.filter((r) => r.s === s);
+      if (!mine.length) continue;
+      const h = mine.reduce((a, r) => a + r.hours, 0);
+      totalH += h;
+      totalAmt += mine.reduce((a, r) => a + (r.amount || 0), 0);
+      blocks.push(`${s.name}:\nClasses: ${mine.length}\nHours: ${num(h)}`);
+    }
+    if (!blocks.length) return "";
+    return `Hey ${parent}!\n\nWith the month coming to an end, please find the details of the classes held below:\n\n${blocks.join("\n\n")}\n\n` +
+      `Total Hours: ${num(totalH)}\nTotal Amount: Rs. ${Math.round(totalAmt).toLocaleString("en-IN")}\n\nPlease let me know when you've initiated the transaction`;
+  }
+
+  function invoiceSection(students, rows, month) {
+    const parents = parentsFor(students);
+    if (!parents.size) {
+      return `<section class="invoice"><div class="sect" style="font-size:20px">Invoice</div>
+        <p class="calc">Add <code>"parent": { "name": "…" }</code> to a student's student.json to make invoices.</p></section>`;
+    }
+    const names = [...parents.keys()];
+    if (!names.includes(S.invoiceParent)) S.invoiceParent = names[0];
+    const kids = parents.get(S.invoiceParent);
+    const text = invoiceText(S.invoiceParent, kids, rows);
+    return `<section class="invoice">
+        <div class="head-row" style="margin-bottom:12px">
+          <div><div class="sect" style="font-size:20px">Invoice for ${esc(monthLabel(month))}</div>
+            <p class="calc" style="margin:2px 0 0">${esc(kids.map((k) => k.name).join(" & "))} · extra hours count as classes</p></div>
+          <div class="seg filters">${names.map((n) => `<button data-parent="${esc(n)}" class="${n === S.invoiceParent ? "on" : ""}">${esc(n)}</button>`).join("")}</div>
+        </div>
+        ${text ? `<textarea id="invoiceText" class="invoicebox" spellcheck="false" aria-label="Invoice message">${esc(text)}</textarea>
+          <div class="inline" style="margin-top:10px"><button class="btn primary" id="copyInvoice">Copy message</button><span class="calc">You can edit it above before copying.</span></div>`
+          : `<p class="calc">No classes for ${esc(kids.map((k) => k.name).join(" or "))} in ${esc(monthLabel(month))}.</p>`}
+      </section>`;
+  }
+
   function vClasses() {
     const month = S.month;
     const rows = classRows(month);
@@ -1140,6 +1192,7 @@
         <div class="calc">${nClasses} class${nClasses === 1 ? "" : "es"}${extraH ? ` + ${fmtHours(extraH)} extra work` : ""} · ${fmtHours(hours)} billed</div>
       </section>
       <div class="ccards">${cards}</div>
+      ${invoiceSection(students, rows, month)}
       ${form}
       <div class="head-row" style="margin:40px 0 14px">
         <h3 class="sect">Classes in ${esc(monthLabel(month))}</h3>
@@ -1311,6 +1364,13 @@
     classes(main) {
       $$("[data-month]", main).forEach((b) => b.addEventListener("click", () => { S.month = shiftMonth(S.month, Number(b.dataset.month)); render(); }));
       $$("[data-cstu]", main).forEach((b) => b.addEventListener("click", () => { S.classStudent = b.dataset.cstu; render(); }));
+      $$("[data-parent]", main).forEach((b) => b.addEventListener("click", () => { S.invoiceParent = b.dataset.parent; render(); }));
+      const ci = $("#copyInvoice", main);
+      if (ci) ci.addEventListener("click", async () => {
+        const ta = $("#invoiceText");
+        if (await copyText(ta.value)) { ci.textContent = "Copied ✓"; setTimeout(() => { ci.textContent = "Copy message"; }, 1800); }
+        else { ta.focus(); ta.select(); toast("Clipboard blocked. The message is selected: press Ctrl+C."); }
+      });
       $("#extraForm", main).addEventListener("submit", (e) => {
         e.preventDefault();
         addExtra($("#xStu").value, $("#xDate").value, Number($("#xHours").value), $("#xNote").value.trim());

@@ -26,7 +26,7 @@ Per student `<S>` (Bhargav, Harika, Adithyaa):
 Shared:
 - `D:\Tushars\Students\_fathom_processed.txt`: Gmail message IDs already logged, one per line as `id | YYYY-MM-DD | Student`
 
-Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\` or `templates.json` (the app owns them), or the `rate` in student.json. Only add to `extra-hours.json` when Tushar reports extra work (see "When Tushar reports class hours"); never edit or remove entries he made in the app.
+Ignore any old files named just `Class Log.md`; they are outdated copies. Never touch `prompt-log\` or `templates.json` (the app owns them), or the `rate` or `parent` in student.json. Only add to `extra-hours.json` when Tushar reports extra work (see "When Tushar reports class hours"); never edit or remove entries he made in the app.
 If D:\Tushars\Students isn't connected to the session, ask Tushar to add it with "Add folder" (or request access to it), then continue.
 
 ## Steps

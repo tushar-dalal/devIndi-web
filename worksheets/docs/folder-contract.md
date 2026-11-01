@@ -69,6 +69,7 @@ General rules
 | `name` | yes | Display name; must be unique across students. |
 | `color` | no | Small personal dot so the active student is unmistakable. |
 | `rate` | no | `{ "perHour": 1200, "currency": "INR" }` — used by the Class counter. |
+| `parent` | no | `{ "name": "Sridhar", "invoiceOrder": 1 }` — who the monthly invoice goes to; students with the same parent share one invoice, listed by `invoiceOrder`. |
 | `subjects` | no | Per-subject course name and level (Honors, AP), keyed by the subject folder name. |
 | `difficulty` | no | Per context: `home` (alone), `class` (with Tushar), `testPrep`. Key `default`, or a subject folder name to override. |
 | `rules[].type` | yes | `difficulty` · `emphasis` · `exclusion` · `tool` · `convention` · `habit` · `cap` |
