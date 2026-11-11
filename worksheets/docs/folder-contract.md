@@ -210,6 +210,18 @@ Billable work done outside class, entered on the Class counter page.
 ```
 Billed like classes: rounded up to 15 minutes × `rate`.
 
+## class-updates.json (app writes, in the Students folder itself)
+
+What each parent has been sent through the Class counter's "Class update" message, so the next
+message holds only new entries.
+```json
+{ "schema": 1, "parents": { "Sridhar": { "floor": "2026-11-05",
+    "sentKeys": ["Harika|c|2026-11-05|1", "Adithyaa|x|x-…"],
+    "history": [ { "sentOn": "2026-11-11", "count": 5, "from": "2026-11-05", "through": "2026-11-11", "keys": ["…"] } ] } } }
+```
+Keys: `<folder>|c|<date>|<session>` for a class, `<folder>|x|<id>` for an extra-hours entry. Anything
+on or after `floor` that isn't in `sentKeys` is pending.
+
 ## templates.json (app writes)
 
 ```json

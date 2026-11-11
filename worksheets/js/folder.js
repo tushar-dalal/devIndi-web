@@ -119,6 +119,14 @@ const Folder = (() => {
       }
     }
 
+    // class-updates.json (app-written): which classes each parent has been sent.
+    result.updates = { schema: 1, parents: {} };
+    if (rootList.some((e) => e.name === "class-updates.json" && e.kind === "file")) {
+      const r = await readJson(src, ["class-updates.json"], result.errors, "class-updates.json");
+      if (r.data && r.data.parents && typeof r.data.parents === "object") result.updates = r.data;
+      else if (r.data) result.errors.push(err("class-updates.json", 'has no "parents" object', "warn"));
+    }
+
     const dirs = rootList.filter((e) => e.kind === "directory" && !/^[_.]/.test(e.name))
       .sort((a, b) => a.name.localeCompare(b.name));
     for (const d of dirs) result.students.push(await scanStudent(src, d.name, result.masters));

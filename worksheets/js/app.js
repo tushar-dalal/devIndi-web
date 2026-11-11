@@ -28,7 +28,7 @@
     student: null, req: null,
     filter: "taught", search: "", closed: new Set(), openNotes: new Set(), justAdded: new Set(),
     promptText: "", promptEdited: false, saved: null, histSubject: "all",
-    month: Prompt.todayISO().slice(0, 7), classStudent: "all",
+    month: Prompt.todayISO().slice(0, 7), classStudent: "all", updateSince: {},
     shownTotal: 0
   };
 
@@ -1084,6 +1084,109 @@
       `Total Hours: ${num(totalH)}\nTotal Amount: Rs. ${Math.round(totalAmt).toLocaleString("en-IN")}\n\nPlease let me know when you've initiated the transaction`;
   }
 
+  // ── Class update (weekly message) ──────────────────────
+  // Every billable entry for a student, oldest first: classes (log + record) and
+  // extra-hours entries, numbered per month together the way Tushar numbers them
+  // in chat. Each has a stable key so "already sent" survives re-scans.
+  function billables(s) {
+    const rate = rateOf(s);
+    const list = [];
+    for (const c of allClasses(s)) {
+      if (c.hours == null) continue;
+      list.push({ key: `${s.dir}|c|${c.date}|${c.session}`, s, date: c.date, order: c.session, hours: c.hours, kind: "class", title: c.title });
+    }
+    for (const e of s.extra || []) {
+      const hours = billedMinutes(Math.round(e.hours * 60)) / 60;
+      list.push({ key: `${s.dir}|x|${e.id}`, s, date: e.date, order: 100, hours, kind: "extra", title: e.note || "Work outside class" });
+    }
+    list.sort((a, b) => a.date.localeCompare(b.date) || a.order - b.order);
+    const perMonth = {};
+    for (const x of list) { const ym = x.date.slice(0, 7); x.n = (perMonth[ym] = (perMonth[ym] || 0) + 1); x.amount = rate ? x.hours * rate.perHour : 0; }
+    return list;
+  }
+
+  const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+  const weekday = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short" });
+  const isoDaysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return Prompt.todayISO(d); };
+
+  function pendingFor(parent, kids) {
+    const rec = ((S.data.updates && S.data.updates.parents) || {})[parent] || {};
+    const sent = new Set(rec.sentKeys || []);
+    const since = S.updateSince[parent] || rec.floor || isoDaysAgo(7);
+    const items = kids.flatMap(billables).filter((x) => !sent.has(x.key) && x.date >= since && x.date <= today());
+    items.sort((a, b) => a.date.localeCompare(b.date) || (a.s.profile.parent.invoiceOrder || 99) - (b.s.profile.parent.invoiceOrder || 99) || a.order - b.order);
+    return { rec, since, items };
+  }
+
+  function updateText(kids, items) {
+    if (!items.length) return "";
+    const multi = kids.length > 1;
+    const byDate = new Map();
+    for (const x of items) { if (!byDate.has(x.date)) byDate.set(x.date, []); byDate.get(x.date).push(x); }
+    const blocks = [...byDate].map(([d, xs]) => `${weekday(d)} ${ddmm(d)}\n` +
+      xs.map((x) => `${multi ? x.s.name[0].toUpperCase() + " " : ""}Class ${x.n}: ${num(x.hours)}`).join("\n"));
+    const first = items[0].date, last = items[items.length - 1].date;
+    return `Class update (${ddmm(first)}${first === last ? "" : ` – ${ddmm(last)}`}):\n\n${blocks.join("\n\n")}`;
+  }
+
+  function updateSection(students) {
+    const parents = parentsFor(students);
+    if (!parents.size) return "";
+    const names = [...parents.keys()];
+    if (!names.includes(S.invoiceParent)) S.invoiceParent = names[0];
+    const parent = S.invoiceParent;
+    const kids = parents.get(parent);
+    const { rec, since, items } = pendingFor(parent, kids);
+    const text = updateText(kids, items);
+    const last = (rec.history || [])[rec.history ? rec.history.length - 1 : 0];
+    const hours = items.reduce((a, x) => a + x.hours, 0);
+    return `<section class="invoice">
+        <div class="head-row" style="margin-bottom:12px">
+          <div><div class="sect" style="font-size:20px">Class update</div>
+            <p class="calc" style="margin:2px 0 0">Classes ${esc(parent)} hasn't been sent yet${last ? ` · last sent ${esc(niceDate(last.sentOn))} (${last.count} entr${last.count === 1 ? "y" : "ies"}, up to ${esc(ddmm(last.through))})` : " · nothing marked sent yet"}</p></div>
+          <div class="seg filters">${names.map((n) => `<button data-parent="${esc(n)}" class="${n === parent ? "on" : ""}">${esc(n)}</button>`).join("")}</div>
+        </div>
+        <div class="inline" style="margin-bottom:10px;flex-wrap:wrap">
+          <label class="calc" for="updSince">Look back to</label>
+          <input type="date" id="updSince" class="mini-date" value="${esc(since)}" max="${esc(today())}">
+          <span class="calc">${items.length ? `${items.length} entr${items.length === 1 ? "y" : "ies"} · ${num(hours)} h` : ""}</span>
+        </div>
+        ${text ? `<textarea id="updateText" class="invoicebox upd" spellcheck="false" aria-label="Class update message">${esc(text)}</textarea>
+          <div class="inline" style="margin-top:10px;flex-wrap:wrap">
+            <button class="btn primary" id="copyUpdate">Copy &amp; mark as sent</button>
+            <button class="btn" id="copyUpdateOnly">Copy only</button>
+            ${last ? `<button class="linkbtn" id="undoUpdate">Undo last “sent”</button>` : ""}
+          </div>`
+          : `<p class="calc">Nothing new for ${esc(parent)} since ${esc(niceDate(since))}.${last ? ` <button class="linkbtn" id="undoUpdate">Undo last “sent”</button>` : ""}</p>`}
+      </section>`;
+  }
+
+  async function saveUpdates(data) {
+    await S.src.write(["class-updates.json"], JSON.stringify(data, null, 2));
+    S.data.updates = data;
+  }
+  async function markSent(parent, items) {
+    const data = JSON.parse(JSON.stringify(S.data.updates || { schema: 1, parents: {} }));
+    data.schema = 1;
+    const rec = data.parents[parent] || (data.parents[parent] = { sentKeys: [], history: [] });
+    if (!rec.floor) rec.floor = items[0].date; // from here on, anything unsent shows up
+    rec.sentKeys = [...new Set([...(rec.sentKeys || []), ...items.map((x) => x.key)])];
+    (rec.history = rec.history || []).push({ sentOn: today(), sentAt: new Date().toISOString(), count: items.length,
+      from: items[0].date, through: items[items.length - 1].date, keys: items.map((x) => x.key) });
+    await saveUpdates(data);
+    delete S.updateSince[parent];
+  }
+  async function undoLastSent(parent) {
+    const data = JSON.parse(JSON.stringify(S.data.updates));
+    const rec = data.parents[parent];
+    const last = rec && rec.history && rec.history.pop();
+    if (!last) return;
+    const drop = new Set(last.keys || []);
+    rec.sentKeys = (rec.sentKeys || []).filter((k) => !drop.has(k));
+    if (!rec.history.length) delete rec.floor;
+    await saveUpdates(data);
+  }
+
   function invoiceSection(students, rows, month) {
     const parents = parentsFor(students);
     if (!parents.size) {
@@ -1192,6 +1295,7 @@
         <div class="calc">${nClasses} class${nClasses === 1 ? "" : "es"}${extraH ? ` + ${fmtHours(extraH)} extra work` : ""} · ${fmtHours(hours)} billed</div>
       </section>
       <div class="ccards">${cards}</div>
+      ${updateSection(students)}
       ${invoiceSection(students, rows, month)}
       ${form}
       <div class="head-row" style="margin:40px 0 14px">
@@ -1365,6 +1469,34 @@
       $$("[data-month]", main).forEach((b) => b.addEventListener("click", () => { S.month = shiftMonth(S.month, Number(b.dataset.month)); render(); }));
       $$("[data-cstu]", main).forEach((b) => b.addEventListener("click", () => { S.classStudent = b.dataset.cstu; render(); }));
       $$("[data-parent]", main).forEach((b) => b.addEventListener("click", () => { S.invoiceParent = b.dataset.parent; render(); }));
+      const us = $("#updSince", main);
+      if (us) us.addEventListener("change", () => { if (us.value) { S.updateSince[S.invoiceParent] = us.value; render(); } });
+      const pend = () => {
+        const kids = parentsFor(S.data.students.filter((s) => !s.missing)).get(S.invoiceParent);
+        return pendingFor(S.invoiceParent, kids).items;
+      };
+      const cu = $("#copyUpdate", main);
+      if (cu) cu.addEventListener("click", async () => {
+        const ta = $("#updateText");
+        const items = pend();
+        const copied = await copyText(ta.value);
+        try { await markSent(S.invoiceParent, items); }
+        catch (e) { toast("Copied, but couldn't save what was sent: " + e.message); return; }
+        render();
+        toast(copied ? `Copied · ${items.length} entr${items.length === 1 ? "y" : "ies"} marked as sent to ${S.invoiceParent}` : "Marked as sent, but the clipboard was blocked. Copy it from the box before leaving.");
+      });
+      const cuo = $("#copyUpdateOnly", main);
+      if (cuo) cuo.addEventListener("click", async () => {
+        const ta = $("#updateText");
+        if (await copyText(ta.value)) toast("Copied (not marked as sent)");
+        else { ta.focus(); ta.select(); toast("Clipboard blocked. The message is selected: press Ctrl+C."); }
+      });
+      const uu = $("#undoUpdate", main);
+      if (uu) uu.addEventListener("click", async () => {
+        if (!uu.dataset.armed) { uu.dataset.armed = "1"; uu.textContent = "Click again to undo"; return; }
+        try { await undoLastSent(S.invoiceParent); toast("Last update un-marked; those classes are pending again"); render(); }
+        catch (e) { toast("Couldn't undo: " + e.message); }
+      });
       const ci = $("#copyInvoice", main);
       if (ci) ci.addEventListener("click", async () => {
         const ta = $("#invoiceText");
