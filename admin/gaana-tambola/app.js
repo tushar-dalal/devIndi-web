@@ -24,7 +24,7 @@
   };
 
   // ver = which hook version of the current song is loaded; vers = versions already played for it.
-  const fresh = () => ({ mode: null, played: [], skipped: [], current: null, ver: 1, vers: [], pos: 0, queued: null, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
+  const fresh = () => ({ mode: 'calling', played: [], skipped: [], current: null, ver: 1, vers: [], pos: 0, queued: null, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
   let S = Object.assign(fresh(), ls.get(STATE_KEY, {}));
   let hooks = ls.get(HOOKS_KEY, {}); // "23.2" -> edited start of song 23, version 2
   const save = () => { S.updatedAt = Date.now(); ls.set(STATE_KEY, S); };
@@ -553,6 +553,7 @@
   // Restore: paused on the current song and version, at the saved position.
   if (!Array.isArray(S.vers)) S.vers = S.current != null ? [1] : [];
   if (!S.ver) S.ver = 1;
+  if (!S.mode) { S.mode = 'calling'; save(); } // never leave Next waiting on a mode choice
   if (S.current != null) { P.n = S.current; P.v = S.ver; P.base = S.pos; }
   render();
   selectHook(1, 1);
