@@ -1,15 +1,17 @@
 /* Gaana Tambola facilitator.
-   Audio never leaves the device: the anchor picks the MP3 folder once, the page cuts each
-   song's hook window out of the MP3 (frame by frame, no re-encoding) and keeps it in IndexedDB.
-   Game state lives in localStorage and is saved after every action. */
+   Audio is streamed from clips/NN-V.mp3 on the site: three pre-cut hook versions per song
+   (see tools/cut-clips.js and hooks.json). Nothing audio is stored on the device: clips are held
+   in memory only, and the next song is fetched and decoded before Next is tapped.
+   Game state (played list, settings) lives in localStorage and is saved after every action. */
 (() => {
   'use strict';
 
-  const D = window.GT_DATA;
+  const D = window.GT_DATA, CLIPS = window.GT_CLIPS;
+  const CLIP_V = 2;           // bump when the clips are re-cut, so browsers fetch the new files
   const HOOK = 25;            // seconds per hook
+  const VERSIONS = [1, 2, 3];
   const FADE_IN = 0.4, FADE_OUT = 1.8, NEXT_FADE = 0.3;
-  const PAD_BEFORE = 15, PAD_AFTER = 12; // seconds kept around the hook, so it can be nudged
-  const STATE_KEY = 'gt_state_v1', HOOKS_KEY = 'gt_hooks_v1';
+  const STATE_KEY = 'gt_state_v1', HOOKS_KEY = 'gt_hooks_v2';
 
   const SONGS = {};
   for (const [n, title, movie, start, len, file, check] of D.songs) SONGS[n] = { n, title, movie, start, len, file, check };
@@ -21,113 +23,20 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
 
-  const fresh = () => ({ mode: null, played: [], skipped: [], current: null, pos: 0, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
+  // ver = which hook version of the current song is loaded; vers = versions already played for it.
+  const fresh = () => ({ mode: null, played: [], skipped: [], current: null, ver: 1, vers: [], pos: 0, queued: null, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
   let S = Object.assign(fresh(), ls.get(STATE_KEY, {}));
-  let hooks = ls.get(HOOKS_KEY, {});
+  let hooks = ls.get(HOOKS_KEY, {}); // "23.2" -> edited start of song 23, version 2
   const save = () => { S.updatedAt = Date.now(); ls.set(STATE_KEY, S); };
-  const hookStart = (n) => (hooks[n] != null ? hooks[n] : SONGS[n].start);
+  const clipInfo = (n, v) => { const c = CLIPS[n][v - 1]; return { start: c[0], clipStart: c[1], clipEnd: c[2] }; };
+  const hookStart = (n, v) => (hooks[n + '.' + v] != null ? hooks[n + '.' + v] : clipInfo(n, v).start);
+  const clipUrl = (n, v) => `clips/${String(n).padStart(2, '0')}-${v}.mp3?v=${CLIP_V}`;
 
-  // ---------- IndexedDB clip store ----------
-  let dbp = null;
-  function db() {
-    if (!dbp) dbp = new Promise((res, rej) => {
-      const r = indexedDB.open('gaana-tambola', 1);
-      r.onupgradeneeded = () => r.result.createObjectStore('clips', { keyPath: 'n' });
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-    return dbp;
-  }
-  async function idb(mode, fn) {
-    const d = await db();
-    return new Promise((res, rej) => {
-      const tx = d.transaction('clips', mode);
-      const req = fn(tx.objectStore('clips'));
-      tx.oncomplete = () => res(req && req.result);
-      tx.onerror = () => rej(tx.error);
-      tx.onabort = () => rej(tx.error);
-    });
-  }
-  const getClip = (n) => idb('readonly', (s) => s.get(n));
-  const putClip = (c) => idb('readwrite', (s) => s.put(c));
-  const clipKeys = () => idb('readonly', (s) => s.getAllKeys());
-  const clearClips = () => idb('readwrite', (s) => s.clear());
-
-  // ---------- MP3 frame slicer ----------
-  const BR1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
-  const BR2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
-  const SR = [44100, 48000, 32000];
-  function frameAt(b, i) {
-    if (i + 4 > b.length || b[i] !== 0xff || (b[i + 1] & 0xe0) !== 0xe0) return null;
-    const ver = (b[i + 1] >> 3) & 3, layer = (b[i + 1] >> 1) & 3;
-    const bri = b[i + 2] >> 4, sri = (b[i + 2] >> 2) & 3, pad = (b[i + 2] >> 1) & 1;
-    if (ver === 1 || layer !== 1 || bri === 0 || bri === 15 || sri === 3) return null; // Layer III only
-    const v1 = ver === 3;
-    const sr = SR[sri] / (v1 ? 1 : ver === 2 ? 2 : 4);
-    const br = (v1 ? BR1 : BR2)[bri] * 1000;
-    const len = Math.floor(((v1 ? 144 : 72) * br) / sr) + pad;
-    return { len, sr, spf: v1 ? 1152 : 576 };
-  }
-  // Returns { bytes, start, end } covering [from, to] seconds of the track, or null if it can't parse.
-  function sliceMp3(buf, from, to) {
-    const b = new Uint8Array(buf);
-    let i = 0;
-    if (b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33) { // ID3v2
-      i = 10 + ((b[6] & 127) << 21 | (b[7] & 127) << 14 | (b[8] & 127) << 7 | (b[9] & 127)) + ((b[5] & 0x10) ? 10 : 0);
-    }
-    let t = 0, a = -1, aT = 0, z = -1, first = true, frames = 0;
-    while (i < b.length) {
-      const f = frameAt(b, i);
-      if (!f || (first && !frameAt(b, i + f.len) && i + f.len < b.length)) { i++; continue; } // resync
-      if (first) {
-        first = false;
-        // Skip a Xing/Info/VBRI header frame: it holds no audio and would claim the whole track's length.
-        const head = String.fromCharCode(...b.subarray(i + 4, Math.min(i + 60, b.length)));
-        if (/Xing|Info|VBRI/.test(head)) { i += f.len; continue; }
-      }
-      if (a < 0 && t + f.spf / f.sr > from) { a = i; aT = t; }
-      t += f.spf / f.sr;
-      i += f.len; frames++;
-      if (a >= 0 && t >= to) { z = i; break; }
-    }
-    if (frames < 50 || a < 0) return null;
-    if (z < 0) z = Math.min(i, b.length);
-    return { bytes: buf.slice(a, z), start: aT, end: Math.min(t, to + 1) };
-  }
-
-  // ---------- file import ----------
-  const norm = (s) => s.toLowerCase().replace(/\.mp3$/, '').replace(/[^a-z0-9]/g, '');
-  const byFile = {}; for (const n of ALL) byFile[norm(SONGS[n].file)] = n;
-  let haveClips = new Set();
-
-  async function importFiles(list) {
-    const files = [...list].filter((f) => /\.mp3$/i.test(f.name));
-    const matched = [], unknown = [];
-    for (const f of files) { const n = byFile[norm(f.name)]; if (n) matched.push([n, f]); else unknown.push(f.name); }
-    const prog = $('importProg'); prog.hidden = false;
-    let done = 0, failed = [];
-    for (const [n, f] of matched) {
-      $('importText').textContent = `Storing ${done + 1} of ${matched.length}: #${n} ${SONGS[n].title}`;
-      try {
-        const buf = await f.arrayBuffer();
-        const hs = hookStart(n);
-        const cut = sliceMp3(buf, Math.max(0, hs - PAD_BEFORE), hs + HOOK + PAD_AFTER);
-        const rec = cut
-          ? { n, blob: new Blob([cut.bytes], { type: 'audio/mpeg' }), clipStart: cut.start, clipEnd: cut.end, name: f.name, savedAt: Date.now() }
-          : { n, blob: new Blob([buf], { type: f.type || 'audio/mpeg' }), clipStart: 0, clipEnd: SONGS[n].len, name: f.name, whole: true, savedAt: Date.now() };
-        await putClip(rec);
-        bufCache.delete(n);
-        haveClips.add(n);
-      } catch (e) { failed.push(n); }
-      done++;
-      $('importFill').style.width = (done / matched.length) * 100 + '%';
-    }
-    $('importText').textContent = `Stored ${done - failed.length} clip${done - failed.length === 1 ? '' : 's'}` +
-      (failed.length ? ` · failed: ${failed.map((n) => '#' + n).join(', ')}` : '') +
-      (unknown.length ? ` · ${unknown.length} file${unknown.length === 1 ? '' : 's'} not in the song list` : '');
-    try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch {}
-    renderClips();
-  }
+  // Clean up what earlier versions of this page kept in the browser: stored clips and the offline worker.
+  try { indexedDB.deleteDatabase('gaana-tambola'); } catch {}
+  try { localStorage.removeItem('gt_hooks_v1'); } catch {}
+  if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister())).catch(() => {});
+  if (window.caches) caches.keys().then((ks) => ks.filter((k) => k.startsWith('gaana-tambola')).forEach((k) => caches.delete(k))).catch(() => {});
 
   // ---------- audio engine ----------
   let ctx = null, master = null;
@@ -142,21 +51,26 @@
     return ctx;
   }
 
-  const bufCache = new Map(); // n -> Promise<{buffer, clip, level}>
-  function loadBuffer(n) {
-    if (bufCache.has(n)) return bufCache.get(n);
+  // In-memory only: "n-v" -> Promise<{buffer, clip}>. Holds the current song and what comes next.
+  const bufCache = new Map();
+  function loadBuffer(n, v = 1) {
+    const key = n + '-' + v;
+    if (bufCache.has(key)) { const p = bufCache.get(key); bufCache.delete(key); bufCache.set(key, p); return p; }
     const p = (async () => {
-      const clip = await getClip(n);
-      if (!clip) throw new Error('missing');
-      const ab = await clip.blob.arrayBuffer();
-      const buffer = await new Promise((res, rej) => audio().decodeAudioData(ab, res, rej));
-      return { buffer, clip, level: levelFor(buffer, hookStart(n) - clip.clipStart) };
+      let res;
+      try { res = await fetch(clipUrl(n, v)); } catch { throw new Error('network'); }
+      if (!res.ok) throw new Error('http ' + res.status);
+      const ab = await res.arrayBuffer();
+      const buffer = await new Promise((ok, bad) => audio().decodeAudioData(ab, ok, bad));
+      return { buffer, clip: clipInfo(n, v) };
     })();
-    bufCache.set(n, p);
-    p.catch(() => bufCache.delete(n));
-    while (bufCache.size > 6) bufCache.delete(bufCache.keys().next().value);
+    bufCache.set(key, p);
+    p.then(() => { if (n === upNext && v === 1) setReady(true); },
+      () => { bufCache.delete(key); if (n === upNext && v === 1) setReady(false, true); });
+    while (bufCache.size > 9) bufCache.delete(bufCache.keys().next().value);
     return p;
   }
+
   // Rough level matching: bring each hook's RMS to the same target, within limits.
   function levelFor(buffer, off) {
     const sr = buffer.sampleRate, a = Math.max(0, Math.floor(off * sr)), z = Math.min(buffer.length, a + HOOK * sr);
@@ -169,9 +83,10 @@
     return rms > 0.001 ? Math.min(2.2, Math.max(0.45, 0.14 / rms)) : 1;
   }
 
-  // What is sounding right now.
-  const P = { n: null, src: null, gain: null, startedAt: 0, base: 0, playing: false, replay: false, token: 0 };
-  const pos = () => (P.playing ? Math.min(HOOK, P.base + (ctx.currentTime - P.startedAt)) : P.base);
+  // What is sounding right now. aux = a replay of another song or an editor preview (not counted).
+  const P = { n: null, v: 1, src: null, gain: null, startedAt: 0, base: 0, playing: false, replay: false, preview: false, token: 0 };
+  const pos = () => (P.playing ? Math.max(0, Math.min(HOOK, P.base + (ctx.currentTime - P.startedAt))) : P.base);
+  const isAux = () => P.replay || P.preview;
 
   function stopNode(fade) {
     if (!P.src) return;
@@ -186,15 +101,16 @@
     } catch {}
   }
 
-  async function playSong(n, from = 0, opts = {}) {
+  async function playSong(n, v, from = 0, opts = {}) {
     const token = ++P.token;
     audio();
-    const { buffer, clip, level } = await loadBuffer(n);
+    const { buffer, clip } = await loadBuffer(n, v);
     if (token !== P.token) return false;
-    let off = hookStart(n) - clip.clipStart + from;
-    const warn = off < 0 || hookStart(n) - clip.clipStart + HOOK > buffer.duration + 0.05;
+    const start = opts.start != null ? opts.start : hookStart(n, v);
+    let off = start - clip.clipStart + from;
     off = Math.max(0, Math.min(off, buffer.duration - 0.5));
     const dur = Math.max(0.3, Math.min(HOOK - from, buffer.duration - off));
+    const level = levelFor(buffer, start - clip.clipStart);
     const now = ctx.currentTime + 0.02;
     const src = ctx.createBufferSource(); src.buffer = buffer;
     const g = ctx.createGain();
@@ -204,15 +120,14 @@
     g.gain.linearRampToValueAtTime(0, now + dur);
     src.connect(g).connect(master);
     src.start(now, off, dur);
-    Object.assign(P, { n, src, gain: g, startedAt: now, base: from, playing: true, replay: !!opts.replay, preview: !!opts.preview });
+    Object.assign(P, { n, v, src, gain: g, startedAt: now, base: from, playing: true, replay: !!opts.replay, preview: !!opts.preview, previewStart: opts.start });
     src.onended = () => {
       if (P.src !== src) return;
       P.src = null; P.playing = false;
-      if (!P.replay && !P.preview) { P.base = HOOK; S.pos = HOOK; save(); maybeAuto(); }
-      else { P.n = S.current; P.replay = false; P.preview = false; P.base = S.pos; } // back to the current call
+      if (!isAux()) { P.base = HOOK; S.pos = HOOK; save(); maybeAuto(); }
+      else { P.n = S.current; P.v = S.ver; P.replay = false; P.preview = false; P.base = S.pos; } // back to the current call
       render();
     };
-    if (warn && opts.preview) $('hookNote').textContent = 'This start is outside the stored clip. Re-load the song file to move the hook this far.';
     return true;
   }
 
@@ -221,7 +136,7 @@
     const p = pos();
     stopNode(0.08);
     P.playing = false; P.base = p;
-    if (!P.replay && !P.preview) { S.pos = p; save(); }
+    if (!isAux()) { S.pos = p; save(); }
     render();
   }
 
@@ -231,9 +146,37 @@
     const left = unplayed();
     if (!left.length) return null;
     if (S.mode === 'calling') return D.order.find((n) => left.includes(n));
+    // Live random: draw ahead of time so the song can be fetched before Next is tapped.
+    if (S.queued != null && left.includes(S.queued)) return S.queued;
     const r = new Uint32Array(1); crypto.getRandomValues(r);
-    return left[r[0] % left.length];
+    S.queued = left[r[0] % left.length]; save();
+    return S.queued;
   }
+
+  // Fetch + decode what Next will play (and the one after, in calling order), plus the other two
+  // versions of the current song, so every button responds at once.
+  let upNext = null;
+  function preload() {
+    if (S.current != null) for (const v of VERSIONS) loadBuffer(S.current, v).catch(() => {});
+    if (!S.mode) { upNext = null; setReady(null); return; }
+    const n = pickNext();
+    upNext = n;
+    if (n == null) { setReady(null); return; }
+    setReady(false);
+    loadBuffer(n, 1).catch(() => {});
+    if (S.mode === 'calling') {
+      const after = D.order.find((m) => m !== n && !S.played.includes(m) && !S.skipped.includes(m));
+      if (after != null) setTimeout(() => loadBuffer(after, 1).catch(() => {}), 1500);
+    }
+  }
+  function setReady(ok, failed) {
+    const pill = $('clipsPill');
+    if (ok === null) { $('clipsText').textContent = navigator.onLine ? 'Streaming from devindi.in' : 'Offline'; pill.className = 'pill' + (navigator.onLine ? '' : ' warn'); return; }
+    $('clipsText').textContent = ok ? 'Next song ready' : failed ? 'Next song didn’t load' : 'Loading next song…';
+    pill.className = 'pill' + (ok ? ' solid' : failed ? ' warn' : '');
+  }
+  window.addEventListener('online', preload);
+  window.addEventListener('offline', () => setReady(null));
 
   let lastNext = 0, pendingErr = null;
   async function next() {
@@ -246,43 +189,55 @@
     hideErr();
     try {
       audio();
-      await loadBuffer(n); // fail here, before the playing hook is cut off
+      await loadBuffer(n, 1); // fail here, before the playing hook is cut off
       if (P.playing) {
-        if (!P.replay && !P.preview) { S.pos = pos(); save(); }
+        if (!isAux()) { S.pos = pos(); save(); }
         stopNode(NEXT_FADE);
       }
       P.playing = false;
-      const ok = await playSong(n, 0);
+      const ok = await playSong(n, 1, 0);
       if (!ok) return;
-      S.played.push(n); S.current = n; S.pos = 0; save();
-      preloadNext();
+      S.played.push(n); S.current = n; S.ver = 1; S.vers = [1]; S.pos = 0; S.queued = null; save();
+      preload();
       keepAwake();
     } catch (e) {
-      P.playing = false;
-      showErr(n, e && e.message === 'missing'
-        ? `Song #${n} (${SONGS[n].title}) isn't loaded on this device.`
-        : `Song #${n} (${SONGS[n].title}) couldn't be played.`);
+      showErr(n, e);
     }
     render();
   }
 
-  function preloadNext() {
-    if (S.mode !== 'calling') return;
-    const n = pickNext();
-    if (n != null) loadBuffer(n).catch(() => {});
+  // Play another version of the song on screen (the current call, or a song being replayed).
+  async function playVersion(v) {
+    cancelAuto();
+    const auxSong = P.replay && P.n !== S.current ? P.n : null;
+    const n = auxSong != null ? auxSong : S.current;
+    if (n == null) return;
+    if (P.playing) stopNode(NEXT_FADE);
+    P.playing = false;
+    hideErr();
+    try {
+      const ok = await playSong(n, v, 0, { replay: auxSong != null });
+      if (ok && auxSong == null) {
+        S.ver = v; S.pos = 0;
+        if (!S.vers.includes(v)) S.vers.push(v);
+        save();
+      }
+    } catch (e) { showErr(n, e, true); }
+    render();
   }
 
   async function togglePlay() {
     cancelAuto();
     if (P.playing) { pause(); return; }
-    // Resume the replay/preview song if that was what paused, else the current call.
-    const aux = P.n != null && (P.replay || P.preview) && P.base < HOOK;
+    // Resume the replay/preview if that was what paused, else the current call.
+    const aux = P.n != null && isAux() && P.base < HOOK;
     const n = aux ? P.n : S.current;
     if (n == null) { next(); return; }
+    const v = aux ? P.v : S.ver;
     let from = aux ? P.base : S.pos;
     if (from >= HOOK - 0.3) from = 0;
-    try { await playSong(n, from, { replay: aux && P.replay, preview: aux && P.preview }); }
-    catch (e) { showErr(n, `Song #${n} couldn't be played.`); }
+    try { await playSong(n, v, from, { replay: aux && P.replay, preview: aux && P.preview, start: aux && P.preview ? P.previewStart : undefined }); }
+    catch (e) { showErr(n, e, true); }
     render();
   }
 
@@ -291,11 +246,12 @@
     cancelAuto();
     if (P.playing) stopNode(0.15);
     P.playing = false;
-    S.played.pop();
+    const n = S.played.pop();
+    S.queued = S.mode === 'random' ? n : null; // in random mode, the undone song is the next draw again
     S.current = S.played.length ? S.played[S.played.length - 1] : null;
-    S.pos = HOOK;
-    P.n = S.current; P.base = HOOK; P.replay = false; P.preview = false;
-    save(); render();
+    S.ver = 1; S.vers = S.current != null ? [1] : []; S.pos = HOOK;
+    Object.assign(P, { n: S.current, v: 1, base: HOOK, replay: false, preview: false });
+    save(); render(); preload();
   }
 
   function reset() {
@@ -306,28 +262,39 @@
     if (n && !confirm(`Clear ${n} played song${n === 1 ? '' : 's'}?`)) return;
     const keep = { hide: S.hide, auto: S.auto, gap: S.gap, vol: S.vol };
     S = Object.assign(fresh(), keep);
-    Object.assign(P, { n: null, base: 0, replay: false, preview: false });
+    Object.assign(P, { n: null, v: 1, base: 0, replay: false, preview: false });
     hideErr();
-    save(); render();
+    save(); render(); preload();
   }
 
   async function replay(n) {
     cancelAuto();
     if (P.playing) stopNode(NEXT_FADE);
     P.playing = false;
-    try { await playSong(n, 0, { replay: n !== S.current }); }
-    catch { showErr(n, `Song #${n} isn't loaded on this device.`, true); }
+    hideErr();
+    const cur = n === S.current;
+    try {
+      const ok = await playSong(n, cur ? S.ver : 1, 0, { replay: !cur });
+      if (ok && cur) { S.pos = 0; save(); }
+    } catch (e) { showErr(n, e, true); }
+    for (const v of VERSIONS) loadBuffer(n, v).catch(() => {});
     render();
   }
 
   function setMode(m) {
     if (S.played.length || S.skipped.length) { flashMode(); return; }
-    S.mode = m; save(); render(); preloadNext();
+    S.mode = m; S.queued = null; save(); render(); preload();
   }
 
-  function showErr(n, text, noSkip) {
+  // Say exactly what went wrong.
+  function showErr(n, e, noSkip) {
     pendingErr = n;
-    $('errText').textContent = text;
+    if (e) console.error('Gaana Tambola: song', n, e);
+    const name = `Song #${n} (${SONGS[n].title})`;
+    const net = !!(e && (e.message === 'network' || /^http/.test(e.message)));
+    $('errText').textContent = net
+      ? `${name} couldn't be fetched${navigator.onLine ? '' : ' (no internet)'}. Check the connection and retry, or skip it.`
+      : `${name} couldn't be decoded${e && e.name ? ' (' + e.name + ')' : ''}. Retry, or skip it.`;
     $('skipBtn').hidden = !!noSkip;
     $('errBox').hidden = false;
   }
@@ -358,14 +325,14 @@
   function $(id) { return document.getElementById(id); }
   const fmt = (s) => { s = Math.max(0, s); const m = Math.floor(s / 60); return m + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
   const fmt1 = (s) => { s = Math.max(0, s); const m = Math.floor(s / 60); return m + ':' + (s % 60).toFixed(1).padStart(4, '0'); };
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   const cells = {};
   function buildBoard() {
     const b = $('board');
     for (const n of ALL) {
       const c = document.createElement('button');
-      c.type = 'button'; c.className = 'cell'; c.textContent = n; c.tabIndex = -1;
-      c.title = `#${n}`;
+      c.type = 'button'; c.className = 'cell'; c.textContent = n; c.tabIndex = -1; c.title = `#${n}`;
       cells[n] = c; b.appendChild(c);
     }
   }
@@ -382,7 +349,9 @@
     } else $('roundStat').innerHTML = S.mode === 'random' ? '<b>Live random</b>' : 'Pick a mode';
 
     // now playing
-    const showN = P.n != null && (P.replay || P.preview) ? P.n : S.current;
+    const auxShown = P.n != null && isAux();
+    const showN = auxShown ? P.n : S.current;
+    const showV = auxShown ? P.v : S.ver;
     const s = showN != null ? SONGS[showN] : null;
     $('nowNum').textContent = s ? s.n : '—';
     $('nowNum').classList.toggle('idle', !s);
@@ -391,9 +360,18 @@
     $('nowCard').classList.toggle('masked', !!(S.hide && s));
     $('historyWrap').classList.toggle('masked-list', !!S.hide);
     $('hideToggle').checked = !!S.hide;
-    $('nowLabel').textContent = P.preview ? 'Preview (not counted)' : P.replay && showN !== S.current ? 'Replay (not counted)'
-      : s ? (P.playing ? 'Now playing' : 'Paused') + (S.mode === 'calling' ? ` · call ${S.played.indexOf(s.n) + 1}` : '') : 'Now playing';
+    const vTag = s ? ` · version ${showV}` : '';
+    $('nowLabel').textContent = P.preview ? `Preview (not counted)${vTag}`
+      : P.replay && showN !== S.current ? `Replay (not counted)${vTag}`
+      : s ? (P.playing ? 'Now playing' : 'Paused') + (S.mode === 'calling' ? ` · call ${S.played.indexOf(s.n) + 1}` : '') + vTag : 'Now playing';
     $('playLabel').textContent = P.playing ? 'Pause' : 'Play';
+    // version buttons
+    for (const b of $('verSeg').querySelectorAll('button')) {
+      const v = +b.dataset.v;
+      b.disabled = !s || P.preview;
+      b.setAttribute('aria-pressed', String(!!s && v === showV));
+      b.classList.toggle('heard', !!s && !auxShown && S.vers.includes(v));
+    }
     const remaining = unplayed().length;
     $('nextBtn').disabled = !remaining;
     $('doneBanner').hidden = !!remaining || !played;
@@ -402,8 +380,7 @@
 
     // board
     for (const n of ALL) {
-      const c = cells[n];
-      c.className = 'cell' + (S.played.includes(n) ? ' played' : '') + (S.skipped.includes(n) ? ' skipped' : '') + (n === S.current ? ' current' : '');
+      cells[n].className = 'cell' + (S.played.includes(n) ? ' played' : '') + (S.skipped.includes(n) ? ' skipped' : '') + (n === S.current ? ' current' : '');
     }
     $('boardStat').textContent = `${played} of ${total} played` + (S.skipped.length ? ` · ${S.skipped.length} skipped` : '') + ` · ${remaining} left`;
 
@@ -426,7 +403,7 @@
   }
 
   function tick() {
-    const p = P.n != null && (P.replay || P.preview || P.playing) ? pos() : (S.current != null ? S.pos : 0);
+    const p = P.n != null && (isAux() || P.playing) ? pos() : (S.current != null ? S.pos : 0);
     $('barFill').style.width = (Math.min(p, HOOK) / HOOK) * 100 + '%';
     $('barPos').textContent = fmt(p);
   }
@@ -434,28 +411,13 @@
   (function loop() {
     if (P.playing) {
       tick();
-      if (!P.replay && !P.preview && Date.now() - lastSave > 1000) { S.pos = pos(); save(); lastSave = Date.now(); }
+      if (!isAux() && Date.now() - lastSave > 1000) { S.pos = pos(); save(); lastSave = Date.now(); }
     }
     requestAnimationFrame(loop);
   })();
 
-  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   function flashMode() {
-    const seg = $('modeSeg');
-    seg.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 260 });
-  }
-
-  async function renderClips() {
-    try { haveClips = new Set(await clipKeys()); } catch { haveClips = new Set(); }
-    const k = haveClips.size;
-    $('clipsText').textContent = `${k}/99 clips stored`;
-    $('clipsPill').classList.toggle('solid', k === 99);
-    $('clipsPill').classList.toggle('warn', k < 99);
-    const miss = ALL.filter((n) => !haveClips.has(n));
-    $('missing').innerHTML = !miss.length ? '<b>All 99 songs are stored on this device.</b>'
-      : k === 0 ? 'No songs stored on this device yet.'
-      : `<b>Missing ${miss.length}:</b> ` + miss.map((n) => `#${n} ${esc(SONGS[n].title)}`).join(' · ');
-    renderHookEditor();
+    $('modeSeg').animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 260 });
   }
 
   // ---------- ticket check ----------
@@ -470,7 +432,7 @@
         : `<div class="${isP(n) ? 'hit' : ''}"><b>${n}</b><span>${esc(SONGS[n].title)}</span></div>`;
     }
     html += '</div>';
-    const nums = g.flat().filter(Boolean), got = nums.filter(isP).length;
+    const got = g.flat().filter(Boolean).filter(isP).length;
     const line = (r) => { const ns = g[r].filter(Boolean); return [ns.filter(isP).length, ns.length]; };
     const pats = [['Early 5', got >= 5, `${Math.min(got, 5)}/5`]];
     ['Top line', 'Middle line', 'Bottom line'].forEach((name, r) => { const [a, b] = line(r); pats.push([name, a === b, `${a}/${b}`]); });
@@ -481,68 +443,64 @@
   }
 
   // ---------- hook editor ----------
-  let edN = 1, edStart = null;
+  let edN = 1, edV = 1, edStart = null;
   function renderHookEditor() {
     const sel = $('hookSel');
-    if (!sel.options.length) {
-      for (const n of ALL) { const o = document.createElement('option'); o.value = n; sel.appendChild(o); }
-    }
+    if (!sel.options.length) for (const n of ALL) { const o = document.createElement('option'); o.value = n; sel.appendChild(o); }
     for (const o of sel.options) {
       const n = +o.value, s = SONGS[n];
-      o.textContent = `#${n} ${s.title}${hooks[n] != null ? ' (edited)' : ''}${s.check ? ' · check' : ''}${haveClips.has(n) ? '' : ' · not loaded'}`;
+      const edited = VERSIONS.some((v) => hooks[n + '.' + v] != null);
+      o.textContent = `#${n} ${s.title}${edited ? ' (edited)' : ''}${s.check ? ' · check' : ''}`;
     }
     sel.value = edN;
-    if (edStart == null) edStart = hookStart(edN);
-    const def = SONGS[edN].start;
-    $('hookTime').innerHTML = `${fmt1(edStart)}<small>to ${fmt1(edStart + HOOK)} · default ${fmt(def)}${edStart !== hookStart(edN) ? ' · unsaved' : ''}</small>`;
+    for (const b of $('edVerSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(+b.dataset.v === edV));
+    if (edStart == null) edStart = hookStart(edN, edV);
+    const def = clipInfo(edN, edV).start;
+    $('hookTime').innerHTML = `${fmt1(edStart)}<small>to ${fmt1(edStart + HOOK)} · default ${fmt1(def)}${edStart !== hookStart(edN, edV) ? ' · unsaved' : ''}</small>`;
     const chips = $('checkChips'); chips.innerHTML = '';
     for (const n of ALL.filter((n) => SONGS[n].check)) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = (n === edN ? 'on' : '') + (hooks[n] != null ? ' edited' : '');
+      b.className = (n === edN ? 'on' : '') + (hooks[n + '.1'] != null ? ' edited' : '');
       b.textContent = `#${n} ${SONGS[n].title}`;
       b.title = SONGS[n].check;
-      b.addEventListener('click', () => selectHook(n));
+      b.addEventListener('click', () => selectHook(n, 1));
       chips.appendChild(b);
     }
   }
-  function selectHook(n) {
-    edN = n; edStart = hookStart(n);
-    $('hookNote').textContent = SONGS[n].check ? `Flagged: hook ${SONGS[n].check}.` : '';
+  function selectHook(n, v = edV) {
+    edN = n; edV = v; edStart = hookStart(n, v);
+    $('hookNote').textContent = SONGS[n].check && v === 1 ? `Flagged: version 1 ${SONGS[n].check}.` : '';
     renderHookEditor();
   }
-  async function nudge(d) {
-    const clip = await getClip(edN).catch(() => null);
-    let v = Math.round((edStart + d) * 10) / 10;
-    v = Math.max(0, Math.min(v, SONGS[edN].len - HOOK));
-    if (clip && !clip.whole && (v < clip.clipStart - 0.05 || v + HOOK > clip.clipEnd + 0.05)) {
-      $('hookNote').textContent = `The stored clip covers ${fmt(clip.clipStart)}–${fmt(clip.clipEnd)}. Save this, then load the song file again to move the hook further.`;
-    } else $('hookNote').textContent = '';
+  function nudge(d) {
+    const clip = clipInfo(edN, edV);
+    const want = Math.round((edStart + d) * 10) / 10;
+    const v = Math.max(clip.clipStart, Math.min(want, Math.round((clip.clipEnd - HOOK) * 10) / 10));
+    $('hookNote').textContent = v !== want
+      ? `This version's clip covers ${fmt1(clip.clipStart)}–${fmt1(clip.clipEnd)}. To move further, change hooks.json and re-run tools/cut-clips.js.`
+      : '';
     edStart = v; renderHookEditor();
   }
   async function preview() {
     cancelAuto();
     if (P.playing) stopNode(NEXT_FADE);
     P.playing = false;
-    const saved = hooks[edN];
-    hooks[edN] = edStart; // temporarily
-    bufCache.delete(edN);
-    try { await playSong(edN, 0, { preview: true }); }
-    catch { $('hookNote').textContent = `#${edN} isn't loaded on this device yet.`; }
-    if (saved == null) delete hooks[edN]; else hooks[edN] = saved;
-    bufCache.delete(edN);
+    try { await playSong(edN, edV, 0, { preview: true, start: edStart }); }
+    catch { $('hookNote').textContent = `#${edN} version ${edV} couldn't be fetched. Check the connection.`; }
     render();
   }
   function saveHook() {
-    if (edStart === SONGS[edN].start) delete hooks[edN]; else hooks[edN] = edStart;
-    ls.set(HOOKS_KEY, hooks); bufCache.delete(edN);
-    $('hookNote').textContent = `Saved #${edN}: hook starts at ${fmt1(edStart)}.`;
+    const k = edN + '.' + edV;
+    if (edStart === clipInfo(edN, edV).start) delete hooks[k]; else hooks[k] = edStart;
+    ls.set(HOOKS_KEY, hooks);
+    $('hookNote').textContent = `Saved #${edN} version ${edV}: starts at ${fmt1(edStart)} (on this device).`;
     renderHookEditor();
   }
   function revertHook() {
-    delete hooks[edN]; ls.set(HOOKS_KEY, hooks); bufCache.delete(edN);
-    edStart = SONGS[edN].start;
-    $('hookNote').textContent = `#${edN} is back to its default start.`;
+    delete hooks[edN + '.' + edV]; ls.set(HOOKS_KEY, hooks);
+    edStart = clipInfo(edN, edV).start;
+    $('hookNote').textContent = `#${edN} version ${edV} is back to its default start.`;
     renderHookEditor();
   }
 
@@ -553,6 +511,8 @@
   $('undoBtn').addEventListener('click', undo);
   $('resetBtn').addEventListener('click', reset);
   $('modeSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); });
+  $('verSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && !b.disabled) playVersion(+b.dataset.v); });
+  $('edVerSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) selectHook(edN, +b.dataset.v); });
   $('hideToggle').addEventListener('change', (e) => { S.hide = e.target.checked; save(); render(); });
   $('autoToggle').addEventListener('change', (e) => { S.auto = e.target.checked; if (!S.auto) cancelAuto(); save(); });
   $('gapIn').addEventListener('change', (e) => { S.gap = Math.max(1, Math.min(30, +e.target.value || 4)); save(); render(); });
@@ -560,26 +520,19 @@
   $('retryBtn').addEventListener('click', async () => {
     const n = pendingErr; if (n == null) return;
     hideErr();
+    for (const v of VERSIONS) bufCache.delete(n + '-' + v);
     if (S.played.includes(n)) { replay(n); return; }
-    try { if (await playSong(n, 0)) { S.played.push(n); S.current = n; S.pos = 0; save(); preloadNext(); } }
-    catch { showErr(n, `Song #${n} still couldn't be played.`); }
-    render();
+    lastNext = 0; next();
   });
   $('skipBtn').addEventListener('click', () => {
     const n = pendingErr; if (n == null) return;
-    S.skipped.push(n); save(); hideErr(); lastNext = 0; next();
+    S.skipped.push(n); if (S.queued === n) S.queued = null; save(); hideErr(); lastNext = 0; next();
   });
   $('tkForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const no = Math.round(+$('tkIn').value);
     if (no >= 1 && no <= 50) renderTicket(no);
     else $('tkOut').innerHTML = '<p class="empty">Tickets run from 1 to 50.</p>';
-  });
-  $('folderIn').addEventListener('change', (e) => { importFiles(e.target.files); e.target.value = ''; });
-  $('filesIn').addEventListener('change', (e) => { importFiles(e.target.files); e.target.value = ''; });
-  $('clearClipsBtn').addEventListener('click', async () => {
-    if (!confirm('Remove all stored song clips from this browser? You will need to load the folder again.')) return;
-    await clearClips(); bufCache.clear(); renderClips();
   });
   $('hookSel').addEventListener('change', (e) => selectHook(+e.target.value));
   document.querySelectorAll('[data-nudge]').forEach((b) => b.addEventListener('click', () => nudge(+b.dataset.nudge)));
@@ -592,22 +545,16 @@
     if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
     else if (e.key === 'n' || e.key === 'N' || e.key === 'ArrowRight') { e.preventDefault(); next(); }
     else if (e.key === 'u' || e.key === 'U') { e.preventDefault(); undo(); }
+    else if (e.key === '1' || e.key === '2' || e.key === '3') { e.preventDefault(); playVersion(+e.key); }
   });
   // Save the exact spot if the tab is closed mid-hook.
-  window.addEventListener('pagehide', () => { if (P.playing && !P.replay && !P.preview) { S.pos = pos(); save(); } });
+  window.addEventListener('pagehide', () => { if (P.playing && !isAux()) { S.pos = pos(); save(); } });
 
-  // Restore: paused on the current song at the saved position.
-  if (S.current != null) { P.n = S.current; P.base = S.pos; }
+  // Restore: paused on the current song and version, at the saved position.
+  if (!Array.isArray(S.vers)) S.vers = S.current != null ? [1] : [];
+  if (!S.ver) S.ver = 1;
+  if (S.current != null) { P.n = S.current; P.v = S.ver; P.base = S.pos; }
   render();
-  renderClips();
-  selectHook(1);
-  if (S.current != null) loadBuffer(S.current).catch(() => {});
-  preloadNext();
-
-  // Offline: cache the page shell.
-  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
-      $('offlineNote').textContent = 'Page saved for offline use. Once all 99 clips are stored, the game runs with Wi-Fi off.';
-    }).catch(() => {});
-  }
+  selectHook(1, 1);
+  preload();
 })();

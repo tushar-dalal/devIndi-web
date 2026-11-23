@@ -58,6 +58,10 @@
   #playBtn:hover{background:var(--ink);color:var(--paper);opacity:1;}
   #undoBtn{min-height:56px;padding-inline:18px;}
   .kbd{font-family:var(--mono);font-size:10.5px;opacity:.55;letter-spacing:.04em;}
+  .vers{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .seg button:disabled{opacity:.35;cursor:not-allowed;}
+  .seg button.heard:not([aria-pressed="true"]){color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
+  #verSeg button{padding:10px 18px;font-size:12.5px;min-width:52px;}
   .alert{border:1px dashed var(--ink);padding:14px 16px;font-size:14.5px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;}
   .alert[hidden]{display:none;}
   .alert .btns{display:flex;gap:6px;margin:0;}
@@ -129,7 +133,8 @@
   .missing{margin-top:12px;font-size:13.5px;color:var(--mute);}
   .missing b{color:var(--ink);font-weight:500;}
   .hook-pick{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
-  .hook-pick select{flex:1;font-size:15px;}
+  .hook-pick{flex-wrap:wrap;}
+  .hook-pick select{flex:1;min-width:180px;font-size:15px;}
   .hook-time{font-size:44px;font-weight:500;letter-spacing:-.05em;line-height:1;margin:6px 0 12px;font-variant-numeric:tabular-nums;}
   .hook-time small{font-size:14px;letter-spacing:0;color:var(--mute);font-weight:400;margin-left:8px;}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
@@ -166,7 +171,7 @@
   <section class="legal-hero gt-hero">
     <p class="label crumbs"><a href="../dashboard.html">Admin</a><span>/</span><b>Gaana Tambola</b></p>
     <h1>Gaana <em>Tambola</em></h1>
-    <p class="lede">One tap plays the 25-second hook of the next song. The board tracks which of the 99 songs have been called, and the game survives a refresh.</p>
+    <p class="lede">One tap plays the 25-second hook of the next song, with two more versions of each hook if the room can't guess it. The board tracks which of the 99 songs have been called, and the game survives a refresh.</p>
   </section>
 
   <!-- Top bar -->
@@ -199,6 +204,14 @@
           <div class="bar"><i id="barFill"></i></div>
           <div class="bar-meta"><span class="stat" id="barPos">0:00</span><span class="stat">0:25</span></div>
         </div>
+        <div class="vers">
+          <span class="stat">Hook version</span>
+          <div class="seg" id="verSeg" role="group" aria-label="Hook version">
+            <button type="button" data-v="1" aria-pressed="false">V1</button>
+            <button type="button" data-v="2" aria-pressed="false">V2</button>
+            <button type="button" data-v="3" aria-pressed="false">V3</button>
+          </div>
+        </div>
         <div class="alert" id="errBox" hidden>
           <span id="errText"></span>
           <span class="btns"><button class="btn sm ghost" type="button" id="retryBtn">Retry</button><button class="btn sm" type="button" id="skipBtn">Skip</button></span>
@@ -215,7 +228,7 @@
           <span class="vol"><span class="stat">Gap</span><input class="gap-in" type="number" id="gapIn" min="1" max="30" value="4" aria-label="Auto-advance gap in seconds"><span class="stat">s</span></span>
           <span class="countdown" id="countdown"></span>
         </div>
-        <p class="stat keys" style="margin:0;white-space:normal">Keys: <b>Space</b> play/pause · <b>N</b> or <b>→</b> next · <b>U</b> undo</p>
+        <p class="stat keys" style="margin:0;white-space:normal">Keys: <b>Space</b> play/pause · <b>N</b> or <b>→</b> next · <b>U</b> undo · <b>1</b> <b>2</b> <b>3</b> versions</p>
       </div>
     </div>
 
@@ -252,32 +265,26 @@
   </section>
 
   <!-- Setup -->
-  <section class="setup">
+  <section class="setup" id="setup">
     <div class="section-head" style="padding-bottom:16px"><p class="label" style="justify-self:start"><b>Before the event</b> / Setup</p></div>
     <div class="setup-grid">
       <div class="box">
-        <h3>Load the songs</h3>
-        <p>Pick the <b>Gaana Tambola</b> folder (or its 99 MP3s). Only each song's hook window is kept, stored in this browser so the game plays with Wi-Fi off. Nothing is uploaded.</p>
-        <div class="row">
-          <label class="btn sm" for="folderIn">Choose folder</label>
-          <label class="btn sm ghost" for="filesIn">Choose files</label>
-          <button class="btn sm ghost" type="button" id="clearClipsBtn">Clear stored clips</button>
-          <input type="file" id="folderIn" webkitdirectory multiple hidden>
-          <input type="file" id="filesIn" accept="audio/mpeg,.mp3" multiple hidden>
-        </div>
-        <div class="progress" id="importProg" hidden>
-          <div class="bar"><i id="importFill"></i></div>
-          <p class="stat" id="importText" style="margin-top:8px"></p>
-        </div>
-        <div class="missing" id="missing"></div>
-        <p class="note" id="offlineNote"></p>
+        <h3>Audio</h3>
+        <p>Every song has three 25-second hook versions, streamed from devindi.in. <b>V1</b> is the main hook (it carries the title line); <b>V2</b> and <b>V3</b> are other places in the song where that part comes back. Next always plays V1.</p>
+        <p>Nothing is saved on this device: the next song is fetched while the current one plays, so Next starts at once. The page needs internet during the game.</p>
+        <p class="note">Version 2 and 3 times come from automated repeat analysis and haven't been checked by ear. Use the hook editor to nudge any that miss.</p>
       </div>
 
       <div class="box">
         <h3>Hook editor</h3>
-        <p>Nudge where a song's 25 s hook starts, preview it, then save. Previews don't change the played list.</p>
+        <p>Nudge where a version's 25 s hook starts (within a few seconds), preview it, then save on this device. Previews don't change the played list.</p>
         <div class="hook-pick">
           <select id="hookSel" aria-label="Song"></select>
+          <div class="seg" id="edVerSeg" role="group" aria-label="Version to edit">
+            <button type="button" data-v="1" aria-pressed="true">V1</button>
+            <button type="button" data-v="2" aria-pressed="false">V2</button>
+            <button type="button" data-v="3" aria-pressed="false">V3</button>
+          </div>
         </div>
         <div class="hook-time" id="hookTime">0:00.0<small></small></div>
         <div class="row">
@@ -315,7 +322,8 @@
     window.location.href = '../index.html';
   });
 </script>
-<script src="data.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="data.js?v=3"></script>
+<script src="clips.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
