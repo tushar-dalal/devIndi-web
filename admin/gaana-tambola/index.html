@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gaana Tambola · devIndi Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css?v=20261031">
+<style>
+  body{visibility:hidden;}
+  .gt-hero{padding-bottom:clamp(24px,4vw,40px);}
+
+  /* Top bar */
+  .topbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);}
+  .topbar .grow{flex:1;}
+  .seg{display:inline-flex;border:1px solid var(--ink);border-radius:999px;padding:3px;gap:2px;}
+  .seg button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:8px 14px;border-radius:999px;border:0;background:transparent;color:var(--mute);cursor:pointer;}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);}
+  .seg.locked button:not([aria-pressed="true"]){opacity:.35;cursor:not-allowed;}
+  .stat{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);white-space:nowrap;}
+  .stat b{color:var(--ink);font-weight:500;}
+  .pill.warn{border-style:dashed;border-color:var(--ink);}
+  .btn.sm{padding:9px 16px;font-size:14px;}
+  .btn.danger{background:transparent;color:var(--ink);border-color:var(--ink);}
+  .btn.danger:hover{background:var(--ink);color:var(--paper);opacity:1;}
+
+  /* Main stage */
+  .stage{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,56px);padding:clamp(24px,4vw,40px) 0;}
+  @media (max-width:900px){ .stage{grid-template-columns:minmax(0,1fr);} }
+  .now-head{flex-wrap:wrap;}
+
+  .now{border:1px solid var(--ink);padding:clamp(20px,3vw,28px);display:flex;flex-direction:column;gap:18px;}
+  .now-head{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .now-num{font-size:clamp(104px,15vw,188px);font-weight:500;letter-spacing:-.06em;line-height:.85;margin:6px 0 0;font-variant-numeric:tabular-nums;}
+  .now-num.idle{color:var(--faint);}
+  .now-title{font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.035em;line-height:1.15;margin:0;}
+  .now-movie{font-family:var(--serif);font-style:italic;font-size:clamp(19px,2vw,24px);color:var(--mute);margin:2px 0 0;}
+  .masked .now-title,.masked .now-movie{filter:blur(9px);user-select:none;}
+  .bar{height:6px;background:var(--line);position:relative;overflow:hidden;}
+  .bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--ink);}
+  .bar-meta{display:flex;justify-content:space-between;margin-top:8px;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);cursor:pointer;user-select:none;}
+  .toggle input{appearance:none;-webkit-appearance:none;width:34px;height:20px;border:1px solid var(--ink);border-radius:999px;position:relative;cursor:pointer;margin:0;background:var(--paper);}
+  .toggle input::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--ink);transition:transform .2s var(--ease);}
+  .toggle input:checked{background:var(--ink);}
+  .toggle input:checked::after{background:var(--paper);transform:translateX(14px);}
+  .toggle:has(input:checked){color:var(--ink);}
+
+  .controls{display:grid;grid-template-columns:2fr 1.2fr auto;gap:8px;}
+  .controls .btn{justify-content:center;min-height:64px;}
+  #nextBtn{font-size:20px;min-height:72px;}
+  #playBtn{background:transparent;color:var(--ink);}
+  #playBtn:hover{background:var(--ink);color:var(--paper);opacity:1;}
+  #undoBtn{min-height:56px;padding-inline:18px;}
+  .kbd{font-family:var(--mono);font-size:10.5px;opacity:.55;letter-spacing:.04em;}
+  .alert{border:1px dashed var(--ink);padding:14px 16px;font-size:14.5px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;}
+  .alert[hidden]{display:none;}
+  .alert .btns{display:flex;gap:6px;margin:0;}
+  .done-banner{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:14px 16px;font-weight:500;}
+  .done-banner[hidden]{display:none;}
+
+  .extras{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;padding-top:16px;border-top:1px solid var(--line);}
+  .vol{display:inline-flex;align-items:center;gap:10px;}
+  input[type=range]{accent-color:var(--ink);width:130px;}
+  .gap-in{width:52px;font-family:var(--mono);font-size:13px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;text-align:center;}
+  .countdown{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;}
+
+  /* Board */
+  .board-head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:14px;}
+  .board{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;}
+  .cell{aspect-ratio:1;display:grid;place-items:center;border:1px solid var(--line);font-family:var(--mono);font-size:clamp(12px,1.3vw,15px);font-variant-numeric:tabular-nums;color:var(--mute);background:var(--paper);padding:0;cursor:default;}
+  .cell.played{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+  .cell.skipped{border-style:dashed;border-color:var(--ink);color:var(--ink);}
+  .cell.current{outline:2px solid var(--ink);outline-offset:2px;position:relative;}
+  .cell.current::after{content:"";position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--paper);animation:pulse 1.6s var(--ease) infinite;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mute);}
+  .legend i{width:12px;height:12px;border:1px solid var(--line);display:inline-block;}
+  .legend i.p{background:var(--ink);border-color:var(--ink);}
+  .legend i.c{background:var(--ink);outline:2px solid var(--ink);outline-offset:1px;}
+  .legend i.s{border:1px dashed var(--ink);}
+
+  /* Lower panels */
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);padding-bottom:clamp(32px,5vw,56px);}
+  @media (max-width:900px){ .panels{grid-template-columns:minmax(0,1fr);} }
+  .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--ink);}
+  .panel-head h2{margin:0;font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.045em;}
+  .panel-head h2 em{font-family:var(--serif);font-style:italic;font-weight:400;}
+  .history{list-style:none;margin:0;padding:0;max-height:440px;overflow:auto;}
+  .history li{border-bottom:1px solid var(--line);}
+  .history button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:44px 40px 1fr auto;gap:12px;align-items:center;width:100%;padding:11px 4px;cursor:pointer;}
+  .history button:hover{background:var(--paper-2);}
+  .history .c{font-family:var(--mono);font-size:11.5px;color:var(--faint);}
+  .history .n{font-weight:500;font-variant-numeric:tabular-nums;}
+  .history .t{font-size:15px;min-width:0;}
+  .history .t small{display:block;color:var(--mute);font-size:13px;}
+  .history .r{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);}
+  .masked-list .history .t{filter:blur(6px);}
+  .empty{color:var(--mute);padding:20px 0;margin:0;}
+
+  .tk-form{display:flex;gap:8px;align-items:center;margin:16px 0;}
+  .tk-form input{width:120px;font-size:17px;border:1px solid var(--line);border-radius:999px;padding:10px 16px;font-family:var(--mono);}
+  .tk-form input:focus{border-color:var(--ink);outline:none;}
+  .ticket{display:grid;grid-template-columns:repeat(9,1fr);border-top:1px solid var(--ink);border-left:1px solid var(--ink);}
+  .ticket div{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);min-height:62px;padding:6px 5px;font-size:11px;line-height:1.2;color:var(--mute);overflow:hidden;}
+  .ticket div b{display:block;font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:500;margin-bottom:3px;}
+  .ticket div.blank{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px);}
+  .ticket div.hit{background:var(--ink);color:#a1a1a1;}
+  .ticket div.hit b{color:var(--paper);}
+  .ticket div.hit b::after{content:" ✓";}
+  @media (max-width:560px){ .ticket div{min-height:44px;} .ticket div span{display:none;} }
+  .patterns{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+
+  /* Setup */
+  .setup{padding-bottom:clamp(56px,8vw,96px);}
+  .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);margin-top:20px;}
+  @media (max-width:900px){ .setup-grid{grid-template-columns:minmax(0,1fr);} }
+  .box{border:1px solid var(--line);padding:22px;}
+  .box h3{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:-.03em;}
+  .box p{color:var(--mute);font-size:14.5px;margin:0 0 14px;}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .progress{margin-top:14px;}
+  .progress[hidden]{display:none;}
+  .missing{margin-top:12px;font-size:13.5px;color:var(--mute);}
+  .missing b{color:var(--ink);font-weight:500;}
+  .hook-pick{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
+  .hook-pick select{flex:1;font-size:15px;}
+  .hook-time{font-size:44px;font-weight:500;letter-spacing:-.05em;line-height:1;margin:6px 0 12px;font-variant-numeric:tabular-nums;}
+  .hook-time small{font-size:14px;letter-spacing:0;color:var(--mute);font-weight:400;margin-left:8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .chips button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:var(--paper);cursor:pointer;color:var(--ink);}
+  .chips button:hover,.chips button.on{border-color:var(--ink);}
+  .chips button.edited::after{content:" •";}
+  .note{font-size:13px;color:var(--faint);margin-top:12px;}
+
+  /* Phones: pin the two main buttons to the bottom */
+  @media (max-width:720px){
+    .controls{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--paper);border-top:1px solid var(--ink);padding:10px 16px calc(10px + env(safe-area-inset-bottom));grid-template-columns:2fr 1.3fr auto;}
+    .controls .btn{min-width:0;padding-inline:12px;}
+    #nextBtn{min-height:64px;font-size:19px;}
+    body{padding-bottom:110px;}
+    .keys{display:none;}
+    .board-head{flex-wrap:wrap;gap:4px 12px;}
+    .topbar .grow{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../dashboard.html"><span class="sq"></span>devIndi<span class="tag">Admin</span></a>
+    <nav class="nav-links">
+      <a href="../dashboard.html" class="hide-sm">Admin home</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="legal-hero gt-hero">
+    <p class="label crumbs"><a href="../dashboard.html">Admin</a><span>/</span><b>Gaana Tambola</b></p>
+    <h1>Gaana <em>Tambola</em></h1>
+    <p class="lede">One tap plays the 25-second hook of the next song. The board tracks which of the 99 songs have been called, and the game survives a refresh.</p>
+  </section>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="seg" id="modeSeg" role="group" aria-label="Order mode">
+      <button type="button" data-mode="calling" aria-pressed="false">Calling order</button>
+      <button type="button" data-mode="random" aria-pressed="false">Live random</button>
+    </div>
+    <span class="stat" id="roundStat"></span>
+    <span class="stat"><b id="countStat">0</b> of 99 played</span>
+    <span class="pill" id="clipsPill"><span class="dot"></span><span id="clipsText">Checking clips…</span></span>
+    <span class="grow"></span>
+    <button class="btn sm danger" type="button" id="resetBtn">Reset</button>
+  </div>
+
+  <!-- Stage -->
+  <section class="stage">
+    <div>
+      <div class="now" id="nowCard">
+        <div class="now-head">
+          <p class="label" id="nowLabel">Now playing</p>
+          <label class="toggle"><input type="checkbox" id="hideToggle"> Hide details</label>
+        </div>
+        <div>
+          <p class="now-num idle" id="nowNum">—</p>
+          <p class="now-title" id="nowTitle">Choose an order mode, then tap Next.</p>
+          <p class="now-movie" id="nowMovie">&nbsp;</p>
+        </div>
+        <div>
+          <div class="bar"><i id="barFill"></i></div>
+          <div class="bar-meta"><span class="stat" id="barPos">0:00</span><span class="stat">0:25</span></div>
+        </div>
+        <div class="alert" id="errBox" hidden>
+          <span id="errText"></span>
+          <span class="btns"><button class="btn sm ghost" type="button" id="retryBtn">Retry</button><button class="btn sm" type="button" id="skipBtn">Skip</button></span>
+        </div>
+        <div class="done-banner" id="doneBanner" hidden>All 99 songs played</div>
+        <div class="controls">
+          <button class="btn" type="button" id="nextBtn">Next <span class="arr">→</span></button>
+          <button class="btn" type="button" id="playBtn"><span id="playLabel">Play</span></button>
+          <button class="btn ghost" type="button" id="undoBtn" title="Undo last Next (U)">Undo</button>
+        </div>
+        <div class="extras">
+          <span class="vol"><span class="stat">Volume</span><input type="range" id="volume" min="0" max="100" value="90" aria-label="Volume"></span>
+          <label class="toggle"><input type="checkbox" id="autoToggle"> Auto-advance</label>
+          <span class="vol"><span class="stat">Gap</span><input class="gap-in" type="number" id="gapIn" min="1" max="30" value="4" aria-label="Auto-advance gap in seconds"><span class="stat">s</span></span>
+          <span class="countdown" id="countdown"></span>
+        </div>
+        <p class="stat keys" style="margin:0;white-space:normal">Keys: <b>Space</b> play/pause · <b>N</b> or <b>→</b> next · <b>U</b> undo</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="board-head">
+        <p class="label"><b>Played board</b></p>
+        <span class="stat" id="boardStat"></span>
+      </div>
+      <div class="board" id="board" aria-label="Songs 1 to 99"></div>
+      <div class="legend">
+        <span><i></i>Not played</span>
+        <span><i class="p"></i>Played</span>
+        <span><i class="c"></i>Current</span>
+        <span><i class="s"></i>Skipped</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- History + ticket check -->
+  <section class="panels">
+    <div id="historyWrap">
+      <div class="panel-head"><h2>History</h2><span class="stat">Tap to replay</span></div>
+      <ul class="history" id="history"></ul>
+      <p class="empty" id="historyEmpty">No songs called yet.</p>
+    </div>
+    <div>
+      <div class="panel-head"><h2>Ticket <em>check</em></h2><span class="stat">Tickets 1–50</span></div>
+      <form class="tk-form" id="tkForm">
+        <input type="number" id="tkIn" min="1" max="50" placeholder="No." inputmode="numeric" aria-label="Ticket number">
+        <button class="btn sm" type="submit">Check</button>
+      </form>
+      <div id="tkOut"><p class="empty">Enter a ticket number to see its 15 songs and which patterns are complete.</p></div>
+    </div>
+  </section>
+
+  <!-- Setup -->
+  <section class="setup">
+    <div class="section-head" style="padding-bottom:16px"><p class="label" style="justify-self:start"><b>Before the event</b> / Setup</p></div>
+    <div class="setup-grid">
+      <div class="box">
+        <h3>Load the songs</h3>
+        <p>Pick the <b>Gaana Tambola</b> folder (or its 99 MP3s). Only each song's hook window is kept, stored in this browser so the game plays with Wi-Fi off. Nothing is uploaded.</p>
+        <div class="row">
+          <label class="btn sm" for="folderIn">Choose folder</label>
+          <label class="btn sm ghost" for="filesIn">Choose files</label>
+          <button class="btn sm ghost" type="button" id="clearClipsBtn">Clear stored clips</button>
+          <input type="file" id="folderIn" webkitdirectory multiple hidden>
+          <input type="file" id="filesIn" accept="audio/mpeg,.mp3" multiple hidden>
+        </div>
+        <div class="progress" id="importProg" hidden>
+          <div class="bar"><i id="importFill"></i></div>
+          <p class="stat" id="importText" style="margin-top:8px"></p>
+        </div>
+        <div class="missing" id="missing"></div>
+        <p class="note" id="offlineNote"></p>
+      </div>
+
+      <div class="box">
+        <h3>Hook editor</h3>
+        <p>Nudge where a song's 25 s hook starts, preview it, then save. Previews don't change the played list.</p>
+        <div class="hook-pick">
+          <select id="hookSel" aria-label="Song"></select>
+        </div>
+        <div class="hook-time" id="hookTime">0:00.0<small></small></div>
+        <div class="row">
+          <button class="btn sm ghost" type="button" data-nudge="-5">−5 s</button>
+          <button class="btn sm ghost" type="button" data-nudge="-1">−1 s</button>
+          <button class="btn sm ghost" type="button" data-nudge="1">+1 s</button>
+          <button class="btn sm ghost" type="button" data-nudge="5">+5 s</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn sm" type="button" id="previewBtn">Preview</button>
+          <button class="btn sm" type="button" id="saveHookBtn">Save</button>
+          <button class="btn sm ghost" type="button" id="revertHookBtn">Back to default</button>
+        </div>
+        <p class="note" id="hookNote"></p>
+        <p class="label" style="margin-top:18px">Check these first</p>
+        <div class="chips" id="checkChips"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../../analytics/config.js"></script>
+<script src="../../analytics/track.js" data-mode="admin" defer></script>
+<script>
+  // Gate: same speed bump as the other admin pages (see admin/index.html).
+  if (sessionStorage.getItem('devindi_admin_ok') !== '1') {
+    window.location.replace('../index.html');
+  } else {
+    document.body.style.visibility = 'visible';
+  }
+  document.getElementById('logoutLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('devindi_admin_ok');
+    sessionStorage.removeItem('devindi_feedback_key');
+    window.location.href = '../index.html';
+  });
+</script>
+<script src="data.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
