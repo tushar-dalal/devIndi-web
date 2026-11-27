@@ -1,0 +1,27 @@
+/* Shared by the Gaana Tambola caller (index.html) and the ticket generator (tickets.html). */
+
+/* Caller / Ticket generator tabs */
+.gt-tabs{display:flex;gap:4px;margin:0 0 18px;border:1px solid var(--ink);border-radius:999px;padding:3px;width:max-content;max-width:100%;}
+.gt-tabs a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:999px;color:var(--mute);text-decoration:none;white-space:nowrap;}
+.gt-tabs a:hover{color:var(--ink);}
+.gt-tabs a[aria-current="page"]{background:var(--ink);color:var(--paper);}
+
+/* Printable ticket, same look as the original printed set */
+.tk{--tk-maroon:#7d1f2c;--tk-gold:#d6a648;--tk-blank:#ecd7ab;--tk-dot:#cfae6e;
+  font-family:"Poppins",var(--sans,system-ui),sans-serif;border:2px solid var(--tk-gold);border-radius:10px;overflow:hidden;background:#fff;color:#1d1d1d;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.tk-head{display:flex;align-items:center;gap:10px;background:var(--tk-maroon);color:#fff;padding:7px 12px;}
+.tk-head .t{font-weight:700;font-size:17px;letter-spacing:.01em;color:var(--tk-gold);white-space:nowrap;}
+.tk-head .s{font-size:11.5px;color:#f3e3e3;white-space:nowrap;}
+.tk-head .name{flex:1;font-size:12.5px;white-space:nowrap;overflow:hidden;margin-left:14px;}
+.tk-head .no{background:var(--tk-gold);color:var(--tk-maroon);font-weight:700;font-size:13px;border-radius:7px;padding:4px 12px;white-space:nowrap;}
+.tk .cells{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;padding:4px;background:var(--tk-gold);}
+.tk .cells > div{position:relative;background:#fff;min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px 4px 5px;}
+.tk .cells > div.blank{background:var(--tk-blank);}
+.tk .cells > div.blank::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--tk-dot);}
+.tk .cells b{position:absolute;top:3px;left:5px;font-size:9.5px;font-weight:700;color:#b57a26;}
+.tk .cells .song{font-weight:600;font-size:12.5px;line-height:1.15;color:#1d1d1d;}
+.tk .cells .film{font-size:8.5px;line-height:1.15;color:var(--tk-maroon);margin-top:4px;}
+.tk-cut{display:flex;align-items:center;gap:8px;color:#999;font-size:11px;margin:10px 0;}
+.tk-cut::after{content:"";flex:1;border-top:1px dashed #b5b5b5;}
+.tk-page .tk-cut:last-child{display:none;}

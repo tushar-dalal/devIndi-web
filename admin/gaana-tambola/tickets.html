@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ticket Generator · Gaana Tambola</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css?v=20261031">
+<link rel="stylesheet" href="gt-shared.css?v=1">
+<style>
+  body{visibility:hidden;}
+  .gen{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,56px);padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--ink);}
+  @media (max-width:900px){ .gen{grid-template-columns:minmax(0,1fr);} }
+  .box{border:1px solid var(--ink);padding:clamp(20px,3vw,28px);}
+  .box h2{margin:0 0 6px;font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.045em;}
+  .box h2 em{font-family:var(--serif);font-style:italic;font-weight:400;}
+  .box p{color:var(--mute);font-size:14.5px;margin:0 0 16px;}
+  .count-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .num-in{width:130px;font-size:22px;border:1px solid var(--ink);border-radius:999px;padding:10px 18px;font-family:var(--mono);}
+  .num-in:focus,.code-in:focus{outline:2px solid var(--ink);outline-offset:2px;}
+  .code-in{width:150px;font-size:15px;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-family:var(--mono);text-transform:uppercase;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+  .chips button{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--paper);cursor:pointer;color:var(--ink);}
+  .chips button:hover{border-color:var(--ink);}
+  .or{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:20px 0 10px;display:flex;align-items:center;gap:10px;}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line);}
+  .msg{font-size:14px;color:var(--ink);margin:12px 0 0;min-height:1.4em;}
+  .result .code{font-family:var(--mono);font-size:clamp(34px,5vw,52px);font-weight:500;letter-spacing:-.02em;line-height:1;margin:4px 0 12px;}
+  .result ul{list-style:none;margin:0 0 18px;padding:0;}
+  .result li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px;}
+  .result li span:first-child{color:var(--mute);}
+  .result .row{display:flex;flex-wrap:wrap;gap:8px;}
+  .result[hidden],.sheet-wrap[hidden]{display:none;}
+  .in-use{margin-top:12px;}
+  .sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 0 12px;border-bottom:1px solid var(--ink);margin-bottom:20px;}
+  .sheet-head h2{margin:0;font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.045em;}
+  .sheet{padding-bottom:clamp(56px,8vw,96px);}
+  .tk-page{margin-bottom:10px;}
+  .sheet-wrap{overflow-x:auto;}
+  .sheet .tk{min-width:760px;}
+  .more{text-align:center;padding:4px 0 40px;}
+
+  @media print{
+    @page{size:A4 landscape;margin:9mm;}
+    body{visibility:visible !important;padding:0 !important;background:#fff;}
+    .nav,.gt-hero,.gt-tabs,.gen,.sheet-head,.more,footer{display:none !important;}
+    main.wrap{max-width:none;padding:0;margin:0;}
+    .sheet-wrap{overflow:visible;}
+    .sheet{display:block;padding:0;}
+    .tk-page{break-after:page;page-break-after:always;}
+    .tk-page:last-child{break-after:auto;page-break-after:auto;}
+    .sheet .tk{min-width:0;break-inside:avoid;}
+    .tk-cut{margin:5mm 0;}
+    .tk .cells > div{min-height:22mm;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../dashboard.html"><span class="sq"></span>devIndi<span class="tag">Admin</span></a>
+    <nav class="nav-links">
+      <a href="../dashboard.html" class="hide-sm">Admin home</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="legal-hero gt-hero">
+    <p class="label crumbs"><a href="../dashboard.html">Admin</a><span>/</span><a href="index.html">Gaana Tambola</a><span>/</span><b>Tickets</b></p>
+    <h1>Ticket <em>generator</em></h1>
+    <p class="lede">Make a fresh set of printable tickets for the same 99 songs. Every ticket has 15 songs in 3 rows of 5, with each song used about the same number of times across the set.</p>
+  </section>
+
+  <nav class="gt-tabs" aria-label="Gaana Tambola">
+    <a href="index.html">Caller</a>
+    <a href="tickets.html" aria-current="page">Ticket generator</a>
+  </nav>
+
+  <section class="gen">
+    <div class="box">
+      <h2>New <em>set</em></h2>
+      <p>How many tickets do you need? (1 to 300)</p>
+      <form id="genForm">
+        <div class="count-row">
+          <input class="num-in" type="number" id="countIn" min="1" max="300" value="50" inputmode="numeric" aria-label="Number of tickets" required>
+          <button class="btn" type="submit">Generate <span class="arr">→</span></button>
+        </div>
+        <div class="chips" id="quick">
+          <button type="button" data-n="50">50</button>
+          <button type="button" data-n="75">75</button>
+          <button type="button" data-n="80">80</button>
+          <button type="button" data-n="90">90</button>
+          <button type="button" data-n="100">100</button>
+          <button type="button" data-n="150">150</button>
+        </div>
+      </form>
+      <p class="or">or open a ticket file</p>
+      <div class="count-row"><select class="code-in" id="fileSel" aria-label="Ticket files made on this device" style="width:auto;text-transform:none"></select></div>
+      <form id="codeForm" class="count-row">
+        <input class="code-in" type="text" id="codeIn" placeholder="File, e.g. 75-K7QM" maxlength="8" style="width:200px" autocapitalize="characters" spellcheck="false" aria-label="Set code">
+        <button class="btn ghost" type="submit">Rebuild</button>
+      </form>
+      <p class="msg" id="msg"></p>
+      <p class="note" style="font-size:13px;color:var(--faint);margin:14px 0 0">Tickets are built by code on this page, nothing is sent anywhere. A file name rebuilds exactly the same tickets on any device: type it in under "Rebuild", e.g. on the phone you'll check tickets with.</p>
+    </div>
+
+    <div class="box result" id="result" hidden>
+      <p class="label">Ticket file</p>
+      <p class="code" id="resCode"></p>
+      <ul>
+        <li><span>Made</span><b id="resAt"></b></li>
+        <li><span>Tickets</span><b id="resCount"></b></li>
+        <li><span>Songs per ticket</span><b>15 (3 rows of 5)</b></li>
+        <li><span>Each song appears on</span><b id="resSpread"></b></li>
+        <li><span>Printing</span><b id="resPages"></b></li>
+      </ul>
+      <div class="row">
+        <button class="btn" type="button" id="printBtn">Print / Save as PDF</button>
+      </div>
+      <p class="note" style="font-size:13px;color:var(--faint);margin:14px 0 0">Each ticket is labelled <b id="resLabel"></b>: the file name, then its number. This file is now at the top of the Ticket check list on the Caller page (on this device).</p>
+    </div>
+  </section>
+
+  <div class="sheet-wrap" id="sheetWrap" hidden>
+    <div class="sheet-head"><h2>Preview</h2><span class="stat" id="sheetStat"></span></div>
+    <div class="sheet" id="sheet"></div>
+  </div>
+</main>
+
+<script>
+  // Gate: admin or the Gaana Tambola guest account (see admin/index.html).
+  const role = sessionStorage.getItem('devindi_admin_ok');
+  if (role !== '1' && role !== 'guest') {
+    window.location.replace('../index.html');
+  } else {
+    document.body.style.visibility = 'visible';
+  }
+  document.getElementById('logoutLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('devindi_admin_ok');
+    sessionStorage.removeItem('devindi_feedback_key');
+    window.location.href = '../index.html';
+  });
+</script>
+<script src="data.js?v=3"></script>
+<script src="tickets.js?v=1"></script>
+<script src="ticket-card.js?v=1"></script>
+<script>
+(() => {
+  'use strict';
+  const T = window.GT_TICKETS, $ = (id) => document.getElementById(id);
+  let set = null;
+
+  function show(code) {
+    try { set = T.generate(code); }
+    catch { $('msg').textContent = 'That set code isn’t valid. It looks like 75-K7QM.'; return; }
+    $('msg').textContent = '';
+    const use = new Array(100).fill(0);
+    set.tickets.forEach((g) => g.flat().forEach((n) => { if (n) use[n]++; }));
+    const u = use.slice(1), lo = Math.min(...u), hi = Math.max(...u);
+    T.store.add(set.code);
+    const file = T.store.files().find((f) => f.code === set.code);
+    $('resCode').textContent = set.code;
+    $('resAt').textContent = T.when(file.at);
+    $('resLabel').textContent = T.label(set.code, 1) + ' … ' + T.label(set.code, set.count);
+    fillFiles();
+    $('resCount').textContent = set.count;
+    $('resSpread').textContent = lo === hi ? `${lo} tickets` : `${lo}–${hi} tickets`;
+    $('resPages').textContent = `${Math.ceil(set.count / 2)} A4 pages, 2 per page`;
+    $('result').hidden = false;
+    history.replaceState(null, '', '#' + set.code);
+    renderSheet();
+  }
+
+  // Draw the first tickets at once, the rest in chunks so a 300-ticket set stays responsive.
+  let drawJob = 0;
+  function renderSheet() {
+    const job = ++drawJob, sheet = $('sheet');
+    sheet.innerHTML = '';
+    $('sheetWrap').hidden = false;
+    $('sheetStat').textContent = `Set ${set.code} · ${set.count} ticket${set.count === 1 ? '' : 's'}`;
+    let i = 0;
+    (function chunk() {
+      if (job !== drawJob) return;
+      const frag = document.createDocumentFragment();
+      // Two tickets per A4 page, with a cut line between them.
+      for (const end = Math.min(set.count, i + 20); i < end; i += 2) {
+        const pg = document.createElement('div'); pg.className = 'tk-page';
+        for (let j = i; j < Math.min(set.count, i + 2); j++) {
+          pg.appendChild(GT_CARD(set.tickets[j], j + 1, set.code));
+          const cut = document.createElement('div'); cut.className = 'tk-cut'; cut.textContent = '✂'; pg.appendChild(cut);
+        }
+        frag.appendChild(pg);
+      }
+      sheet.appendChild(frag);
+      if (i < set.count) setTimeout(chunk, 0);
+    })();
+  }
+
+  $('genForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const n = Math.round(+$('countIn').value);
+    if (!(n >= T.MIN && n <= T.MAX)) { $('msg').textContent = `Choose between ${T.MIN} and ${T.MAX} tickets.`; return; }
+    show(T.newCode(n));
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  $('quick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { $('countIn').value = b.dataset.n; $('genForm').requestSubmit(); } });
+  $('codeForm').addEventListener('submit', (e) => { e.preventDefault(); show($('codeIn').value); });
+  // The page title becomes the PDF's file name.
+  $('printBtn').addEventListener('click', () => {
+    const t = document.title;
+    document.title = `Gaana Tambola tickets ${set.code}`;
+    window.print();
+    document.title = t;
+  });
+  function fillFiles() {
+    const files = T.store.files(), sel = $('fileSel');
+    sel.innerHTML = files.length ? '' : '<option value="">No ticket files yet</option>';
+    sel.disabled = !files.length;
+    for (const f of files) sel.add(new Option(`${f.code} · ${T.parseCode(f.code).count} tickets · ${T.when(f.at)}`, f.code));
+    if (set) sel.value = set.code;
+  }
+  $('fileSel').addEventListener('change', (e) => { if (e.target.value) show(e.target.value); });
+  fillFiles();
+
+  // Open a set from the link (tickets.html#75-K7QM) or the one in use for ticket check.
+  const fromHash = T.parseCode(decodeURIComponent(location.hash.slice(1)));
+  if (fromHash) { $('codeIn').value = fromHash.code; show(fromHash.code); }
+  else if (T.store.active() !== 'original') show(T.store.active());
+})();
+</script>
+</body>
+</html>

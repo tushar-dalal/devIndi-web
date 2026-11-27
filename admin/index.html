@@ -28,8 +28,8 @@
       <p class="label" style="margin-bottom:12px">Sign in</p>
       <div class="form">
         <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@devindi.in" required autocomplete="username">
+          <label for="email">Email or username</label>
+          <input type="text" id="email" name="email" placeholder="you@devindi.in" required autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
         <div class="field">
           <label for="password">Password</label>
@@ -53,6 +53,9 @@
   // source (or the public GitHub repo) can see exactly how it works.
   // Don't put anything here you wouldn't want a determined stranger to see.
   const EXPECTED_HASH = 'af6eb2dea0d9f18b3873d5e5270a7288a638fe54681cc2e86b75dc3fd47ba61c';
+  // Guest account: sees only Gaana Tambola (the caller and the ticket generator).
+  // Every other admin page requires devindi_admin_ok === '1', so a guest session bounces off them.
+  const GUEST_HASH = '107190579e9b10081b5ab64f188071ea2f335ada23d847989568eb5d53b9fbf7';
 
   async function sha256Hex(text) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -73,7 +76,12 @@
     const password = document.getElementById('password').value;
     const hash = await sha256Hex(email + ':' + password);
 
-    if (hash === EXPECTED_HASH) {
+    if (hash === GUEST_HASH) {
+      sessionStorage.setItem('devindi_admin_ok', 'guest');
+      sessionStorage.removeItem('devindi_feedback_key');
+      submitBtn.textContent = 'Signing in…';
+      window.location.href = 'gaana-tambola/index.html';
+    } else if (hash === EXPECTED_HASH) {
       sessionStorage.setItem('devindi_admin_ok', '1');
       // Key for reading the feedback inbox (see analytics/feedback-setup.sql).
       // It comes from the password, so it isn't in this file; Supabase only keeps its hash.

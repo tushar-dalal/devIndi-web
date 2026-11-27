@@ -73,7 +73,7 @@
       <li><a class="app-row plain" href="gaana-tambola/index.html">
         <span class="idx">07</span>
         <span><span class="name">Gaana Tambola</span><span class="cat">Event</span></span>
-        <span class="blurb">Music-housie caller for the Sangeet: one tap plays the next song's 25-second hook, with the 1–99 board, history and ticket check.</span>
+        <span class="blurb">Music-housie caller: one tap plays the next song's 25-second hook, with the 1–99 board, history, ticket check and a ticket generator.</span>
         <span class="go" aria-hidden="true">→</span>
       </a></li>
     </ul>
@@ -86,7 +86,17 @@
   // Gate: bounce straight back to sign-in unless this tab's session
   // already passed the login check. See admin/index.html for the caveat
   // on what this gate actually protects against.
-  if (sessionStorage.getItem('devindi_admin_ok') !== '1') {
+  const role = sessionStorage.getItem('devindi_admin_ok');
+  if (role === 'guest') {
+    // Guests only get Gaana Tambola.
+    document.querySelectorAll('#pageList > li').forEach((li) => {
+      if (!li.querySelector('a[href^="gaana-tambola/"]')) li.remove();
+    });
+    document.querySelector('#pageList .idx').textContent = '01';
+    document.querySelector('.lede').textContent = 'Guest access: the Gaana Tambola caller and ticket generator.';
+    document.querySelector('a[href="../index.html"].hide-sm').hidden = true;
+    document.body.style.visibility = 'visible';
+  } else if (role !== '1') {
     window.location.replace('index.html');
   } else {
     document.body.style.visibility = 'visible';

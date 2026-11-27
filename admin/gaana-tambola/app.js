@@ -12,6 +12,7 @@
   const VERSIONS = [1, 2, 3];
   const FADE_IN = 0.4, FADE_OUT = 1.8, NEXT_FADE = 0.3;
   const STATE_KEY = 'gt_state_v1', HOOKS_KEY = 'gt_hooks_v2';
+  const RATES = [1, 1.5, 2];
 
   const SONGS = {};
   for (const [n, title, movie, start, len, file, check] of D.songs) SONGS[n] = { n, title, movie, start, len, file, check };
@@ -24,7 +25,7 @@
   };
 
   // ver = which hook version of the current song is loaded; vers = versions already played for it.
-  const fresh = () => ({ mode: 'calling', played: [], skipped: [], current: null, ver: 1, vers: [], pos: 0, queued: null, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
+  const fresh = () => ({ rate: 1, mode: 'calling', played: [], skipped: [], current: null, ver: 1, vers: [], pos: 0, queued: null, hide: false, auto: false, gap: 4, vol: 90, updatedAt: Date.now() });
   let S = Object.assign(fresh(), ls.get(STATE_KEY, {}));
   let hooks = ls.get(HOOKS_KEY, {}); // "23.2" -> edited start of song 23, version 2
   const save = () => { S.updatedAt = Date.now(); ls.set(STATE_KEY, S); };
@@ -65,10 +66,67 @@
       return { buffer, clip: clipInfo(n, v) };
     })();
     bufCache.set(key, p);
-    p.then(() => { if (n === upNext && v === 1) setReady(true); },
+    p.then(() => { if (n === upNext && v === 1 && S.rate === 1) setReady(true); },
       () => { bufCache.delete(key); if (n === upNext && v === 1) setReady(false, true); });
     while (bufCache.size > 9) bufCache.delete(bufCache.keys().next().value);
     return p;
+  }
+
+  // Faster playback with the pitch kept: WSOLA time-stretch of the decoded clip, done in code.
+  // Overlapping 46 ms windows are taken from the input at `rate` x the output step; each window
+  // is nudged (within 12 ms) to where it best lines up with the audio before it, then overlap-added.
+  function stretch(buf, rate) {
+    const sr = buf.sampleRate, chs = buf.numberOfChannels, len = buf.length;
+    const N = Math.round(sr * 0.046 / 2) * 2, Hs = N / 2, tol = Math.round(sr * 0.012), DEC = 4;
+    const outLen = Math.max(1, Math.floor(len / rate));
+    const win = new Float32Array(N);
+    for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / N);
+    const inp = [...Array(chs)].map((_, c) => buf.getChannelData(c));
+    // Mono, 4x decimated (box-averaged) copy for the alignment search.
+    const mLen = Math.floor(len / DEC), m = new Float32Array(mLen);
+    for (let i = 0; i < mLen; i++) { let a = 0; for (let c = 0; c < chs; c++) for (let j = 0; j < DEC; j++) a += inp[c][i * DEC + j]; m[i] = a; }
+    const out = [...Array(chs)].map(() => new Float32Array(outLen + N)), norm = new Float32Array(outLen + N);
+    const maxPos = Math.max(0, len - N), L = Math.floor(Hs / DEC);
+    let prev = 0;
+    for (let o = 0; o < outLen; o += Hs) {
+      let pos = Math.min(maxPos, Math.round(o * rate));
+      if (o > 0) {
+        const nat = Math.min(maxPos, prev + Hs) / DEC | 0;
+        const lo = Math.max(0, pos - tol) / DEC | 0, hi = Math.min(maxPos, pos + tol) / DEC | 0;
+        let best = -Infinity, bestP = pos / DEC | 0;
+        for (let q = lo; q <= hi; q++) {
+          let dot = 0, en = 1e-9;
+          for (let i = 0; i < L; i++) { const x = m[q + i]; dot += x * m[nat + i]; en += x * x; }
+          const sc = dot / Math.sqrt(en);
+          if (sc > best) { best = sc; bestP = q; }
+        }
+        pos = Math.min(maxPos, bestP * DEC);
+      }
+      for (let c = 0; c < chs; c++) { const a = inp[c], b = out[c]; for (let i = 0; i < N && pos + i < len; i++) b[o + i] += a[pos + i] * win[i]; }
+      for (let i = 0; i < N; i++) norm[o + i] += win[i];
+      prev = pos;
+    }
+    const res = ctx.createBuffer(chs, outLen, sr);
+    for (let c = 0; c < chs; c++) {
+      const b = out[c];
+      for (let i = 0; i < outLen; i++) b[i] = norm[i] > 0.05 ? b[i] / norm[i] : b[i];
+      res.copyToChannel(b.subarray(0, outLen), c);
+    }
+    return res;
+  }
+  // Decoded clip at a speed: { buffer (original), clip, play (buffer to play) }.
+  const fastCache = new Map();
+  function getBuffer(n, v, rate) {
+    if (rate === 1) return loadBuffer(n, v).then((b) => ({ ...b, play: b.buffer }));
+    const key = n + '-' + v + '@' + rate;
+    if (!fastCache.has(key)) {
+      const p = loadBuffer(n, v).then((b) => ({ ...b, play: stretch(b.buffer, rate) }));
+      fastCache.set(key, p);
+      p.then(() => { if (n === upNext && v === 1 && rate === S.rate) setReady(true); },
+        () => { fastCache.delete(key); if (n === upNext && v === 1) setReady(false, true); });
+      while (fastCache.size > 6) fastCache.delete(fastCache.keys().next().value);
+    }
+    return fastCache.get(key);
   }
 
   // Rough level matching: bring each hook's RMS to the same target, within limits.
@@ -84,8 +142,9 @@
   }
 
   // What is sounding right now. aux = a replay of another song or an editor preview (not counted).
-  const P = { n: null, v: 1, src: null, gain: null, startedAt: 0, base: 0, playing: false, replay: false, preview: false, token: 0 };
-  const pos = () => (P.playing ? Math.max(0, Math.min(HOOK, P.base + (ctx.currentTime - P.startedAt))) : P.base);
+  const P = { rate: 1, n: null, v: 1, src: null, gain: null, startedAt: 0, base: 0, playing: false, replay: false, preview: false, token: 0 };
+  // Position in seconds of the song's hook (at 2x, 25 s of song pass in 12.5 s).
+  const pos = () => (P.playing ? Math.max(0, Math.min(HOOK, P.base + (ctx.currentTime - P.startedAt) * P.rate)) : P.base);
   const isAux = () => P.replay || P.preview;
 
   function stopNode(fade) {
@@ -104,7 +163,8 @@
   async function playSong(n, v, from = 0, opts = {}) {
     const token = ++P.token;
     audio();
-    const { buffer, clip } = await loadBuffer(n, v);
+    const rate = opts.preview ? 1 : S.rate; // editor previews always play at normal speed
+    const { buffer, clip, play } = await getBuffer(n, v, rate);
     if (token !== P.token) return false;
     const start = opts.start != null ? opts.start : hookStart(n, v);
     let off = start - clip.clipStart + from;
@@ -112,15 +172,16 @@
     const dur = Math.max(0.3, Math.min(HOOK - from, buffer.duration - off));
     const level = levelFor(buffer, start - clip.clipStart);
     const now = ctx.currentTime + 0.02;
-    const src = ctx.createBufferSource(); src.buffer = buffer;
+    const real = dur / rate; // seconds of real time
+    const src = ctx.createBufferSource(); src.buffer = play;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, now);
     g.gain.linearRampToValueAtTime(level, now + (from > 0.1 ? 0.08 : FADE_IN));
-    if (dur > FADE_OUT + 0.5) g.gain.setValueAtTime(level, now + dur - FADE_OUT);
-    g.gain.linearRampToValueAtTime(0, now + dur);
+    if (real > FADE_OUT + 0.5) g.gain.setValueAtTime(level, now + real - FADE_OUT);
+    g.gain.linearRampToValueAtTime(0, now + real);
     src.connect(g).connect(master);
-    src.start(now, off, dur);
-    Object.assign(P, { n, v, src, gain: g, startedAt: now, base: from, playing: true, replay: !!opts.replay, preview: !!opts.preview, previewStart: opts.start });
+    src.start(now, Math.min(off / rate, play.duration - 0.1), real);
+    Object.assign(P, { rate, n, v, src, gain: g, startedAt: now, base: from, playing: true, replay: !!opts.replay, preview: !!opts.preview, previewStart: opts.start });
     src.onended = () => {
       if (P.src !== src) return;
       P.src = null; P.playing = false;
@@ -157,13 +218,13 @@
   // versions of the current song, so every button responds at once.
   let upNext = null;
   function preload() {
-    if (S.current != null) for (const v of VERSIONS) loadBuffer(S.current, v).catch(() => {});
+    if (S.current != null) for (const v of VERSIONS) getBuffer(S.current, v, S.rate).catch(() => {});
     if (!S.mode) { upNext = null; setReady(null); return; }
     const n = pickNext();
     upNext = n;
     if (n == null) { setReady(null); return; }
     setReady(false);
-    loadBuffer(n, 1).catch(() => {});
+    getBuffer(n, 1, S.rate).catch(() => {});
     if (S.mode === 'calling') {
       const after = D.order.find((m) => m !== n && !S.played.includes(m) && !S.skipped.includes(m));
       if (after != null) setTimeout(() => loadBuffer(after, 1).catch(() => {}), 1500);
@@ -189,7 +250,7 @@
     hideErr();
     try {
       audio();
-      await loadBuffer(n, 1); // fail here, before the playing hook is cut off
+      await getBuffer(n, 1, S.rate); // fail here, before the playing hook is cut off
       if (P.playing) {
         if (!isAux()) { S.pos = pos(); save(); }
         stopNode(NEXT_FADE);
@@ -260,7 +321,7 @@
     const n = S.played.length;
     render();
     if (n && !confirm(`Clear ${n} played song${n === 1 ? '' : 's'}?`)) return;
-    const keep = { hide: S.hide, auto: S.auto, gap: S.gap, vol: S.vol };
+    const keep = { hide: S.hide, auto: S.auto, gap: S.gap, vol: S.vol, rate: S.rate };
     S = Object.assign(fresh(), keep);
     Object.assign(P, { n: null, v: 1, base: 0, replay: false, preview: false });
     hideErr();
@@ -279,6 +340,21 @@
     } catch (e) { showErr(n, e, true); }
     for (const v of VERSIONS) loadBuffer(n, v).catch(() => {});
     render();
+  }
+
+  // Change speed; a hook that is playing carries on from the same spot at the new speed.
+  async function setRate(r) {
+    if (!RATES.includes(r) || r === S.rate) return;
+    S.rate = r; save();
+    const wasPlaying = P.playing && !P.preview;
+    if (wasPlaying) {
+      const p = pos(), n = P.n, v = P.v, rp = P.replay;
+      stopNode(0.08); P.playing = false; P.base = p;
+      if (!rp) { S.pos = p; save(); }
+      render();
+      try { await playSong(n, v, p >= HOOK - 0.3 ? 0 : p, { replay: rp }); } catch (e) { showErr(n, e, true); }
+    }
+    render(); preload();
   }
 
   function setMode(m) {
@@ -365,6 +441,7 @@
       : P.replay && showN !== S.current ? `Replay (not counted)${vTag}`
       : s ? (P.playing ? 'Now playing' : 'Paused') + (S.mode === 'calling' ? ` · call ${S.played.indexOf(s.n) + 1}` : '') + vTag : 'Now playing';
     $('playLabel').textContent = P.playing ? 'Pause' : 'Play';
+    for (const b of $('speedSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(+b.dataset.rate === S.rate));
     // version buttons
     for (const b of $('verSeg').querySelectorAll('button')) {
       const v = +b.dataset.v;
@@ -421,10 +498,23 @@
   }
 
   // ---------- ticket check ----------
-  let currentTicket = null;
+  // Which ticket file to check against: files made in the ticket generator (newest first, newest
+  // selected by default), plus the original 50 printed tickets.
+  const TK = window.GT_TICKETS;
+  let currentTicket = null, tkSet = TK.store.active();
+  const tkList = () => TK.tickets(tkSet);
+  function fillTkSets() {
+    const sel = $('tkSet'); sel.innerHTML = '';
+    for (const f of TK.store.files()) sel.add(new Option(`${f.code} · ${TK.parseCode(f.code).count} tickets · ${TK.when(f.at)}`, f.code));
+    sel.add(new Option('Original 50 (printed)', 'original'));
+    tkSet = TK.store.active(); sel.value = tkSet;
+    const n = tkList().length;
+    $('tkIn').max = n;
+    $('tkRange').textContent = `Tickets 1–${n}`;
+  }
   function renderTicket(no) {
     currentTicket = no;
-    const g = D.tickets[no - 1];
+    const g = tkList()[no - 1];
     const isP = (n) => S.played.includes(n);
     let html = '<div class="ticket">';
     for (const row of g) for (const n of row) {
@@ -438,7 +528,8 @@
     ['Top line', 'Middle line', 'Bottom line'].forEach((name, r) => { const [a, b] = line(r); pats.push([name, a === b, `${a}/${b}`]); });
     pats.push(['Full House', got === 15, `${got}/15`]);
     html += '<div class="patterns">' + pats.map(([name, ok, c]) => `<span class="pill ${ok ? 'solid' : ''}">${ok ? '✓ ' : ''}${name} · ${c}</span>`).join('') + '</div>';
-    html += `<p class="stat" style="margin-top:12px">Ticket <b>${String(no).padStart(2, '0')}</b> · ${got} of 15 songs played</p>`;
+    const name = tkSet === 'original' ? `Original ${String(no).padStart(2, '0')}` : TK.label(tkSet, no);
+    html += `<p class="stat" style="margin-top:12px">Ticket <b>${esc(name)}</b> · ${got} of 15 songs played</p>`;
     $('tkOut').innerHTML = html;
   }
 
@@ -511,6 +602,7 @@
   $('undoBtn').addEventListener('click', undo);
   $('resetBtn').addEventListener('click', reset);
   $('modeSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); });
+  $('speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setRate(+b.dataset.rate); });
   $('verSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && !b.disabled) playVersion(+b.dataset.v); });
   $('edVerSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) selectHook(edN, +b.dataset.v); });
   $('hideToggle').addEventListener('change', (e) => { S.hide = e.target.checked; save(); render(); });
@@ -531,9 +623,18 @@
   $('tkForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const no = Math.round(+$('tkIn').value);
-    if (no >= 1 && no <= 50) renderTicket(no);
-    else $('tkOut').innerHTML = '<p class="empty">Tickets run from 1 to 50.</p>';
+    const max = tkList().length;
+    if (no >= 1 && no <= max) renderTicket(no);
+    else $('tkOut').innerHTML = `<p class="empty">This file's tickets run from 1 to ${max}.</p>`;
   });
+  $('tkSet').addEventListener('change', (e) => {
+    tkSet = e.target.value; TK.store.use(tkSet); fillTkSets();
+    currentTicket = null;
+    $('tkOut').innerHTML = '<p class="empty">Enter a ticket number to see its 15 songs and which patterns are complete.</p>';
+  });
+  // A file made in another tab shows up here when you come back.
+  window.addEventListener('storage', (e) => { if (e.key === 'gt_ticketfiles' || e.key === 'gt_ticketset') fillTkSets(); });
+  window.addEventListener('pageshow', fillTkSets);
   $('hookSel').addEventListener('change', (e) => selectHook(+e.target.value));
   document.querySelectorAll('[data-nudge]').forEach((b) => b.addEventListener('click', () => nudge(+b.dataset.nudge)));
   $('previewBtn').addEventListener('click', preview);
@@ -546,6 +647,7 @@
     else if (e.key === 'n' || e.key === 'N' || e.key === 'ArrowRight') { e.preventDefault(); next(); }
     else if (e.key === 'u' || e.key === 'U') { e.preventDefault(); undo(); }
     else if (e.key === '1' || e.key === '2' || e.key === '3') { e.preventDefault(); playVersion(+e.key); }
+    else if (e.key === 's' || e.key === 'S') { e.preventDefault(); setRate(RATES[(RATES.indexOf(S.rate) + 1) % RATES.length]); }
   });
   // Save the exact spot if the tab is closed mid-hook.
   window.addEventListener('pagehide', () => { if (P.playing && !isAux()) { S.pos = pos(); save(); } });
@@ -553,8 +655,10 @@
   // Restore: paused on the current song and version, at the saved position.
   if (!Array.isArray(S.vers)) S.vers = S.current != null ? [1] : [];
   if (!S.ver) S.ver = 1;
+  if (!RATES.includes(S.rate)) S.rate = 1;
   if (!S.mode) { S.mode = 'calling'; save(); } // never leave Next waiting on a mode choice
   if (S.current != null) { P.n = S.current; P.v = S.ver; P.base = S.pos; }
+  fillTkSets();
   render();
   selectHook(1, 1);
   preload();
